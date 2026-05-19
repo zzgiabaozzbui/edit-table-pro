@@ -19,11 +19,18 @@ npm install edit-table-pro
 
 **Peer dependencies:** React ≥ 18, React DOM ≥ 18
 
+Then import the stylesheet once in your app entry point:
+
+```ts
+import 'edit-table-pro/style.css'
+```
+
 ## Quick Start
 
 ```tsx
 import { EditableTable } from 'edit-table-pro'
 import type { ColDef } from 'edit-table-pro'
+import 'edit-table-pro/style.css'
 
 type Product = {
   id: string
@@ -102,6 +109,29 @@ export default function App() {
 | [Custom Render](./docs/user/08-custom-render.md) | Buttons, badges, and custom cell content |
 | [Performance Guide](./docs/user/09-performance.md) | Benchmarks, sweet spots, pitfalls |
 | [Limitations](./docs/user/10-limitations.md) | What it does not support and when to use alternatives |
+
+## Theming
+
+Override CSS variables anywhere in your stylesheet:
+
+```css
+.et-root {
+  --et-color-primary:    #52c41a;   /* green accent */
+  --et-color-bg-header:  #f6ffed;
+  --et-color-row-hover:  rgba(82,196,26,0.04);
+  --et-font-size:        13px;
+  --et-border-radius:    4px;
+}
+```
+
+Or pass a `theme` prop:
+
+```tsx
+<EditableTable
+  theme={{ colorPrimary: '#52c41a', colorBgHeader: '#f6ffed' }}
+  ...
+/>
+```
 
 ## Requirements
 

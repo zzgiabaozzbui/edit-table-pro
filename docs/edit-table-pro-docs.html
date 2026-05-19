@@ -370,10 +370,13 @@
   <h2>Install</h2>
   <pre><code>npm install edit-table-pro</code></pre>
   <p><strong>Peer dependencies:</strong> React ≥ 18, React DOM ≥ 18</p>
+  <p>Then import the stylesheet <strong>once</strong> in your app entry point:</p>
+  <pre><code><span class="kw">import</span> <span class="st">'edit-table-pro/style.css'</span></code></pre>
 
   <h2>Quick Start</h2>
   <pre><code><span class="kw">import</span> <span class="op">{</span> EditableTable <span class="op">}</span> <span class="kw">from</span> <span class="st">'edit-table-pro'</span>
 <span class="kw">import type</span> <span class="op">{</span> ColDef <span class="op">}</span> <span class="kw">from</span> <span class="st">'edit-table-pro'</span>
+<span class="kw">import</span> <span class="st">'edit-table-pro/style.css'</span>
 
 <span class="kw">type</span> <span class="tp">Product</span> <span class="op">= {</span>
   id<span class="op">:</span> <span class="tp">string</span>
@@ -436,6 +439,31 @@
     <tr><td><code>Ctrl+R</code></td><td>Fill active cell right one column</td></tr>
   </table>
 
+  <h2>Theming</h2>
+  <p>Override CSS variables anywhere in your stylesheet:</p>
+  <pre><code><span class="st">.et-root</span> <span class="op">{</span>
+  <span class="kw">--et-color-primary</span><span class="op">:</span>   <span class="nu">#52c41a</span><span class="op">;</span>
+  <span class="kw">--et-color-bg-header</span><span class="op">:</span> <span class="nu">#f6ffed</span><span class="op">;</span>
+  <span class="kw">--et-color-row-hover</span><span class="op">:</span> <span class="st">rgba(82,196,26,0.04)</span><span class="op">;</span>
+  <span class="kw">--et-font-size</span><span class="op">:</span>       <span class="nu">13px</span><span class="op">;</span>
+  <span class="kw">--et-border-radius</span><span class="op">:</span>   <span class="nu">4px</span><span class="op">;</span>
+<span class="op">}</span></code></pre>
+  <p>Or use the <code>theme</code> prop:</p>
+  <pre><code><span class="op">&lt;</span><span class="tp">EditableTable</span>
+  theme<span class="op">={{</span> colorPrimary<span class="op">:</span> <span class="st">'#52c41a'</span>, colorBgHeader<span class="op">:</span> <span class="st">'#f6ffed'</span> <span class="op">}}</span>
+  ...<span class="op"> /&gt;</span></code></pre>
+  <table>
+    <tr><th>CSS variable</th><th>theme prop</th><th>Default</th></tr>
+    <tr><td><code>--et-color-primary</code></td><td><code>colorPrimary</code></td><td><code>#1677ff</code></td></tr>
+    <tr><td><code>--et-color-border</code></td><td><code>colorBorder</code></td><td><code>#d9d9d9</code></td></tr>
+    <tr><td><code>--et-color-bg</code></td><td><code>colorBgContainer</code></td><td><code>#ffffff</code></td></tr>
+    <tr><td><code>--et-color-bg-header</code></td><td><code>colorBgHeader</code></td><td><code>#fafafa</code></td></tr>
+    <tr><td><code>--et-color-row-hover</code></td><td><code>colorRowHover</code></td><td><code>rgba(0,0,0,0.02)</code></td></tr>
+    <tr><td><code>--et-color-error</code></td><td><code>colorError</code></td><td><code>#ff4d4f</code></td></tr>
+    <tr><td><code>--et-font-size</code></td><td><code>fontSize</code></td><td><code>14px</code></td></tr>
+    <tr><td><code>--et-border-radius</code></td><td><code>borderRadius</code></td><td><code>6px</code></td></tr>
+  </table>
+
   <h2>Requirements</h2>
   <ul>
     <li>React 18 or later</li>
@@ -451,6 +479,11 @@
   <h2>Install</h2>
   <pre><code>npm install edit-table-pro</code></pre>
   <p><strong>Peer dependencies:</strong> React ≥ 18, React DOM ≥ 18</p>
+
+  <h2>Import the stylesheet</h2>
+  <p>Import <strong>once</strong> in your app entry point (<code>main.tsx</code>, <code>App.tsx</code>, or a global CSS file):</p>
+  <pre><code><span class="kw">import</span> <span class="st">'edit-table-pro/style.css'</span></code></pre>
+  <div class="note">Without this import the table renders with no visual styles.</div>
 
   <h2>Step 1 — Define your row type</h2>
   <p>All cell values must be <code>string</code>. Numbers, dates, and booleans are stored as strings.</p>

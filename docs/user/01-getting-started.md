@@ -10,6 +10,18 @@ npm install edit-table-pro
 
 ---
 
+## Import the stylesheet
+
+The library ships its styles as a separate CSS file. Import it **once** in your app entry point (e.g. `main.tsx`, `App.tsx`, or a global CSS file):
+
+```ts
+import 'edit-table-pro/style.css'
+```
+
+Without this import the table renders with no visual styles.
+
+---
+
 ## Step 1 — Define your row type
 
 All cell values must be `string`. Numbers, dates, and booleans are stored as strings.

@@ -10,6 +10,18 @@ npm install edit-table-pro
 
 ---
 
+## Import stylesheet
+
+Thư viện đóng gói CSS thành file riêng. Import **một lần** ở entry point của app (ví dụ `main.tsx`, `App.tsx` hoặc file CSS global):
+
+```ts
+import 'edit-table-pro/style.css'
+```
+
+Nếu bỏ qua bước này bảng sẽ hiển thị không có style.
+
+---
+
 ## Bước 1 — Định nghĩa kiểu dòng
 
 Mọi giá trị cell phải là `string`. Số, ngày tháng, boolean đều lưu dưới dạng chuỗi.

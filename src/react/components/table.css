@@ -1,0 +1,168 @@
+.et-root {
+  font-family: var(--et-font-family);
+  font-size: var(--et-font-size);
+  color: var(--et-color-text);
+  box-sizing: border-box;
+}
+
+.et-root *,
+.et-root *::before,
+.et-root *::after {
+  box-sizing: border-box;
+}
+
+/* ── Input ─────────────────────────────────── */
+.et-input {
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--et-color-border);
+  border-radius: var(--et-border-radius);
+  background: var(--et-color-bg);
+  color: var(--et-color-text);
+  font-family: inherit;
+  font-size: inherit;
+  padding: var(--et-padding-y) var(--et-padding-x);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.et-input:hover:not(:focus):not(.error) {
+  border-color: #4096ff;
+}
+
+.et-input:focus:not(.error) {
+  border-color: var(--et-color-primary);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--et-color-primary) 10%, transparent);
+}
+
+.et-input.error {
+  border-color: var(--et-color-error);
+  padding-right: 26px;
+}
+
+.et-input.error:focus {
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--et-color-error) 10%, transparent);
+}
+
+/* ── Error icon ─────────────────────────────── */
+.et-error-icon {
+  display: none;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--et-color-error);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  font-style: normal;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  user-select: none;
+  flex-shrink: 0;
+  z-index: 1;
+  line-height: 1;
+}
+
+/* ── Error tooltip (position: fixed, escapes overflow) ── */
+.et-error-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  background: var(--et-color-error-bg);
+  border: 1px solid var(--et-color-error-border);
+  border-radius: var(--et-border-radius);
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--et-color-error);
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Row ────────────────────────────────────── */
+.et-row:hover {
+  background: var(--et-color-row-hover);
+}
+
+/* ── Selected row ───────────────────────────── */
+.et-row-selected {
+  background: color-mix(in srgb, var(--et-color-primary) 8%, transparent);
+}
+
+.et-row-selected:hover {
+  background: color-mix(in srgb, var(--et-color-primary) 12%, transparent);
+}
+
+/* ── Readonly cell ──────────────────────────── */
+.et-cell-readonly {
+  opacity: 0.65;
+  user-select: text;
+  cursor: default;
+}
+
+/* ── Stripe row ─────────────────────────────── */
+.et-row-stripe {
+  background: var(--et-color-bg-header);
+}
+
+/* ── Loading overlay ────────────────────────── */
+.et-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(1px);
+}
+
+.et-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--et-color-split);
+  border-top-color: var(--et-color-primary);
+  border-radius: 50%;
+  animation: et-spin 0.7s linear infinite;
+}
+
+@keyframes et-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Fill Handle ────────────────────────────── */
+.et-cell-fill-handle {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  background: var(--et-color-primary);
+  border: 1px solid #fff;
+  border-radius: 1px;
+  cursor: crosshair;
+  z-index: 10;
+  padding: 0;
+  outline: none;
+}
+
+.et-cell-fill-handle:focus-visible {
+  outline: 2px solid var(--et-color-primary);
+  outline-offset: 1px;
+}
+
+/* ── Fill Preview Highlight ─────────────────── */
+.et-fill-preview {
+  outline: 2px dashed var(--et-color-primary) !important;
+  outline-offset: -1px;
+  background-color: color-mix(in srgb, var(--et-color-primary) 8%, transparent) !important;
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+docs/
+.playwright-mcp/
+
+# AI tools
+.claude/
+CLAUDE.md
+.cursor/
+.copilot/
+.aider*
+.continue/

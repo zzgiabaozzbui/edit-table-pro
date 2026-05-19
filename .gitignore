@@ -1,7 +1,12 @@
 node_modules/
 dist/
 .env
-docs/
+# docs — ignore internal/AI docs, allow user-facing docs
+docs/context/
+docs/history/
+docs/ai-handbook/
+docs/human-context/
+docs/*.md
 .playwright-mcp/
 
 # AI tools

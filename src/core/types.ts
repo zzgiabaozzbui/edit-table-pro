@@ -93,6 +93,14 @@ export type CellRange = {
   rowIndexStart: number;
   rowIndexEnd: number;
   colKey: ColKey;
+  colKeys?: ColKey[];
+};
+
+export type CellSelectionRange = {
+  rowId: RowId;
+  rowIndex: number;
+  colKeyStart: ColKey;
+  colKeyEnd: ColKey;
 };
 
 export type FillState = {

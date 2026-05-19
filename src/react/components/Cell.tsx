@@ -12,6 +12,8 @@ type CellProps = Readonly<{
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   className?: string;
+  "data-colkey"?: string;
+  "data-rowid"?: string;
 }>;
 
 export function Cell({
@@ -21,6 +23,8 @@ export function Cell({
   align,
   ellipsis,
   className,
+  "data-colkey": dataColKey,
+  "data-rowid": dataRowId,
 }: CellProps) {
   const {
     commitCell,
@@ -28,6 +32,7 @@ export function Cell({
     cellRefs,
     setActiveCell,
     activeCellState,
+    cellSelection,
     runSideEffect,
   } = useTableContext();
 
@@ -155,6 +160,8 @@ export function Cell({
   return (
     <div
       className={className}
+      data-colkey={dataColKey}
+      data-rowid={dataRowId}
       style={{ position: "relative", width, minWidth: width, height: "100%" }}
     >
       <input
@@ -190,7 +197,11 @@ export function Cell({
       <div ref={tooltipRef} className="et-error-tooltip">
         {errorMsg}
       </div>
-      {isActiveCell && <FillHandle rowId={cell.rowId} colKey={cell.colKey} />}
+      {(isActiveCell ||
+        (cellSelection?.rowId === cell.rowId &&
+          cellSelection?.colKeyEnd === cell.colKey)) && (
+        <FillHandle rowId={cell.rowId} colKey={cell.colKey} />
+      )}
     </div>
   );
 }

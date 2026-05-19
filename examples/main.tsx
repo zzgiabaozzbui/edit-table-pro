@@ -70,7 +70,7 @@ const data: Employee[] = Array.from({ length: 50000 }, (_, i) => ({
 }));
 
 const THEMES: Record<string, TableTheme> = {
-  default: {},
+  default: { fontSize: 12, borderRadius: 0 },
   green: {
     colorPrimary: "#52c41a",
     colorBgHeader: "#f6ffed",

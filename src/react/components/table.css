@@ -160,6 +160,13 @@
   outline-offset: 1px;
 }
 
+/* ── Cell Selection Highlight ───────────────── */
+.et-cell-selected {
+  outline: 1px solid var(--et-color-primary);
+  outline-offset: -1px;
+  background-color: color-mix(in srgb, var(--et-color-primary) 6%, transparent);
+}
+
 /* ── Fill Preview Highlight ─────────────────── */
 .et-fill-preview {
   outline: 2px dashed var(--et-color-primary) !important;

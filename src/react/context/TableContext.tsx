@@ -4,6 +4,7 @@ import type {
   CellKey,
   CellPos,
   CellRange,
+  CellSelectionRange,
   ColDef,
   ColKey,
   DirtyRow,
@@ -11,7 +12,7 @@ import type {
   HistoryState,
   RowId,
 } from "@/core/types";
-import { type RefObject, createContext, useContext } from "react";
+import { type MutableRefObject, createContext, useContext } from "react";
 
 export type TableProps<T> = {
   bordered?: boolean;
@@ -30,12 +31,12 @@ export type TableContextValue<T = Record<string, string>> = {
   rows: T[];
   addRow: () => void;
   appendRows: (newRows: T[]) => void;
-  rowsDataRef: RefObject<T[]>;
+  rowsDataRef: MutableRefObject<T[]>;
   editSessionStore: EditSessionStore;
-  dirtyRowsRef: RefObject<Map<RowId, DirtyRow>>;
-  historyRef: RefObject<HistoryState>;
-  pendingRowsRef: RefObject<Set<RowId>>;
-  cellRefs: RefObject<Map<CellKey, HTMLElement>>;
+  dirtyRowsRef: MutableRefObject<Map<RowId, DirtyRow>>;
+  historyRef: MutableRefObject<HistoryState>;
+  pendingRowsRef: MutableRefObject<Set<RowId>>;
+  cellRefs: MutableRefObject<Map<CellKey, HTMLElement>>;
   commitCell: (cell: CellPos, rawValue: string) => Promise<void>;
   focusCell: (cell: CellPos) => void;
   undo: () => void;
@@ -58,15 +59,18 @@ export type TableContextValue<T = Record<string, string>> = {
   columnWidths: Map<ColKey, number>;
   setColumnWidth: (colKey: ColKey, width: number) => void;
   // Feature 7: Keyboard Navigation
-  activeCellRef: RefObject<CellPos | null>;
+  activeCellRef: MutableRefObject<CellPos | null>;
   activeCellState: CellPos | null;
   setActiveCell: (cell: CellPos | null) => void;
-  scrollContainerRef: RefObject<HTMLDivElement | null>;
+  scrollContainerRef: MutableRefObject<HTMLDivElement | null>;
   // Feature 8: Fill Handle
   getRowId: (row: T) => string;
   fillState: FillState;
   setFillState: (state: FillState) => void;
   applyFill: (range: CellRange, sourceCell: CellPos) => void;
+  // Feature 9: Multi-cell selection
+  cellSelection: CellSelectionRange | null;
+  setCellSelection: (sel: CellSelectionRange | null) => void;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: generic context default

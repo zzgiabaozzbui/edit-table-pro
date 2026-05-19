@@ -22,6 +22,8 @@ export function FillHandle({
     fillState,
     setFillState,
     applyFill,
+    cellSelection,
+    columns,
   } = useTableContext();
 
   const previewRangeRef = useRef<CellRange | null>(null);
@@ -50,6 +52,21 @@ export function FillHandle({
 
     let rafId = 0;
 
+    // Pre-compute colKeys from cellSelection so preview highlights all selected cols
+    const sel = cellSelection;
+    let activeColKeys: ColKey[] | undefined;
+    if (sel && sel.rowId === rowId) {
+      const visibleKeys = columns.filter((c) => !c.hidden).map((c) => c.key);
+      const si = visibleKeys.indexOf(sel.colKeyStart);
+      const ei = visibleKeys.indexOf(sel.colKeyEnd);
+      if (si !== -1 && ei !== -1) {
+        activeColKeys = visibleKeys.slice(
+          Math.min(si, ei),
+          Math.max(si, ei) + 1,
+        );
+      }
+    }
+
     const computeRange = (clientY: number): CellRange | null => {
       const container = scrollContainerRef.current;
       if (!container) return null;
@@ -60,7 +77,12 @@ export function FillHandle({
         0,
         Math.min(Math.floor(relY / rowHeight), totalRows - 1),
       );
-      return { rowIndexStart: sourceRowIndex, rowIndexEnd: targetRowIndex, colKey };
+      return {
+        rowIndexStart: sourceRowIndex,
+        rowIndexEnd: targetRowIndex,
+        colKey,
+        colKeys: activeColKeys,
+      };
     };
 
     const onPointerMove = (ev: PointerEvent) => {
@@ -90,7 +112,28 @@ export function FillHandle({
       btn.removeEventListener("pointercancel", onPointerUp);
       const range = previewRangeRef.current;
       if (range) {
-        applyFill(range, { rowId, colKey });
+        // Multi-col fill when a cell selection is active for this row
+        const sel = cellSelection;
+        if (sel && sel.rowId === rowId) {
+          const visibleKeys = columns
+            .filter((c) => !c.hidden)
+            .map((c) => c.key);
+          const si = visibleKeys.indexOf(sel.colKeyStart);
+          const ei = visibleKeys.indexOf(sel.colKeyEnd);
+          if (si !== -1 && ei !== -1) {
+            const lo = Math.min(si, ei);
+            const hi = Math.max(si, ei);
+            const colKeys = visibleKeys.slice(lo, hi + 1);
+            applyFill(
+              { ...range, colKey: colKeys[0], colKeys },
+              { rowId, colKey },
+            );
+          } else {
+            applyFill(range, { rowId, colKey });
+          }
+        } else {
+          applyFill(range, { rowId, colKey });
+        }
       } else {
         setFillState(IDLE);
       }

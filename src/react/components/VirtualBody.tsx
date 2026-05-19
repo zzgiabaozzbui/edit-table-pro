@@ -1,3 +1,4 @@
+import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
 import { useCallback, useState } from "react";
 import { useTableContext } from "../context/TableContext";
@@ -5,6 +6,20 @@ import { Cell } from "./Cell";
 import { ReadonlyCell } from "./ReadonlyCell";
 import { RenderCell } from "./RenderCell";
 import { SelectCell } from "./SelectCell";
+
+function isColInRange(
+  colKey: string,
+  sel: CellSelectionRange,
+  colKeys: string[],
+): boolean {
+  const startIdx = colKeys.indexOf(sel.colKeyStart);
+  const endIdx = colKeys.indexOf(sel.colKeyEnd);
+  const colIdx = colKeys.indexOf(colKey);
+  if (startIdx === -1 || endIdx === -1 || colIdx === -1) return false;
+  const lo = Math.min(startIdx, endIdx);
+  const hi = Math.max(startIdx, endIdx);
+  return colIdx >= lo && colIdx <= hi;
+}
 
 const SELECTION_COL_WIDTH = 40;
 
@@ -28,11 +43,13 @@ export function VirtualBody<T extends Record<string, string>>({
     columnWidths,
     scrollContainerRef,
     fillState,
+    cellSelection,
   } = useTableContext<T>();
   const [scrollTop, setScrollTop] = useState(0);
 
   const viewportHeight = scrollContainerRef.current?.clientHeight ?? 600;
   const visibleCols = columns.filter((c) => !c.hidden);
+  const visibleColKeys = visibleCols.map((c) => c.key);
   const { start, end } = getVisibleRange(
     scrollTop,
     viewportHeight,
@@ -92,15 +109,27 @@ export function VirtualBody<T extends Record<string, string>>({
                 const inFillPreview =
                   fillState.mode === "dragging" &&
                   pr !== null &&
-                  col.key === pr.colKey &&
                   rowIndex >= Math.min(pr.rowIndexStart, pr.rowIndexEnd) &&
-                  rowIndex <= Math.max(pr.rowIndexStart, pr.rowIndexEnd);
+                  rowIndex <= Math.max(pr.rowIndexStart, pr.rowIndexEnd) &&
+                  (pr.colKeys
+                    ? pr.colKeys.includes(col.key)
+                    : col.key === pr.colKey);
+                const inCellSelection =
+                  cellSelection !== null &&
+                  rowIndex === cellSelection.rowIndex &&
+                  isColInRange(col.key, cellSelection, visibleColKeys);
                 const isEditable =
                   col.editable === undefined ||
                   col.editable === true ||
                   (typeof col.editable === "function" && col.editable(liveRow));
 
-                const fillClass = inFillPreview ? "et-fill-preview" : undefined;
+                const cellClass =
+                  [
+                    inFillPreview ? "et-fill-preview" : "",
+                    inCellSelection ? "et-cell-selected" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ") || undefined;
 
                 if (col.render) {
                   return (
@@ -124,7 +153,9 @@ export function VirtualBody<T extends Record<string, string>>({
                       width={colWidth}
                       align={col.align}
                       ellipsis={col.ellipsis}
-                      className={fillClass}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
                     />
                   );
                 }
@@ -136,7 +167,9 @@ export function VirtualBody<T extends Record<string, string>>({
                     width={colWidth}
                     ellipsis={col.ellipsis}
                     align={col.align}
-                    className={fillClass}
+                    className={cellClass}
+                    data-colkey={col.key}
+                    data-rowid={rowId}
                   />
                 );
               })}

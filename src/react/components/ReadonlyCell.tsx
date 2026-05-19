@@ -4,6 +4,8 @@ type ReadonlyCellProps = Readonly<{
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   className?: string;
+  "data-colkey"?: string;
+  "data-rowid"?: string;
 }>;
 
 export function ReadonlyCell({
@@ -12,10 +14,14 @@ export function ReadonlyCell({
   align,
   ellipsis,
   className,
+  "data-colkey": dataColKey,
+  "data-rowid": dataRowId,
 }: ReadonlyCellProps) {
   return (
     <div
       className={["et-cell-readonly", className].filter(Boolean).join(" ")}
+      data-colkey={dataColKey}
+      data-rowid={dataRowId}
       style={{
         width,
         minWidth: width,

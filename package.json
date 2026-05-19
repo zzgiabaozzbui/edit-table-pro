@@ -1,25 +1,53 @@
 {
   "name": "edit-table-pro",
   "version": "0.1.0",
-  "description": "Editable table engine for large datasets",
+  "description": "High-performance editable table for React — virtual scroll, validation, undo/redo, fill handle, zero runtime dependencies",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    }
+      "types":   "./dist/index.d.ts",
+      "import":  "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css"
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": ["**/*.css"],
+  "keywords": [
+    "react",
+    "table",
+    "editable",
+    "datagrid",
+    "virtual-scroll",
+    "data-entry",
+    "spreadsheet",
+    "undo-redo",
+    "fill-handle",
+    "validation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QuangBao/edit-table-pro"
+  },
+  "homepage": "https://github.com/QuangBao/edit-table-pro#readme",
+  "bugs": {
+    "url": "https://github.com/QuangBao/edit-table-pro/issues"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "check": "biome check --write .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "prepublishOnly": "npm run typecheck && npm run build && npm test -- --run"
   },
   "peerDependencies": {
     "react": ">=18",

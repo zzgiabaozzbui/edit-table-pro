@@ -14,14 +14,8 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": ["**/*.css"],
   "keywords": [
     "react",
     "table",

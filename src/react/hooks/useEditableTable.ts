@@ -31,7 +31,7 @@ export type UseEditableTableOptions<T> = {
   theme?: TableTheme;
   createRow?: () => T;
   onSelectionChange?: (ids: RowId[]) => void;
-onCellClick?: CellClickHandler;
+  onCellClick?: CellClickHandler;
   autoFocus?: boolean;
 } & TableProps<T>;
 
@@ -52,7 +52,7 @@ export function useEditableTable<T extends Record<string, string>>(
     sticky,
     rowClassName,
     onSelectionChange,
-onCellClick,
+    onCellClick,
     autoFocus = false,
   } = options;
 

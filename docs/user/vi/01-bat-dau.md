@@ -99,6 +99,7 @@ export default function App() {
 | `sticky` | `boolean` | `undefined` | Header cố định khi cuộn |
 | `loading` | `boolean` | `undefined` | Hiện overlay loading |
 | `showHeader` | `boolean` | `true` | Hiện hàng header cột |
+| `autoFocus` | `boolean` | `false` | Focus ô editable đầu tiên khi mount |
 | `theme` | `TableTheme` | `{}` | Ghi đè CSS token |
 | `rowClassName` | `(row: T, index: number) => string` | `undefined` | CSS class động cho dòng |
 | `createRow` | `() => T` | `undefined` | Bật nút "+ Thêm dòng" |

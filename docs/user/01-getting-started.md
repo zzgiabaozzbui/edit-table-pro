@@ -99,6 +99,7 @@ export default function App() {
 | `sticky` | `boolean` | `undefined` | Sticky header |
 | `loading` | `boolean` | `undefined` | Show loading overlay |
 | `showHeader` | `boolean` | `true` | Show column header row |
+| `autoFocus` | `boolean` | `false` | Focus the first editable cell on mount |
 | `theme` | `TableTheme` | `{}` | CSS token overrides |
 | `rowClassName` | `(row: T, index: number) => string` | `undefined` | Dynamic row CSS class |
 | `createRow` | `() => T` | `undefined` | Enables "+ Add row" button |

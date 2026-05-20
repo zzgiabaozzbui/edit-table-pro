@@ -34,6 +34,7 @@ export function Cell({
     activeCellState,
     cellSelection,
     runSideEffect,
+    onCellClick,
   } = useTableContext();
 
   const isActiveCell =
@@ -157,6 +158,10 @@ export function Cell({
     [cell, commitCell, hideTooltip],
   );
 
+  const handleClick = useCallback(() => {
+    onCellClick?.(cell.rowId, cell.colKey, inputValue);
+  }, [cell.colKey, cell.rowId, inputValue, onCellClick]);
+
   return (
     <div
       className={className}
@@ -167,6 +172,7 @@ export function Cell({
       <input
         ref={inputRef}
         value={inputValue}
+        onClick={handleClick}
         onChange={handleChange}
         onCompositionStart={handleCompositionStart}
         onCompositionEnd={handleCompositionEnd}

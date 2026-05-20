@@ -1,4 +1,9 @@
+import type { CellPos } from "@/core/types";
+import { useCallback } from "react";
+import { useTableContext } from "../context/TableContext";
+
 type ReadonlyCellProps = Readonly<{
+  cell: CellPos;
   value: string;
   width: number;
   align?: "left" | "center" | "right";
@@ -9,6 +14,7 @@ type ReadonlyCellProps = Readonly<{
 }>;
 
 export function ReadonlyCell({
+  cell,
   value,
   width,
   align,
@@ -17,11 +23,26 @@ export function ReadonlyCell({
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
 }: ReadonlyCellProps) {
+  const { onCellClick } = useTableContext();
+  const handleClick = useCallback(() => {
+    onCellClick?.(cell.rowId, cell.colKey, value);
+  }, [cell.colKey, cell.rowId, onCellClick, value]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        onCellClick?.(cell.rowId, cell.colKey, value);
+      }
+    },
+    [cell.colKey, cell.rowId, onCellClick, value],
+  );
+
   return (
     <div
       className={["et-cell-readonly", className].filter(Boolean).join(" ")}
       data-colkey={dataColKey}
       data-rowid={dataRowId}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       style={{
         width,
         minWidth: width,

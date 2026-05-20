@@ -1,6 +1,6 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTableContext } from "../context/TableContext";
 
 type RenderCellProps = Readonly<{
@@ -23,8 +23,19 @@ export function RenderCell({
   width,
   align,
 }: RenderCellProps) {
-  const { cellRefs } = useTableContext();
+  const { cellRefs, onCellClick } = useTableContext();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const handleClick = useCallback(() => {
+    onCellClick?.(cell.rowId, cell.colKey, value);
+  }, [cell.colKey, cell.rowId, onCellClick, value]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        onCellClick?.(cell.rowId, cell.colKey, value);
+      }
+    },
+    [cell.colKey, cell.rowId, onCellClick, value],
+  );
 
   useEffect(() => {
     const key = makeCellKey(cell.rowId, cell.colKey);
@@ -38,6 +49,10 @@ export function RenderCell({
     <div
       ref={wrapperRef}
       tabIndex={-1}
+      data-colkey={cell.colKey}
+      data-rowid={cell.rowId}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       style={{
         width,
         minWidth: width,

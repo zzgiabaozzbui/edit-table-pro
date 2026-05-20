@@ -12,6 +12,7 @@ export type {
   EditSession,
   CellPos,
   CellKey,
+  CellClickHandler,
   RowId,
   ColKey,
   HistoryEntry,

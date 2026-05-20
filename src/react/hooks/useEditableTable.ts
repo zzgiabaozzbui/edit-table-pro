@@ -4,6 +4,7 @@ import { EditSessionStore } from "@/core/session";
 import { SIZE_CONFIG } from "@/core/theme";
 import type { TableTheme } from "@/core/theme";
 import type {
+  CellClickHandler,
   CellKey,
   CellPos,
   CellSelectionRange,
@@ -30,6 +31,7 @@ export type UseEditableTableOptions<T> = {
   theme?: TableTheme;
   createRow?: () => T;
   onSelectionChange?: (ids: RowId[]) => void;
+  onCellClick?: CellClickHandler;
 } & TableProps<T>;
 
 export function useEditableTable<T extends Record<string, string>>(
@@ -49,6 +51,7 @@ export function useEditableTable<T extends Record<string, string>>(
     sticky,
     rowClassName,
     onSelectionChange,
+    onCellClick,
   } = options;
 
   const rowHeight = rowHeightProp ?? SIZE_CONFIG[size].rowHeight;
@@ -196,6 +199,7 @@ export function useEditableTable<T extends Record<string, string>>(
     exportCsv,
     runSideEffect,
     patchRow,
+    onCellClick,
     selectedRowIds,
     toggleRow,
     toggleAll,

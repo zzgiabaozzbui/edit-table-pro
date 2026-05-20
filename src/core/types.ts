@@ -1,6 +1,11 @@
 export type RowId = string;
 export type ColKey = string;
 export type CellKey = string; // `${RowId}:${ColKey}`
+export type CellClickHandler = (
+  rowId: RowId,
+  colKey: ColKey,
+  value: string,
+) => void;
 
 export function makeCellKey(rowId: RowId, colKey: ColKey): CellKey {
   return `${rowId}:${colKey}`;

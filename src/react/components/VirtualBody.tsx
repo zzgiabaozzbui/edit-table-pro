@@ -149,6 +149,7 @@ export function VirtualBody<T extends Record<string, string>>({
                   return (
                     <ReadonlyCell
                       key={col.key}
+                      cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       width={colWidth}
                       align={col.align}

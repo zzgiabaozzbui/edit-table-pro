@@ -103,6 +103,7 @@ export default function App() {
 | `rowClassName` | `(row: T, index: number) => string` | `undefined` | CSS class động cho dòng |
 | `createRow` | `() => T` | `undefined` | Bật nút "+ Thêm dòng" |
 | `onSelectionChange` | `(ids: RowId[]) => void` | `undefined` | Bật chọn dòng bằng checkbox |
+| `onCellClick` | `(rowId: RowId, colKey: ColKey, value: string) => void` | `undefined` | Được gọi khi người dùng bấm vào ô |
 
 ---
 

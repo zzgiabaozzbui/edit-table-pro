@@ -9,12 +9,12 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 export default defineConfig(({ command }) => ({
   root: command === "serve" ? resolve(__dirname, "examples") : undefined,
   plugins: [
-      react(),
-      dts({
-        include: ["src"],
-        exclude: ["src/**/*.test.ts", "src/**/*.test.tsx"],
-      }),
-    ],
+    react(),
+    dts({
+      include: ["src"],
+      exclude: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    }),
+  ],
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),

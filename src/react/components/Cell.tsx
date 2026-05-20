@@ -174,7 +174,7 @@ export function Cell({
       <input
         ref={inputRef}
         value={inputValue}
-placeholder={placeholder}
+        placeholder={placeholder}
         onClick={handleClick}
         onChange={handleChange}
         onCompositionStart={handleCompositionStart}

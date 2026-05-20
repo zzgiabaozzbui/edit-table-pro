@@ -48,6 +48,16 @@ Column header label. Defaults to `key` if omitted.
 
 ---
 
+### `placeholder`
+
+```ts
+placeholder?: string
+```
+
+Placeholder text shown in empty editable cells for this column.
+
+---
+
 ### `width`
 
 ```ts

@@ -1,6 +1,7 @@
 import type { EditSessionStore } from "@/core/session";
 import type { TableTheme } from "@/core/theme";
 import type {
+  CellClickHandler,
   CellKey,
   CellPos,
   CellRange,
@@ -51,6 +52,7 @@ export type TableContextValue<T = Record<string, string>> = {
     trigger: "change" | "blur",
   ) => void;
   patchRow: (rowId: RowId, patch: Partial<T>) => void;
+  onCellClick?: CellClickHandler;
   // Feature 5: Row Selection
   selectedRowIds: Set<RowId>;
   toggleRow: (rowId: RowId) => void;

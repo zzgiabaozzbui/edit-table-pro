@@ -13,7 +13,7 @@ import type {
   RowId,
 } from "@/core/types";
 import { makeCellKey } from "@/core/types";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TableContextValue, TableProps } from "../context/TableContext";
 import { useCellCommit } from "./useCellCommit";
 import { useColumnResize } from "./useColumnResize";
@@ -30,6 +30,7 @@ export type UseEditableTableOptions<T> = {
   theme?: TableTheme;
   createRow?: () => T;
   onSelectionChange?: (ids: RowId[]) => void;
+  autoFocus?: boolean;
 } & TableProps<T>;
 
 export function useEditableTable<T extends Record<string, string>>(
@@ -49,6 +50,7 @@ export function useEditableTable<T extends Record<string, string>>(
     sticky,
     rowClassName,
     onSelectionChange,
+    autoFocus = false,
   } = options;
 
   const rowHeight = rowHeightProp ?? SIZE_CONFIG[size].rowHeight;
@@ -156,6 +158,22 @@ export function useEditableTable<T extends Record<string, string>>(
       first ? first.focus() : el.focus();
     }
   }, []);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    const firstRow = rowsDataRef.current[0];
+    if (!firstRow) return;
+    const firstEditableCol = columns.find((col) => {
+      if (col.hidden || col.render || col.editable === false) return false;
+      return typeof col.editable === "function" ? col.editable(firstRow) : true;
+    });
+    if (!firstEditableCol) return;
+
+    const frame = requestAnimationFrame(() => {
+      focusCell({ rowId: getRowId(firstRow), colKey: firstEditableCol.key });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [autoFocus, columns, focusCell, getRowId]);
 
   const appendRows = useCallback((newRows: T[]) => {
     const next = [...rowsDataRef.current, ...newRows];

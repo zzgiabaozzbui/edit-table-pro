@@ -9,6 +9,7 @@ type CellProps = Readonly<{
   cell: CellPos;
   initialValue: string;
   width: number;
+  placeholder?: string;
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   className?: string;
@@ -20,6 +21,7 @@ export function Cell({
   cell,
   initialValue,
   width,
+  placeholder,
   align,
   ellipsis,
   className,
@@ -172,6 +174,7 @@ export function Cell({
       <input
         ref={inputRef}
         value={inputValue}
+placeholder={placeholder}
         onClick={handleClick}
         onChange={handleChange}
         onCompositionStart={handleCompositionStart}

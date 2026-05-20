@@ -48,6 +48,16 @@ Nhãn tiêu đề cột. Mặc định là `key` nếu bỏ qua.
 
 ---
 
+### `placeholder`
+
+```ts
+placeholder?: string
+```
+
+Placeholder hiển thị trong các ô editable đang trống của cột này.
+
+---
+
 ### `width`
 
 ```ts

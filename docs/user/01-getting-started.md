@@ -103,6 +103,7 @@ export default function App() {
 | `rowClassName` | `(row: T, index: number) => string` | `undefined` | Dynamic row CSS class |
 | `createRow` | `() => T` | `undefined` | Enables "+ Add row" button |
 | `onSelectionChange` | `(ids: RowId[]) => void` | `undefined` | Enables checkbox selection |
+| `onCellClick` | `(rowId: RowId, colKey: ColKey, value: string) => void` | `undefined` | Called when a cell is clicked |
 
 ---
 

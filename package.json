@@ -1,6 +1,6 @@
 {
   "name": "edit-table-pro",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "High-performance editable table for React — virtual scroll, validation, undo/redo, fill handle, zero runtime dependencies",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -30,11 +30,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QuangBao/edit-table-pro.git"
+    "url": "git+https://github.com/zzgiabaozzbui/edit-table-pro.git"
   },
-  "homepage": "https://github.com/QuangBao/edit-table-pro#readme",
+  "homepage": "https://github.com/zzgiabaozzbui/edit-table-pro#readme",
   "bugs": {
-    "url": "https://github.com/QuangBao/edit-table-pro/issues"
+    "url": "https://github.com/zzgiabaozzbui/edit-table-pro/issues"
   },
   "license": "MIT",
   "scripts": {

@@ -67,6 +67,7 @@ export function useEditableTable<T extends Record<string, string>>(
     showHeader,
     sticky,
     rowClassName,
+    searchable = false,
     onSelectionChange,
     onCellClick,
     value,
@@ -100,6 +101,19 @@ export function useEditableTable<T extends Record<string, string>>(
   const [rows, setRows] = useState<T[]>(() => value ?? initialData);
   const rowsDataRef = useRef<T[]>(initialData);
   const editSessionStore = useMemo(() => new EditSessionStore(), []);
+
+  // Feature 11: Row search (#23)
+  const [query, setQuery] = useState("");
+  const displayRows = useMemo(() => {
+    if (!query) return rows;
+    const q = query.toLowerCase();
+    const visibleCols = effectiveColumns.filter((c) => !c.hidden);
+    return rows.filter((r) =>
+      visibleCols.some((c) => (r[c.key] ?? "").toLowerCase().includes(q)),
+    );
+  }, [rows, query, effectiveColumns]);
+  const displayRowsRef = useRef<T[]>(displayRows);
+  displayRowsRef.current = displayRows;
   const dirtyRowsRef = useRef<Map<RowId, DirtyRow>>(new Map());
   const historyRef = useRef<HistoryState>(createHistory());
   const pendingRowsRef = useRef<Set<RowId>>(new Set());
@@ -196,9 +210,9 @@ export function useEditableTable<T extends Record<string, string>>(
   // Feature 2: Export CSV
   const exportCsv = useCallback(
     (filename: string) => {
-      exportCsvCore(filename, effectiveColumns, rowsDataRef.current);
+      exportCsvCore(filename, effectiveColumns, displayRows);
     },
-    [effectiveColumns],
+    [effectiveColumns, displayRows],
   );
 
   const focusCell = useCallback((cell: CellPos) => {
@@ -309,6 +323,11 @@ export function useEditableTable<T extends Record<string, string>>(
     columns: effectiveColumns,
     tableProps,
     theme,
+    // Feature 11: Row search (#23)
+    searchable,
+    query,
+    setQuery,
+    displayRows,
     rows,
     addRow,
     appendRows,

@@ -80,11 +80,19 @@ export type TableContextValue<T = Record<string, string>> = {
   scrollToRow: (rowId: RowId) => void;
   validate: (rowId: RowId, colKey: ColKey) => ValidationResult;
   getDirtyRows: () => SubmitRow[];
+  // Feature 10b: Column visibility (#24)
+  setColumnVisibility: (key: ColKey, visible: boolean) => void;
+  toggleColumn: (key: ColKey) => void;
 };
 
 export type EditableTableRef<T = Record<string, string>> = Pick<
   TableContextValue<T>,
-  "setData" | "scrollToRow" | "validate" | "getDirtyRows"
+  | "setData"
+  | "scrollToRow"
+  | "validate"
+  | "getDirtyRows"
+  | "setColumnVisibility"
+  | "toggleColumn"
 >;
 
 // biome-ignore lint/suspicious/noExplicitAny: generic context default

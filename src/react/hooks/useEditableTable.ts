@@ -87,6 +87,15 @@ export function useEditableTable<T extends Record<string, string>>(
     hasSelection,
   };
 
+  // Feature 10b: Column visibility (#24)
+  const [hiddenKeys, setHiddenKeys] = useState<Set<ColKey>>(
+    () => new Set(columns.filter((c) => c.hidden).map((c) => c.key)),
+  );
+  const effectiveColumns = useMemo(
+    () => columns.filter((c) => !hiddenKeys.has(c.key)),
+    [columns, hiddenKeys],
+  );
+
   // Shared state
   const [rows, setRows] = useState<T[]>(() => value ?? initialData);
   const rowsDataRef = useRef<T[]>(initialData);
@@ -187,9 +196,9 @@ export function useEditableTable<T extends Record<string, string>>(
   // Feature 2: Export CSV
   const exportCsv = useCallback(
     (filename: string) => {
-      exportCsvCore(filename, columns, rowsDataRef.current);
+      exportCsvCore(filename, effectiveColumns, rowsDataRef.current);
     },
-    [columns],
+    [effectiveColumns],
   );
 
   const focusCell = useCallback((cell: CellPos) => {
@@ -277,8 +286,27 @@ export function useEditableTable<T extends Record<string, string>>(
     return collectDirtyRows(dirtyRowsRef.current);
   }, []);
 
+  // Feature 10b: Column visibility (#24)
+  const setColumnVisibility = useCallback((key: ColKey, visible: boolean) => {
+    setHiddenKeys((prev) => {
+      const next = new Set(prev);
+      if (visible) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
+  const toggleColumn = useCallback((key: ColKey) => {
+    setHiddenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
   return {
-    columns,
+    columns: effectiveColumns,
     tableProps,
     theme,
     rows,
@@ -319,5 +347,8 @@ export function useEditableTable<T extends Record<string, string>>(
     scrollToRow,
     validate,
     getDirtyRows,
+    // Feature 10b: Column visibility (#24)
+    setColumnVisibility,
+    toggleColumn,
   };
 }

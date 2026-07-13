@@ -56,6 +56,8 @@ function EditableTableInner<T extends Record<string, string>>(
       scrollToRow: ctx.scrollToRow,
       validate: ctx.validate,
       getDirtyRows: ctx.getDirtyRows,
+      setColumnVisibility: ctx.setColumnVisibility,
+      toggleColumn: ctx.toggleColumn,
     }),
     [ctx],
   );

@@ -3,6 +3,7 @@ import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
 import { useCallback, useState } from "react";
 import { useTableContext } from "../context/TableContext";
 import { Cell } from "./Cell";
+import { BooleanCell } from "./BooleanCell";
 import { ReadonlyCell } from "./ReadonlyCell";
 import { RenderCell } from "./RenderCell";
 import { SelectCell } from "./SelectCell";
@@ -142,6 +143,21 @@ export function VirtualBody<T extends Record<string, string>>({
                       rowIndex={rowIndex}
                       width={colWidth}
                       align={col.align}
+                    />
+                  );
+                }
+                if (col.type === "boolean") {
+                  return (
+                    <BooleanCell
+                      key={col.key}
+                      cell={{ rowId, colKey: col.key }}
+                      value={liveRow[col.key] ?? ""}
+                      width={colWidth}
+                      align={col.align}
+                      disabled={!isEditable}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
                     />
                   );
                 }

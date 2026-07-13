@@ -86,6 +86,7 @@ export type TableContextValue<T = Record<string, string>> = {
   query: string;
   setQuery: (q: string) => void;
   displayRows: T[];
+  displayRowsRef: MutableRefObject<T[]>;
   // Feature 10b: Column visibility (#24)
   setColumnVisibility: (key: ColKey, visible: boolean) => void;
   toggleColumn: (key: ColKey) => void;

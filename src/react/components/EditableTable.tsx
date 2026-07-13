@@ -30,6 +30,11 @@ function EditableTableInner<T extends Record<string, string>>(
     theme,
     columns,
     rows,
+    displayRows,
+    displayRowsRef,
+    searchable,
+    query,
+    setQuery,
     addRow,
     appendRows,
     columnWidths,
@@ -83,7 +88,7 @@ function EditableTableInner<T extends Record<string, string>>(
   useKeyboardNav({
     activeCellRef,
     columns,
-    rowsDataRef,
+    displayRowsRef,
     scrollContainerRef,
     rowHeight,
     editSessionStore,
@@ -156,11 +161,25 @@ function EditableTableInner<T extends Record<string, string>>(
               flexDirection: "column",
             }}
           >
+            {searchable && (
+              <input
+                data-testid="et-search-input"
+                type="text"
+                placeholder="Search…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                style={{
+                  flexShrink: 0,
+                  width: totalWidth,
+                  boxSizing: "border-box",
+                }}
+              />
+            )}
             {tableProps.showHeader !== false && (
               <HeaderRow totalWidth={totalWidth} />
             )}
             <VirtualBody
-              rows={rows}
+              rows={displayRows}
               getRowId={options.getRowId}
               totalWidth={totalWidth}
             />

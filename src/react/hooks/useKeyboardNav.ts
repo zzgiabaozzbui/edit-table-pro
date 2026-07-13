@@ -12,7 +12,7 @@ import { type MutableRefObject, useEffect, useRef } from "react";
 type UseKeyboardNavOptions<T> = {
   activeCellRef: MutableRefObject<CellPos | null>;
   columns: ColDef<T>[];
-  rowsDataRef: MutableRefObject<T[]>;
+  displayRowsRef: MutableRefObject<T[]>;
   scrollContainerRef: MutableRefObject<HTMLDivElement | null>;
   rowHeight: number;
   editSessionStore: EditSessionStore;
@@ -28,7 +28,7 @@ type UseKeyboardNavOptions<T> = {
 export function useKeyboardNav<T extends Record<string, string>>({
   activeCellRef,
   columns,
-  rowsDataRef,
+  displayRowsRef,
   scrollContainerRef,
   rowHeight,
   editSessionStore,
@@ -65,7 +65,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       e.preventDefault();
       const visibleCols = columns.filter((c) => !c.hidden);
       if (visibleCols.length === 0) return;
-      const rowIdx = rowsDataRef.current.findIndex(
+      const rowIdx = displayRowsRef.current.findIndex(
         (r) => getRowId(r) === active.rowId,
       );
       if (rowIdx === -1) return;
@@ -80,7 +80,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
 
     if (e.ctrlKey && e.key === "d") {
       e.preventDefault();
-      const allRows = rowsDataRef.current;
+      const allRows = displayRowsRef.current;
       const rowIdx = allRows.findIndex((r) => getRowId(r) === active.rowId);
       if (rowIdx !== -1 && rowIdx < allRows.length - 1) {
         applyFill(
@@ -97,7 +97,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
 
     if (e.ctrlKey && e.key === "r") {
       e.preventDefault();
-      const allRows = rowsDataRef.current;
+      const allRows = displayRowsRef.current;
       const rowIdx = allRows.findIndex((r) => getRowId(r) === active.rowId);
       const colIdx = navigableCols.findIndex((c) => c.key === active.colKey);
       if (rowIdx !== -1 && colIdx !== -1 && colIdx < navigableCols.length - 1) {
@@ -129,7 +129,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       from: CellPos,
       direction: "next" | "prev" | "up" | "down",
     ) => {
-      const allRows = rowsDataRef.current;
+      const allRows = displayRowsRef.current;
       const colIdx = navigableCols.findIndex((c) => c.key === from.colKey);
       const rowIdx = allRows.findIndex((r) => getRowId(r) === from.rowId);
 
@@ -167,7 +167,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     if (e.key === "Escape") {
       e.preventDefault();
       const key = makeCellKey(active.rowId, active.colKey);
-      const snapRows = rowsDataRef.current;
+      const snapRows = displayRowsRef.current;
       const rowIndex = snapRows.findIndex((r) => getRowId(r) === active.rowId);
       const originalValue =
         rowIndex !== -1 ? (snapRows[rowIndex][active.colKey] ?? "") : "";

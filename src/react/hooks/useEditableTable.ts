@@ -328,6 +328,7 @@ export function useEditableTable<T extends Record<string, string>>(
     query,
     setQuery,
     displayRows,
+    displayRowsRef,
     rows,
     addRow,
     appendRows,

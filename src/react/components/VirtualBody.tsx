@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useTableContext } from "../context/TableContext";
 import { BooleanCell } from "./BooleanCell";
 import { Cell } from "./Cell";
+import { DateCell } from "./DateCell";
 import { DropdownCell } from "./DropdownCell";
 import { ReadonlyCell } from "./ReadonlyCell";
 import { RenderCell } from "./RenderCell";
@@ -144,6 +145,21 @@ export function VirtualBody<T extends Record<string, string>>({
                       rowIndex={rowIndex}
                       width={colWidth}
                       align={col.align}
+                    />
+                  );
+                }
+                if (col.type === "date") {
+                  return (
+                    <DateCell
+                      key={col.key}
+                      cell={{ rowId, colKey: col.key }}
+                      value={liveRow[col.key] ?? ""}
+                      width={colWidth}
+                      align={col.align}
+                      disabled={!isEditable}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
                     />
                   );
                 }

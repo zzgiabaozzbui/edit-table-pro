@@ -50,10 +50,17 @@ export function usePasteHandler<T extends Record<string, string>>({
         : -1;
 
       if (activeRowIndex !== -1 && activeColIndex !== -1) {
+        const allRows = rowsDataRef.current;
+        const needed = activeRowIndex + lines.length;
+        if (needed > allRows.length && createRow) {
+          const extra = needed - allRows.length;
+          appendRows(Array.from({ length: extra }, () => createRow()));
+        }
+        const rowsForWrite = rowsDataRef.current;
         for (let li = 0; li < lines.length; li++) {
           const rowIndex = activeRowIndex + li;
-          if (rowIndex >= currentRows.length) break;
-          const row = currentRows[rowIndex];
+          if (rowIndex >= rowsForWrite.length) break;
+          const row = rowsForWrite[rowIndex];
           const rowId = getRowId(row);
           const values = lines[li].split("\t");
           for (let ci = 0; ci < values.length; ci++) {

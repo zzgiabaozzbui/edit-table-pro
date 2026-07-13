@@ -14,7 +14,15 @@ import type {
   RowId,
 } from "@/core/types";
 import { makeCellKey } from "@/core/types";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { TableContextValue, TableProps } from "../context/TableContext";
 import { useCellCommit } from "./useCellCommit";
 import { useColumnResize } from "./useColumnResize";
@@ -33,6 +41,8 @@ export type UseEditableTableOptions<T> = {
   onSelectionChange?: (ids: RowId[]) => void;
   onCellClick?: CellClickHandler;
   autoFocus?: boolean;
+  value?: T[];
+  onChange?: (rows: T[]) => void;
 } & TableProps<T>;
 
 export function useEditableTable<T extends Record<string, string>>(
@@ -53,11 +63,14 @@ export function useEditableTable<T extends Record<string, string>>(
     rowClassName,
     onSelectionChange,
     onCellClick,
+    value,
+    onChange,
     autoFocus = false,
   } = options;
 
   const rowHeight = rowHeightProp ?? SIZE_CONFIG[size].rowHeight;
   const hasSelection = !!onSelectionChange;
+  const controlled = value !== undefined;
   const tableProps: TableProps<T> & { hasSelection: boolean } = {
     bordered,
     size,
@@ -69,13 +82,37 @@ export function useEditableTable<T extends Record<string, string>>(
   };
 
   // Shared state
-  const [rows, setRows] = useState<T[]>(() => initialData);
+  const [rows, setRows] = useState<T[]>(() => value ?? initialData);
   const rowsDataRef = useRef<T[]>(initialData);
   const editSessionStore = useMemo(() => new EditSessionStore(), []);
   const dirtyRowsRef = useRef<Map<RowId, DirtyRow>>(new Map());
   const historyRef = useRef<HistoryState>(createHistory());
   const pendingRowsRef = useRef<Set<RowId>>(new Set());
   const cellRefs = useRef<Map<CellKey, HTMLElement>>(new Map());
+
+  // Controlled vs uncontrolled row updates. In controlled mode the parent
+  // owns data: mutations are reported via onChange instead of internal state.
+  const updateRows = useCallback<Dispatch<SetStateAction<T[]>>>(
+    (valueOrFn) => {
+      if (controlled) {
+        const next =
+          typeof valueOrFn === "function"
+            ? (valueOrFn as (prev: T[]) => T[])(rowsDataRef.current)
+            : valueOrFn;
+        onChange?.(next);
+      } else {
+        setRows(valueOrFn);
+      }
+    },
+    [controlled, onChange],
+  );
+
+  useEffect(() => {
+    if (controlled && value) {
+      rowsDataRef.current = [...value];
+      setRows(value);
+    }
+  }, [controlled, value]);
 
   // Navigation state
   const activeCellRef = useRef<CellPos | null>(null);
@@ -106,7 +143,7 @@ export function useEditableTable<T extends Record<string, string>>(
     columns,
     getRowId,
     rowsDataRef,
-    setRows,
+    setRows: updateRows,
   });
 
   // Commit pipeline (depends on runSideEffect)
@@ -117,7 +154,7 @@ export function useEditableTable<T extends Record<string, string>>(
     dirtyRowsRef,
     historyRef,
     editSessionStore,
-    setRows,
+    setRows: updateRows,
     runSideEffect,
   });
 
@@ -127,7 +164,7 @@ export function useEditableTable<T extends Record<string, string>>(
     rowsDataRef,
     historyRef,
     editSessionStore,
-    setRows,
+    setRows: updateRows,
   });
 
   // Feature 8 + 9: Fill
@@ -137,7 +174,7 @@ export function useEditableTable<T extends Record<string, string>>(
     rowsDataRef,
     dirtyRowsRef,
     historyRef,
-    setRows,
+    setRows: updateRows,
     setCellSelection,
   });
 
@@ -178,11 +215,14 @@ export function useEditableTable<T extends Record<string, string>>(
     return () => cancelAnimationFrame(frame);
   }, [autoFocus, columns, focusCell, getRowId]);
 
-  const appendRows = useCallback((newRows: T[]) => {
-    const next = [...rowsDataRef.current, ...newRows];
-    rowsDataRef.current = next;
-    setRows(next);
-  }, []);
+  const appendRows = useCallback(
+    (newRows: T[]) => {
+      const next = [...rowsDataRef.current, ...newRows];
+      rowsDataRef.current = next;
+      updateRows(next);
+    },
+    [updateRows],
+  );
 
   const addRow = useCallback(() => {
     if (!createRow) return;

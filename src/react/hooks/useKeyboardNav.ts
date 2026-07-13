@@ -1,5 +1,11 @@
 import type { EditSessionStore } from "@/core/session";
-import type { CellKey, CellPos, CellRange, ColDef } from "@/core/types";
+import type {
+  CellKey,
+  CellPos,
+  CellRange,
+  CellSelectionRange,
+  ColDef,
+} from "@/core/types";
 import { makeCellKey } from "@/core/types";
 import { type MutableRefObject, useEffect, useRef } from "react";
 
@@ -16,6 +22,7 @@ type UseKeyboardNavOptions<T> = {
   redo: () => void;
   applyFill: (range: CellRange, sourceCell: CellPos) => void;
   focusCell: (cell: CellPos) => void;
+  setCellSelection: (sel: CellSelectionRange | null) => void;
 };
 
 export function useKeyboardNav<T extends Record<string, string>>({
@@ -31,6 +38,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
   redo,
   applyFill,
   focusCell,
+  setCellSelection,
 }: UseKeyboardNavOptions<T>) {
   const keyHandlerRef = useRef<(e: KeyboardEvent) => void>();
 
@@ -52,6 +60,23 @@ export function useKeyboardNav<T extends Record<string, string>>({
     }
 
     if (!active) return;
+
+    if (e.ctrlKey && e.key === "a") {
+      e.preventDefault();
+      const visibleCols = columns.filter((c) => !c.hidden);
+      if (visibleCols.length === 0) return;
+      const rowIdx = rowsDataRef.current.findIndex(
+        (r) => getRowId(r) === active.rowId,
+      );
+      if (rowIdx === -1) return;
+      setCellSelection({
+        rowId: active.rowId,
+        rowIndex: rowIdx,
+        colKeyStart: visibleCols[0].key,
+        colKeyEnd: visibleCols[visibleCols.length - 1].key,
+      });
+      return;
+    }
 
     if (e.ctrlKey && e.key === "d") {
       e.preventDefault();

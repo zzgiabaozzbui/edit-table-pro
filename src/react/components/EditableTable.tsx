@@ -93,6 +93,7 @@ function EditableTableInner<T extends Record<string, string>>(
     redo,
     applyFill,
     focusCell,
+    setCellSelection,
   });
 
   const { handlePaste } = usePasteHandler({

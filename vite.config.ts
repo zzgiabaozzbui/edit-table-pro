@@ -1,5 +1,5 @@
-import { resolve } from "path";
-import { fileURLToPath } from "url";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
@@ -30,5 +30,7 @@ export default defineConfig(({ command }) => ({
   test: {
     root: __dirname,
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    environment: "happy-dom",
+    globals: true,
   },
 }));

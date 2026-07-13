@@ -57,6 +57,7 @@ export type ColDef<T = Record<string, string>> = {
   ellipsis?: boolean;
   hidden?: boolean;
   editable?: boolean | ((row: T) => boolean);
+  options?: { label: string; value: string }[];
   validate?: (value: string, row: T) => ValidationResult;
   format?: (value: string) => string;
   sideEffect?: {

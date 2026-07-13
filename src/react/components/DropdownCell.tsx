@@ -35,7 +35,6 @@ export function DropdownCell({
     setActiveCell,
     activeCellState,
     cellSelection,
-    onCellClick,
   } = useTableContext();
 
   const isActiveCell =
@@ -62,7 +61,6 @@ export function DropdownCell({
         ref={selectRef}
         value={value}
         disabled={disabled}
-        onClick={() => onCellClick?.(cell.rowId, cell.colKey, value)}
         onChange={(e) => commitCell(cell, e.target.value)}
         onFocus={() => setActiveCell(cell)}
         style={{ width: "100%", textAlign: align ?? "left" }}

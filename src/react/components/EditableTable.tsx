@@ -1,6 +1,7 @@
 import "./table.css";
 import { themeToVars } from "@/core/theme";
-import { TableProvider } from "../context/TableContext";
+import { forwardRef, useImperativeHandle } from "react";
+import { type EditableTableRef, TableProvider } from "../context/TableContext";
 import { useCellSelectionDrag } from "../hooks/useCellSelectionDrag";
 import {
   type UseEditableTableOptions,
@@ -19,10 +20,10 @@ type EditableTableProps<T extends Record<string, string>> =
 const ADD_ROW_HEIGHT = 36;
 const SELECTION_COL_WIDTH = 40;
 
-export function EditableTable<T extends Record<string, string>>({
-  height = 600,
-  ...options
-}: EditableTableProps<T>) {
+function EditableTableInner<T extends Record<string, string>>(
+  { height = 600, ...options }: EditableTableProps<T>,
+  ref: React.Ref<EditableTableRef<T>>,
+) {
   const ctx = useEditableTable(options);
   const {
     tableProps,
@@ -47,6 +48,17 @@ export function EditableTable<T extends Record<string, string>>({
     commitCell,
     getRowId,
   } = ctx;
+
+  useImperativeHandle(
+    ref,
+    (): EditableTableRef<T> => ({
+      setData: ctx.setData,
+      scrollToRow: ctx.scrollToRow,
+      validate: ctx.validate,
+      getDirtyRows: ctx.getDirtyRows,
+    }),
+    [ctx],
+  );
 
   const size = tableProps.size ?? "medium";
   const cssVars = themeToVars(theme, size);
@@ -187,3 +199,11 @@ export function EditableTable<T extends Record<string, string>>({
     </TableProvider>
   );
 }
+
+export const EditableTable = forwardRef(EditableTableInner) as <
+  T extends Record<string, string>,
+>(
+  props: EditableTableProps<T> & { ref?: React.Ref<EditableTableRef<T>> },
+) => React.ReactElement;
+
+export type { EditableTableRef };

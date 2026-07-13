@@ -1,3 +1,5 @@
+import { collectDirtyRows } from "@/core/dirty";
+import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
 import { createHistory } from "@/core/history";
 import { EditSessionStore } from "@/core/session";
@@ -9,11 +11,15 @@ import type {
   CellPos,
   CellSelectionRange,
   ColDef,
+  ColKey,
   DirtyRow,
   HistoryState,
   RowId,
+  SubmitRow,
+  ValidationResult,
 } from "@/core/types";
 import { makeCellKey } from "@/core/types";
+import { getRowOffset } from "@/core/virtual";
 import {
   type Dispatch,
   type SetStateAction,
@@ -236,6 +242,41 @@ export function useEditableTable<T extends Record<string, string>>(
     }
   }, [createRow, columns, getRowId, focusCell, appendRows]);
 
+  // Feature 10: Imperative ref API (#20)
+  const setData = useCallback(
+    (next: T[]) => {
+      rowsDataRef.current = [...next];
+      updateRows(next);
+    },
+    [updateRows],
+  );
+
+  const scrollToRow = useCallback(
+    (rowId: RowId) => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      const idx = rowsDataRef.current.findIndex((r) => getRowId(r) === rowId);
+      if (idx < 0) return;
+      container.scrollTop = getRowOffset(idx, rowHeight);
+    },
+    [getRowId, rowHeight],
+  );
+
+  const validate = useCallback(
+    (rowId: RowId, colKey: ColKey): ValidationResult => {
+      const row = rowsDataRef.current.find((r) => getRowId(r) === rowId);
+      if (!row) return { ok: true };
+      const col = columns.find((c) => c.key === colKey);
+      if (!col) return { ok: true };
+      return validateCell(col, row[colKey] ?? "", row);
+    },
+    [columns, getRowId],
+  );
+
+  const getDirtyRows = useCallback((): SubmitRow[] => {
+    return collectDirtyRows(dirtyRowsRef.current);
+  }, []);
+
   return {
     columns,
     tableProps,
@@ -273,5 +314,10 @@ export function useEditableTable<T extends Record<string, string>>(
     applyFill,
     cellSelection,
     setCellSelection,
+    // Feature 10: Imperative ref API
+    setData,
+    scrollToRow,
+    validate,
+    getDirtyRows,
   };
 }

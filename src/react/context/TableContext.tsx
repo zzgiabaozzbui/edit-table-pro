@@ -12,6 +12,8 @@ import type {
   FillState,
   HistoryState,
   RowId,
+  SubmitRow,
+  ValidationResult,
 } from "@/core/types";
 import { type MutableRefObject, createContext, useContext } from "react";
 
@@ -73,7 +75,17 @@ export type TableContextValue<T = Record<string, string>> = {
   // Feature 9: Multi-cell selection
   cellSelection: CellSelectionRange | null;
   setCellSelection: (sel: CellSelectionRange | null) => void;
+  // Feature 10: Imperative ref API (#20)
+  setData: (rows: T[]) => void;
+  scrollToRow: (rowId: RowId) => void;
+  validate: (rowId: RowId, colKey: ColKey) => ValidationResult;
+  getDirtyRows: () => SubmitRow[];
 };
+
+export type EditableTableRef<T = Record<string, string>> = Pick<
+  TableContextValue<T>,
+  "setData" | "scrollToRow" | "validate" | "getDirtyRows"
+>;
 
 // biome-ignore lint/suspicious/noExplicitAny: generic context default
 const TableContext = createContext<TableContextValue<any> | null>(null);

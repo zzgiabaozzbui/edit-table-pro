@@ -6,6 +6,7 @@ export { exportCsv } from "./core/export";
 
 export type { TableTheme } from "./core/theme";
 export type { TableContextValue } from "./react/context/TableContext";
+export type { EditableTableRef } from "./react/context/TableContext";
 
 export type {
   ColDef,

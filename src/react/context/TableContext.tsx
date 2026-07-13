@@ -25,6 +25,7 @@ export type TableProps<T> = {
   sticky?: boolean;
   hasSelection?: boolean;
   rowClassName?: (row: T, index: number) => string;
+  searchable?: boolean;
 };
 
 export type TableContextValue<T = Record<string, string>> = {
@@ -80,6 +81,11 @@ export type TableContextValue<T = Record<string, string>> = {
   scrollToRow: (rowId: RowId) => void;
   validate: (rowId: RowId, colKey: ColKey) => ValidationResult;
   getDirtyRows: () => SubmitRow[];
+  // Feature 11: Row search (#23)
+  searchable: boolean;
+  query: string;
+  setQuery: (q: string) => void;
+  displayRows: T[];
   // Feature 10b: Column visibility (#24)
   setColumnVisibility: (key: ColKey, visible: boolean) => void;
   toggleColumn: (key: ColKey) => void;

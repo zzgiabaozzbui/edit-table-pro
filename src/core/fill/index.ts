@@ -1,6 +1,17 @@
+import type { ColDef, ColKey, RowId } from "@/core/types";
+
 export type FillSeriesType = "copy" | "numeric" | "date-iso";
 
 const DATE_ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+export function resolveEditable<T>(
+  editable: ColDef<T>["editable"],
+  row: T,
+): boolean {
+  if (editable === undefined || editable === true) return true;
+  if (editable === false) return false;
+  return editable(row);
+}
 
 export function detectSeriesType(values: string[]): FillSeriesType {
   if (values.length <= 1) return "copy";
@@ -63,4 +74,52 @@ export function generateFillValues(
   return Array.from({ length: count }, (_, i) =>
     addDays(lastDate, delta * (i + 1)),
   );
+}
+
+type FillEntry = {
+  rowId: RowId;
+  colKey: ColKey;
+  prevValue: string;
+  nextValue: string;
+};
+
+/**
+ * Pure horizontal fill: take the source column's value in one row and series it
+ * across the given target columns (same row). Excludes the source column.
+ * ponytail: single-cell source always resolves to "copy" (see detectSeriesType).
+ */
+export function computeHorizontalFillEntries<T extends Record<string, string>>(
+  columns: ColDef<T>[],
+  rows: T[],
+  sourceRowIndex: number,
+  sourceColKey: ColKey,
+  targetColKeys: ColKey[],
+  getRowId: (row: T) => string,
+): FillEntry[] {
+  const row = rows[sourceRowIndex];
+  if (!row) return [];
+
+  const targets = targetColKeys.filter((ck) => ck !== sourceColKey);
+  if (targets.length === 0) return [];
+
+  const sourceValue = row[sourceColKey] ?? "";
+  const seriesType = detectSeriesType([sourceValue]);
+  const filled = generateFillValues(
+    [sourceValue],
+    targets.length,
+    seriesType,
+  );
+
+  const entries: FillEntry[] = [];
+  for (let j = 0; j < targets.length; j++) {
+    const ck = targets[j];
+    const col = columns.find((c) => c.key === ck);
+    if (!col) continue;
+    if (!resolveEditable(col.editable, row)) continue;
+    const prevValue = row[ck] ?? "";
+    const nextValue = filled[j] ?? "";
+    if (prevValue === nextValue) continue;
+    entries.push({ rowId: getRowId(row), colKey: ck, prevValue, nextValue });
+  }
+  return entries;
 }

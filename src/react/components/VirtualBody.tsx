@@ -1,6 +1,6 @@
 import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTableContext } from "../context/TableContext";
 import { BooleanCell } from "./BooleanCell";
 import { Cell } from "./Cell";
@@ -47,8 +47,11 @@ export function VirtualBody<T extends Record<string, string>>({
     scrollContainerRef,
     fillState,
     cellSelection,
+    reorderRows,
   } = useTableContext<T>();
   const [scrollTop, setScrollTop] = useState(0);
+  // ponytail: #17 drag source rowId kept in a ref to avoid re-renders
+  const dragSrcRef = useRef<string | null>(null);
 
   const viewportHeight = scrollContainerRef.current?.clientHeight ?? 600;
   const visibleCols = columns.filter((c) => !c.hidden);
@@ -87,6 +90,31 @@ export function VirtualBody<T extends Record<string, string>>({
           return (
             <div
               key={rowId}
+              draggable={tableProps.reorderable === true}
+              onDragStart={(e) => {
+                if (!tableProps.reorderable) return;
+                dragSrcRef.current = rowId;
+                e.dataTransfer.effectAllowed = "move";
+              }}
+              onDragOver={(e) => {
+                if (tableProps.reorderable) e.preventDefault();
+              }}
+              onDrop={(e) => {
+                if (!tableProps.reorderable) return;
+                e.preventDefault();
+                const srcId = dragSrcRef.current;
+                dragSrcRef.current = null;
+                if (!srcId || srcId === rowId) return;
+                const fromIndex = rows.findIndex(
+                  (r) => getRowId(r) === srcId,
+                );
+                const toIndex = rows.findIndex(
+                  (r) => getRowId(r) === rowId,
+                );
+                if (fromIndex !== -1 && toIndex !== -1) {
+                  reorderRows(fromIndex, toIndex);
+                }
+              }}
               className={[
                 "et-row",
                 isSelected ? "et-row-selected" : "",

@@ -12,6 +12,10 @@ const IDLE: FillState = {
 
 const SELECTION_COL_WIDTH = 40;
 
+// #19: when the pointer is within this many px of a viewport edge, auto-scroll
+const EDGE = 40;
+const SCROLL_STEP = 12;
+
 type ComputedRange = { range: CellRange; direction: FillState["direction"] };
 
 export function FillHandle({
@@ -160,8 +164,53 @@ export function FillHandle({
     };
 
     let rafId = 0;
+    let autoScrollRaf = 0;
+    let lastClientX = e.clientX;
+    let lastClientY = e.clientY;
+
+    // #19: keep scrolling while the pointer hovers near an edge, recomputing
+    // the preview against the freshly scrolled content each frame.
+    const autoScrollLoop = () => {
+      const container = scrollContainerRef.current;
+      if (!container) {
+        autoScrollRaf = 0;
+        return;
+      }
+      const rect = container.getBoundingClientRect();
+      let moved = false;
+      if (lastClientY - rect.top < EDGE) {
+        container.scrollTop -= SCROLL_STEP;
+        moved = true;
+      } else if (rect.bottom - lastClientY < EDGE) {
+        container.scrollTop += SCROLL_STEP;
+        moved = true;
+      }
+      if (lastClientX - rect.left < EDGE) {
+        container.scrollLeft -= SCROLL_STEP;
+        moved = true;
+      } else if (rect.right - lastClientX < EDGE) {
+        container.scrollLeft += SCROLL_STEP;
+        moved = true;
+      }
+      if (moved) {
+        const r = computeRange(lastClientX, lastClientY);
+        if (r) {
+          previewRangeRef.current = r.range;
+          setFillState({
+            mode: "dragging",
+            sourceCell: { rowId, colKey },
+            sourceRowIndex,
+            previewRange: r.range,
+            direction: r.direction,
+          });
+        }
+      }
+      autoScrollRaf = requestAnimationFrame(autoScrollLoop);
+    };
 
     const onPointerMove = (ev: PointerEvent) => {
+      lastClientX = ev.clientX;
+      lastClientY = ev.clientY;
       const r = computeRange(ev.clientX, ev.clientY);
       if (r) previewRangeRef.current = r.range;
 
@@ -180,6 +229,7 @@ export function FillHandle({
 
     const onPointerUp = () => {
       cancelAnimationFrame(rafId);
+      cancelAnimationFrame(autoScrollRaf);
       btn.removeEventListener("pointermove", onPointerMove);
       btn.removeEventListener("pointerup", onPointerUp);
       btn.removeEventListener("pointercancel", onPointerUp);
@@ -215,6 +265,7 @@ export function FillHandle({
       previewRangeRef.current = null;
     };
 
+    autoScrollRaf = requestAnimationFrame(autoScrollLoop);
     btn.addEventListener("pointermove", onPointerMove);
     btn.addEventListener("pointerup", onPointerUp);
     btn.addEventListener("pointercancel", onPointerUp);

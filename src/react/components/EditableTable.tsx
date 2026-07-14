@@ -1,6 +1,14 @@
 import "./table.css";
-import { useEffect, useCallback, useState } from "react";
-import type { CellPos } from "@/core/types";
+import {
+  forwardRef,
+  useEffect,
+  useCallback,
+  useImperativeHandle,
+  useState,
+  type ForwardedRef,
+  type ReactElement,
+} from "react";
+import type { CellPos, DirtyRow } from "@/core/types";
 import { DARK_THEME, themeToVars } from "@/core/theme";
 import { TableProvider } from "../context/TableContext";
 import { useCellSelectionDrag } from "../hooks/useCellSelectionDrag";
@@ -17,6 +25,17 @@ type EditableTableProps<T extends Record<string, string>> =
   UseEditableTableOptions<T> & {
     height?: number;
   };
+
+export type EditableTableHandle<T = Record<string, string>> = {
+  scrollToRow: (index: number) => void;
+  setData: (rows: T[]) => void;
+  validate: () => Array<{ rowId: string; colKey: string; error: string }>;
+  getDirtyRows: () => DirtyRow[];
+};
+
+type EditableTableComponent = <T extends Record<string, string>>(
+  props: EditableTableProps<T> & { ref?: ForwardedRef<EditableTableHandle<T>> },
+) => ReactElement;
 
 const ADD_ROW_HEIGHT = 36;
 const SELECTION_COL_WIDTH = 40;
@@ -132,10 +151,16 @@ function ContextMenu({ menu, onClose, onCopy, onClear }: ContextMenuProps) {
   );
 }
 
-export function EditableTable<T extends Record<string, string>>({
+export const EditableTable = forwardRef(
+  EditableTableInner,
+) as unknown as EditableTableComponent;
+
+function EditableTableInner<T extends Record<string, string>>({
   height = 600,
   ...options
-}: EditableTableProps<T>) {
+}: EditableTableProps<T>,
+  ref: ForwardedRef<EditableTableHandle<T>>,
+): ReactElement {
   const ctx = useEditableTable(options);
   const {
     tableProps,
@@ -154,6 +179,7 @@ export function EditableTable<T extends Record<string, string>>({
     undo,
     redo,
     rowsDataRef,
+    dirtyRowsRef,
     rowHeight,
     applyFill,
     setCellSelection,
@@ -161,6 +187,40 @@ export function EditableTable<T extends Record<string, string>>({
     getRowId,
     selectAll,
   } = ctx;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollToRow: (index: number) => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = index * rowHeight;
+        }
+      },
+      setData: ctx.setData,
+      validate: () => {
+        const errors: Array<{
+          rowId: string;
+          colKey: string;
+          error: string;
+        }> = [];
+        for (const [rowId, dirty] of dirtyRowsRef.current) {
+          const row = rowsDataRef.current.find(
+            (r) => getRowId(r) === rowId,
+          );
+          if (!row) continue;
+          for (const colKey of Object.keys(dirty.current)) {
+            const col = columns.find((c) => c.key === colKey);
+            if (!col?.validate) continue;
+            const res = col.validate(dirty.current[colKey], row);
+            if (!res.ok) errors.push({ rowId, colKey, error: res.error });
+          }
+        }
+        return errors;
+      },
+      getDirtyRows: () => [...dirtyRowsRef.current.values()],
+    }),
+    [ctx.setData, scrollContainerRef, rowHeight, dirtyRowsRef, rowsDataRef, columns, getRowId],
+  );
 
   const size = tableProps.size ?? "medium";
   // ponytail: resolve "dark"/"light" presets to a TableTheme (#4)

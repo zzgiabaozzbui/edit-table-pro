@@ -10,6 +10,7 @@ export { SelectInput } from "./react/components/SelectInput";
 export type { TableTheme } from "./core/theme";
 export { DARK_THEME } from "./core/theme";
 export type { TableContextValue } from "./react/context/TableContext";
+export type { EditableTableHandle } from "./react/components/EditableTable";
 
 export type {
   ColDef,

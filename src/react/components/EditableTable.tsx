@@ -1,4 +1,6 @@
 import "./table.css";
+import { useEffect, useCallback, useState } from "react";
+import type { CellPos } from "@/core/types";
 import { DARK_THEME, themeToVars } from "@/core/theme";
 import { TableProvider } from "../context/TableContext";
 import { useCellSelectionDrag } from "../hooks/useCellSelectionDrag";
@@ -62,6 +64,70 @@ function SkeletonRows({
           ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+// ponytail: #18 right-click context menu host (always mounted when enabled)
+type ContextMenuState = {
+  x: number;
+  y: number;
+  cell: CellPos;
+  value: string;
+} | null;
+
+type ContextMenuProps = Readonly<{
+  menu: ContextMenuState;
+  onClose: () => void;
+  onCopy: (value: string) => void;
+  onClear: (cell: CellPos) => void;
+}>;
+
+function ContextMenu({ menu, onClose, onCopy, onClear }: ContextMenuProps) {
+  useEffect(() => {
+    if (!menu) return;
+    const close = () => onClose();
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, [menu, onClose]);
+
+  return (
+    <div
+      className="et-context-menu"
+      style={{
+        position: "fixed",
+        top: menu?.y ?? 0,
+        left: menu?.x ?? 0,
+        display: menu ? "block" : "none",
+        zIndex: 50,
+        background: "var(--et-color-bg)",
+        border: "1px solid var(--et-color-border)",
+        borderRadius: "var(--et-border-radius)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        fontSize: "var(--et-font-size)",
+        fontFamily: "var(--et-font-family)",
+        minWidth: 150,
+        padding: "4px 0",
+      }}
+      onContextMenu={(e) => e.preventDefault()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {menu && (
+        <>
+          <div
+            className="et-context-menu-item"
+            onClick={() => onCopy(menu.value)}
+          >
+            Copy cell value
+          </div>
+          <div
+            className="et-context-menu-item"
+            onClick={() => onClear(menu.cell)}
+          >
+            Clear cell
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -151,12 +217,42 @@ export function EditableTable<T extends Record<string, string>>({
     getRowId,
   });
 
+  // ponytail: #18 built-in right-click context menu
+  const contextMenuEnabled = tableProps.contextMenu !== false;
+  const [ctxMenu, setCtxMenu] = useState<{
+    x: number;
+    y: number;
+    cell: CellPos;
+    value: string;
+  } | null>(null);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      if (!contextMenuEnabled) return;
+      const cellEl = (e.target as HTMLElement).closest<HTMLElement>(
+        "[data-colkey]",
+      );
+      if (!cellEl) return;
+      const colKey = cellEl.dataset.colkey as string;
+      const rowId = cellEl.dataset.rowid as string;
+      const rowIndex = rowsDataRef.current.findIndex(
+        (r) => getRowId(r) === rowId,
+      );
+      const value =
+        rowIndex >= 0 ? (rowsDataRef.current[rowIndex][colKey] ?? "") : "";
+      e.preventDefault();
+      setCtxMenu({ x: e.clientX, y: e.clientY, cell: { rowId, colKey }, value });
+    },
+    [contextMenuEnabled, getRowId, rowsDataRef],
+  );
+
   return (
     <TableProvider value={ctx}>
       <div
         className={`et-root${theme === "dark" ? " et-dark" : ""}`}
         onPaste={handlePaste}
         onPointerDown={handleContainerPointerDown}
+        onContextMenu={handleContextMenu}
         style={{
           ...cssVars,
           width: "fit-content",
@@ -261,6 +357,20 @@ export function EditableTable<T extends Record<string, string>>({
             )}
           </div>
         </div>
+        {contextMenuEnabled && (
+          <ContextMenu
+            menu={ctxMenu}
+            onClose={() => setCtxMenu(null)}
+            onCopy={(v) => {
+              navigator.clipboard?.writeText(v);
+              setCtxMenu(null);
+            }}
+            onClear={(cell) => {
+              void commitCell(cell, "");
+              setCtxMenu(null);
+            }}
+          />
+        )}
       </div>
     </TableProvider>
   );

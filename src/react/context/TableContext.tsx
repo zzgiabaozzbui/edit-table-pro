@@ -27,6 +27,8 @@ export type TableProps<T> = {
   rowClassName?: (row: T, index: number) => string;
   // ponytail: #27 sticky footer / summary row
   footer?: ReactNode;
+  // ponytail: #18 built-in right-click context menu (default true)
+  contextMenu?: boolean;
   // ponytail: additive UI props for open issues
   striped?: boolean;
   emptyText?: string;

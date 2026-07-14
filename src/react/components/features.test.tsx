@@ -165,4 +165,27 @@ describe("EditableTable additive features", () => {
     expect(html).toContain("et-footer");
     expect(html).toContain("et-footer-custom");
   });
+
+  it("context menu host renders by default (#18)", () => {
+    const html = renderToStaticMarkup(
+      <EditableTable<Row>
+        columns={baseCols}
+        initialData={data}
+        getRowId={getRowId}
+      />,
+    );
+    expect(html).toContain("et-context-menu");
+  });
+
+  it("context menu host hidden when disabled (#18)", () => {
+    const html = renderToStaticMarkup(
+      <EditableTable<Row>
+        columns={baseCols}
+        initialData={data}
+        getRowId={getRowId}
+        contextMenu={false}
+      />,
+    );
+    expect(html).not.toContain("et-context-menu");
+  });
 });

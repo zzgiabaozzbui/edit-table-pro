@@ -249,3 +249,15 @@
 .et-dark .et-cell-readonly {
   color: var(--et-color-text);
 }
+
+/* ── Context menu (#18) ─────────────────────── */
+.et-context-menu-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.et-context-menu-item:hover {
+  background: var(--et-color-row-hover);
+}

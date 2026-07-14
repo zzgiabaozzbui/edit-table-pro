@@ -37,6 +37,24 @@ export const SIZE_CONFIG = {
   small: { rowHeight: 34, paddingY: 4, paddingX: 8, fontSize: 12 },
 } as const;
 
+// ponytail: dark preset tuned for WCAG AA contrast on a near-black surface (#4)
+export const DARK_THEME: Required<TableTheme> = {
+  colorPrimary: "#1668dc",
+  colorBorder: "#424242",
+  colorBgContainer: "#1f1f1f",
+  colorBgHeader: "#2a2a2a",
+  colorText: "rgba(255,255,255,0.92)",
+  colorError: "#ff7875",
+  colorErrorBg: "#2a1414",
+  colorErrorBorder: "#5c2222",
+  colorRowHover: "rgba(255,255,255,0.06)",
+  colorSplit: "#303030",
+  fontFamily:
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+  fontSize: 14,
+  borderRadius: 6,
+};
+
 export function themeToVars(
   theme: TableTheme = {},
   size: keyof typeof SIZE_CONFIG = "medium",

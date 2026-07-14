@@ -59,6 +59,10 @@ export type ColDef<T = Record<string, string>> = {
   editable?: boolean | ((row: T) => boolean);
   validate?: (value: string, row: T) => ValidationResult;
   format?: (value: string) => string;
+  // ponytail: select-cell options, accepted as [{label,value}] or raw strings
+  options?: Array<{ label: string; value: string }> | string[];
+  // header tooltip text shown on hover
+  tooltip?: string;
   sideEffect?: {
     trigger: "change" | "blur";
     debounceMs?: number;

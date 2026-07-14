@@ -6,8 +6,16 @@ const SELECTION_COL_WIDTH = 40;
 type HeaderRowProps = Readonly<{ totalWidth: number }>;
 
 export function HeaderRow({ totalWidth }: HeaderRowProps) {
-  const { columns, tableProps, columnWidths, selectedRowIds, rows, toggleAll } =
-    useTableContext();
+  const {
+    columns,
+    tableProps,
+    columnWidths,
+    selectedRowIds,
+    rows,
+    toggleAll,
+    sortState,
+    toggleSort,
+  } = useTableContext();
   const visibleCols = columns.filter((c) => !c.hidden);
   const isAllSelected = rows.length > 0 && selectedRowIds.size === rows.length;
   const isIndeterminate =
@@ -51,26 +59,39 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
           />
         </div>
       )}
-      {visibleCols.map((col) => (
-        <div
-          key={col.key}
-          style={{
-            position: "relative",
-            width: columnWidths.get(col.key) ?? col.width ?? 150,
-            minWidth: columnWidths.get(col.key) ?? col.width ?? 150,
-            padding: "var(--et-padding-y) var(--et-padding-x)",
-            borderRight: "1px solid var(--et-color-border)",
-            textAlign: col.align ?? "left",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            color: "var(--et-color-text)",
-          }}
-        >
-          {col.header ?? col.key}
-          <ResizeHandle colKey={col.key} />
-        </div>
-      ))}
+      {visibleCols.map((col) => {
+        const isSorted = sortState?.colKey === col.key;
+        const sortIndicator = isSorted
+          ? sortState?.dir === "asc"
+            ? " ▲"
+            : " ▼"
+          : "";
+        return (
+          <div
+            key={col.key}
+            title={col.tooltip ?? undefined}
+            onClick={() => toggleSort(col.key)}
+            style={{
+              position: "relative",
+              width: columnWidths.get(col.key) ?? col.width ?? 150,
+              minWidth: columnWidths.get(col.key) ?? col.width ?? 150,
+              padding: "var(--et-padding-y) var(--et-padding-x)",
+              borderRight: "1px solid var(--et-color-border)",
+              textAlign: col.align ?? "left",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              color: "var(--et-color-text)",
+              cursor: "pointer",
+              userSelect: "none",
+            }}
+          >
+            {col.header ?? col.key}
+            {sortIndicator}
+            <ResizeHandle colKey={col.key} />
+          </div>
+        );
+      })}
     </div>
   );
 }

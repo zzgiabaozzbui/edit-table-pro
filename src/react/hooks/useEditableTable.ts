@@ -9,6 +9,7 @@ import type {
   CellPos,
   CellSelectionRange,
   ColDef,
+  ColKey,
   DirtyRow,
   HistoryState,
   RowId,
@@ -28,7 +29,7 @@ export type UseEditableTableOptions<T> = {
   initialData: T[];
   rowHeight?: number;
   getRowId: (row: T) => string;
-  theme?: TableTheme;
+  theme?: TableTheme | "dark" | "light";
   createRow?: () => T;
   onSelectionChange?: (ids: RowId[]) => void;
   onCellClick?: CellClickHandler;
@@ -51,6 +52,9 @@ export function useEditableTable<T extends Record<string, string>>(
     showHeader,
     sticky,
     rowClassName,
+    striped,
+    emptyText,
+    filter,
     onSelectionChange,
     onCellClick,
     autoFocus = false,
@@ -65,6 +69,9 @@ export function useEditableTable<T extends Record<string, string>>(
     showHeader,
     sticky,
     rowClassName,
+    striped,
+    emptyText,
+    filter,
     hasSelection,
   };
 
@@ -95,11 +102,61 @@ export function useEditableTable<T extends Record<string, string>>(
   const { columnWidths, setColumnWidth } = useColumnResize(columns);
 
   // Feature 5: Row Selection
-  const { selectedRowIds, toggleRow, toggleAll } = useRowSelection({
+  const { selectedRowIds, toggleRow, toggleAll, selectAll } = useRowSelection({
     rowsDataRef,
     getRowId,
     onSelectionChange,
   });
+
+  // Feature #22: Column visibility toggle API
+  const [hiddenKeys, setHiddenKeys] = useState<Set<ColKey>>(
+    () => new Set(columns.filter((c) => c.hidden).map((c) => c.key)),
+  );
+  const visibleColumns = useMemo(
+    () => columns.filter((c) => !hiddenKeys.has(c.key)),
+    [columns, hiddenKeys],
+  );
+  const toggleColumn = useCallback((colKey: ColKey) => {
+    setHiddenKeys((prev) => {
+      const next = new Set(prev);
+      next.has(colKey) ? next.delete(colKey) : next.add(colKey);
+      return next;
+    });
+  }, []);
+  const setColumnHidden = useCallback((colKey: ColKey, hidden: boolean) => {
+    setHiddenKeys((prev) => {
+      const next = new Set(prev);
+      hidden ? next.add(colKey) : next.delete(colKey);
+      return next;
+    });
+  }, []);
+
+  // Feature #16: Column sorting (click header to toggle asc/desc/none)
+  const [sortState, setSortState] = useState<{
+    colKey: ColKey;
+    dir: "asc" | "desc";
+  } | null>(null);
+  const toggleSort = useCallback((colKey: ColKey) => {
+    setSortState((prev) => {
+      if (!prev || prev.colKey !== colKey) return { colKey, dir: "asc" };
+      if (prev.dir === "asc") return { colKey, dir: "desc" };
+      return null;
+    });
+  }, []);
+  const sortedRows = useMemo(() => {
+    if (!sortState) return rows;
+    const copy = [...rows];
+    const dir = sortState.dir === "asc" ? 1 : -1;
+    copy.sort((a, b) => {
+      const av = a[sortState.colKey] ?? "";
+      const bv = b[sortState.colKey] ?? "";
+      return (
+        String(av).localeCompare(String(bv), undefined, { numeric: true }) *
+        dir
+      );
+    });
+    return copy;
+  }, [rows, sortState]);
 
   // Feature 3: Side Effects
   const { patchRow, runSideEffect } = useSideEffect({
@@ -149,18 +206,34 @@ export function useEditableTable<T extends Record<string, string>>(
     [columns],
   );
 
-  const focusCell = useCallback((cell: CellPos) => {
-    const el = cellRefs.current.get(makeCellKey(cell.rowId, cell.colKey));
-    if (!el) return;
-    if (el instanceof HTMLInputElement) {
-      el.focus();
-    } else {
-      const first = el.querySelector<HTMLElement>(
-        'button,a,input,[tabindex]:not([tabindex="-1"])',
+  const focusCell = useCallback(
+    (cell: CellPos) => {
+      const el = cellRefs.current.get(makeCellKey(cell.rowId, cell.colKey));
+      if (el) {
+        if (el instanceof HTMLInputElement) {
+          el.focus();
+        } else {
+          const first = el.querySelector<HTMLElement>(
+            'button,a,input,[tabindex]:not([tabindex="-1"])',
+          );
+          first ? first.focus() : el.focus();
+        }
+      }
+      // ponytail: scroll active row into view (#30)
+      const sc = scrollContainerRef.current;
+      const idx = rowsDataRef.current.findIndex(
+        (r) => getRowId(r) === cell.rowId,
       );
-      first ? first.focus() : el.focus();
-    }
-  }, []);
+      if (sc && idx >= 0) {
+        const top = idx * rowHeight;
+        const bottom = top + rowHeight;
+        if (top < sc.scrollTop) sc.scrollTop = top;
+        else if (bottom > sc.scrollTop + sc.clientHeight)
+          sc.scrollTop = bottom - sc.clientHeight;
+      }
+    },
+    [getRowId, rowHeight, scrollContainerRef, rowsDataRef],
+  );
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -196,11 +269,17 @@ export function useEditableTable<T extends Record<string, string>>(
     }
   }, [createRow, columns, getRowId, focusCell, appendRows]);
 
+  // ponytail: apply row filter on top of sort for display (#23)
+  const displayRows = useMemo(
+    () => (filter ? sortedRows.filter(filter) : sortedRows),
+    [sortedRows, filter],
+  );
+
   return {
-    columns,
+    columns: visibleColumns,
     tableProps,
     theme,
-    rows,
+    rows: displayRows,
     addRow,
     appendRows,
     rowsDataRef,
@@ -221,6 +300,11 @@ export function useEditableTable<T extends Record<string, string>>(
     selectedRowIds,
     toggleRow,
     toggleAll,
+    selectAll,
+    toggleColumn,
+    setColumnHidden,
+    sortState,
+    toggleSort,
     columnWidths,
     setColumnWidth,
     activeCellRef,

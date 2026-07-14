@@ -23,12 +23,16 @@ export type TableProps<T> = {
   sticky?: boolean;
   hasSelection?: boolean;
   rowClassName?: (row: T, index: number) => string;
+  // ponytail: additive UI props for open issues
+  striped?: boolean;
+  emptyText?: string;
+  filter?: (row: T) => boolean;
 };
 
 export type TableContextValue<T = Record<string, string>> = {
   columns: ColDef<T>[];
   tableProps: TableProps<T>;
-  theme: TableTheme;
+  theme: TableTheme | "dark" | "light";
   rows: T[];
   addRow: () => void;
   appendRows: (newRows: T[]) => void;
@@ -57,6 +61,13 @@ export type TableContextValue<T = Record<string, string>> = {
   selectedRowIds: Set<RowId>;
   toggleRow: (rowId: RowId) => void;
   toggleAll: () => void;
+  selectAll: () => void;
+  // Feature: Column visibility toggle API (#22)
+  toggleColumn: (colKey: ColKey) => void;
+  setColumnHidden: (colKey: ColKey, hidden: boolean) => void;
+  // Feature: Column sorting (#16)
+  sortState: { colKey: ColKey; dir: "asc" | "desc" } | null;
+  toggleSort: (colKey: ColKey) => void;
   // Feature 6: Column Resize
   columnWidths: Map<ColKey, number>;
   setColumnWidth: (colKey: ColKey, width: number) => void;

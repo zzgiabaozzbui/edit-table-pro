@@ -173,3 +173,38 @@
   outline-offset: -1px;
   background-color: color-mix(in srgb, var(--et-color-primary) 8%, transparent) !important;
 }
+
+/* ── Empty state (#26) ──────────────────────── */
+.et-empty {
+  flex: 1;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--et-color-text);
+  opacity: 0.55;
+  font-size: var(--et-font-size);
+  width: 100%;
+}
+
+/* ── Dark mode overrides (#4, WCAG AA) ──────── */
+.et-dark .et-loading-overlay {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.et-dark .et-input {
+  background: var(--et-color-bg);
+  color: var(--et-color-text);
+}
+
+.et-dark .et-row:hover {
+  background: var(--et-color-row-hover);
+}
+
+.et-dark .et-row-stripe {
+  background: var(--et-color-bg-header);
+}
+
+.et-dark .et-cell-readonly {
+  color: var(--et-color-text);
+}

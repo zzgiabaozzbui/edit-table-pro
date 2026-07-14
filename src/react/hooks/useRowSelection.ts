@@ -36,5 +36,12 @@ export function useRowSelection<T>({
     });
   }, [getRowId, onSelectionChange, rowsDataRef]);
 
-  return { selectedRowIds, toggleRow, toggleAll };
+  // ponytail: select every row regardless of current state (#24 Ctrl+A)
+  const selectAll = useCallback(() => {
+    const allIds = rowsDataRef.current.map((r) => getRowId(r));
+    setSelectedRowIds(new Set(allIds));
+    onSelectionChange?.(allIds);
+  }, [getRowId, onSelectionChange, rowsDataRef]);
+
+  return { selectedRowIds, toggleRow, toggleAll, selectAll };
 }

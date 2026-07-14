@@ -2,10 +2,13 @@ import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
 import { useCallback, useState } from "react";
 import { useTableContext } from "../context/TableContext";
+import { BooleanCell } from "./BooleanCell";
 import { Cell } from "./Cell";
+import { DateCell } from "./DateCell";
 import { ReadonlyCell } from "./ReadonlyCell";
 import { RenderCell } from "./RenderCell";
 import { SelectCell } from "./SelectCell";
+import { SelectInput } from "./SelectInput";
 
 function isColInRange(
   colKey: string,
@@ -87,6 +90,10 @@ export function VirtualBody<T extends Record<string, string>>({
               className={[
                 "et-row",
                 isSelected ? "et-row-selected" : "",
+                // ponytail: stripe odd rows when striped prop set
+                tableProps.striped && rowIndex % 2 === 1
+                  ? "et-row-stripe"
+                  : "",
                 extraClass,
               ]
                 .filter(Boolean)
@@ -142,6 +149,48 @@ export function VirtualBody<T extends Record<string, string>>({
                       rowIndex={rowIndex}
                       width={colWidth}
                       align={col.align}
+                    />
+                  );
+                }
+                if (col.type === "boolean") {
+                  return (
+                    <BooleanCell
+                      key={col.key}
+                      cell={{ rowId, colKey: col.key }}
+                      initialValue={liveRow[col.key] ?? ""}
+                      width={colWidth}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
+                    />
+                  );
+                }
+                if (col.type === "date") {
+                  return (
+                    <DateCell
+                      key={col.key}
+                      cell={{ rowId, colKey: col.key }}
+                      initialValue={liveRow[col.key] ?? ""}
+                      width={colWidth}
+                      align={col.align}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
+                    />
+                  );
+                }
+                if (col.type === "select" && col.options) {
+                  return (
+                    <SelectInput
+                      key={col.key}
+                      cell={{ rowId, colKey: col.key }}
+                      initialValue={liveRow[col.key] ?? ""}
+                      col={col}
+                      width={colWidth}
+                      align={col.align}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
                     />
                   );
                 }

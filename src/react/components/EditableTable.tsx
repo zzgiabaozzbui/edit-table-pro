@@ -1,5 +1,5 @@
 import "./table.css";
-import { themeToVars } from "@/core/theme";
+import { DARK_THEME, themeToVars } from "@/core/theme";
 import { TableProvider } from "../context/TableContext";
 import { useCellSelectionDrag } from "../hooks/useCellSelectionDrag";
 import {
@@ -46,10 +46,14 @@ export function EditableTable<T extends Record<string, string>>({
     setCellSelection,
     commitCell,
     getRowId,
+    selectAll,
   } = ctx;
 
   const size = tableProps.size ?? "medium";
-  const cssVars = themeToVars(theme, size);
+  // ponytail: resolve "dark"/"light" presets to a TableTheme (#4)
+  const resolvedTheme =
+    theme === "dark" ? DARK_THEME : theme === "light" ? {} : theme;
+  const cssVars = themeToVars(resolvedTheme, size);
 
   const visibleCols = columns.filter((c) => !c.hidden);
   const selectionWidth = tableProps.hasSelection ? SELECTION_COL_WIDTH : 0;
@@ -79,6 +83,7 @@ export function EditableTable<T extends Record<string, string>>({
     redo,
     applyFill,
     focusCell,
+    selectAll,
   });
 
   const { handlePaste } = usePasteHandler({
@@ -102,7 +107,7 @@ export function EditableTable<T extends Record<string, string>>({
   return (
     <TableProvider value={ctx}>
       <div
-        className="et-root"
+        className={`et-root${theme === "dark" ? " et-dark" : ""}`}
         onPaste={handlePaste}
         onPointerDown={handleContainerPointerDown}
         style={{
@@ -149,6 +154,11 @@ export function EditableTable<T extends Record<string, string>>({
               getRowId={options.getRowId}
               totalWidth={totalWidth}
             />
+            {rows.length === 0 && !tableProps.loading && (
+              <div className="et-empty">
+                {tableProps.emptyText ?? "Không có dữ liệu"}
+              </div>
+            )}
             {canAddRow && (
               <button
                 type="button"

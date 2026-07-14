@@ -16,6 +16,7 @@ type UseKeyboardNavOptions<T> = {
   redo: () => void;
   applyFill: (range: CellRange, sourceCell: CellPos) => void;
   focusCell: (cell: CellPos) => void;
+  selectAll: () => void;
 };
 
 export function useKeyboardNav<T extends Record<string, string>>({
@@ -31,6 +32,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
   redo,
   applyFill,
   focusCell,
+  selectAll,
 }: UseKeyboardNavOptions<T>) {
   const keyHandlerRef = useRef<(e: KeyboardEvent) => void>();
 
@@ -48,6 +50,13 @@ export function useKeyboardNav<T extends Record<string, string>>({
     if (e.ctrlKey && (e.key === "y" || (e.shiftKey && e.key === "z"))) {
       e.preventDefault();
       redo();
+      return;
+    }
+
+    // ponytail: Ctrl+A selects every row (#24)
+    if (e.ctrlKey && e.key === "a") {
+      e.preventDefault();
+      selectAll();
       return;
     }
 

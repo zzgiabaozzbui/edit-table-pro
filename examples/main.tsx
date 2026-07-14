@@ -1,28 +1,66 @@
 import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import type { ColDef, TableTheme } from "../src/index";
-import { EditableTable } from "../src/index";
+import { DARK_THEME, EditableTable } from "../src/index";
 
 type Employee = {
   id: string;
   name: string;
   code: string;
   department: string;
+  status: string;
+  active: string; // "true" | "false"
+  joinDate: string; // "YYYY-MM-DD"
   phone: string;
 };
+
+const DEPARTMENTS = ["IT", "HR", "Finance", "Sales"];
+const STATUSES = ["active", "on_leave", "terminated"];
 
 const columns: ColDef<Employee>[] = [
   {
     key: "code",
     type: "text",
     header: "Mã NV",
-    width: 120,
+    width: 110,
     align: "center",
     validate: (v) =>
       /^\d+$/.test(v) ? { ok: true } : { ok: false, error: "Chỉ cho phép số" },
   },
-  { key: "name", type: "text", header: "Họ tên", width: 220, ellipsis: true },
-  { key: "department", type: "text", header: "Phòng ban", width: 140 },
+  { key: "name", type: "text", header: "Họ tên", width: 200, ellipsis: true },
+  {
+    key: "department",
+    type: "select",
+    header: "Phòng ban",
+    width: 140,
+    // ponytail: select options as raw strings
+    options: DEPARTMENTS,
+  },
+  {
+    key: "status",
+    type: "select",
+    header: "Trạng thái",
+    width: 150,
+    tooltip: "Trạng thái làm việc của nhân viên",
+    options: [
+      { label: "Đang làm việc", value: "active" },
+      { label: "Đang nghỉ phép", value: "on_leave" },
+      { label: "Đã nghỉ việc", value: "terminated" },
+    ],
+  },
+  {
+    key: "active",
+    type: "boolean",
+    header: "Đang active",
+    width: 100,
+    align: "center",
+  },
+  {
+    key: "joinDate",
+    type: "date",
+    header: "Ngày vào làm",
+    width: 150,
+  },
   {
     key: "phone",
     type: "text",
@@ -61,39 +99,36 @@ const columns: ColDef<Employee>[] = [
   },
 ];
 
-const data: Employee[] = Array.from({ length: 50000 }, (_, i) => ({
+const data: Employee[] = Array.from({ length: 2000 }, (_, i) => ({
   id: String(i + 1),
   name: `Nhân viên ${i + 1}`,
   code: String(1000 + i),
-  department: ["IT", "HR", "Finance", "Sales"][i % 4],
+  department: DEPARTMENTS[i % DEPARTMENTS.length],
+  status: STATUSES[i % STATUSES.length],
+  active: i % 3 === 0 ? "true" : "false",
+  joinDate: `2023-${String((i % 12) + 1).padStart(2, "0")}-15`,
   phone: `09${String(i).padStart(8, "0")}`,
 }));
 
-const THEMES: Record<string, TableTheme> = {
-  default: { fontSize: 12, borderRadius: 0 },
-  green: {
-    colorPrimary: "#52c41a",
-    colorBgHeader: "#f6ffed",
-    colorRowHover: "rgba(82,196,26,0.04)",
-  },
-  purple: {
-    colorPrimary: "#722ed1",
-    colorBgHeader: "#f9f0ff",
-    colorRowHover: "rgba(114,46,209,0.04)",
-  },
-  compact: { fontSize: 12, borderRadius: 0 },
-};
-
 function App() {
-  const [themeName, setThemeName] = useState<keyof typeof THEMES>("default");
+  const [dark, setDark] = useState(false);
+  const [striped, setStriped] = useState(true);
   const [size, setSize] = useState<"large" | "medium" | "small">("medium");
   const [bordered, setBordered] = useState(true);
+  const [reorderable, setReorderable] = useState(true);
+
+  // ponytail: theme="dark" uses the built-in WCAG-AA DARK_THEME preset
+  const theme: TableTheme | "dark" | "light" = dark ? "dark" : {};
 
   return (
     <div style={{ padding: 24, fontFamily: "sans-serif" }}>
-      <h2 style={{ marginBottom: 16 }}>
+      <h2 style={{ marginBottom: 8 }}>
         edit-table-pro — {data.length.toLocaleString()} rows
       </h2>
+      <p style={{ marginTop: 0, color: "#888", fontSize: 13 }}>
+        Click a header to sort · right-click a cell for copy/clear · drag the
+        fill handle · Ctrl+A to select all · Ctrl+Z to undo
+      </p>
 
       <div
         style={{
@@ -101,20 +136,40 @@ function App() {
           gap: 16,
           marginBottom: 16,
           alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
         <label>
-          Theme:{" "}
-          <select
-            value={themeName}
-            onChange={(e) =>
-              setThemeName(e.target.value as keyof typeof THEMES)
-            }
-          >
-            {Object.keys(THEMES).map((k) => (
-              <option key={k}>{k}</option>
-            ))}
-          </select>
+          <input
+            type="checkbox"
+            checked={dark}
+            onChange={(e) => setDark(e.target.checked)}
+          />{" "}
+          dark mode
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={striped}
+            onChange={(e) => setStriped(e.target.checked)}
+          />{" "}
+          striped
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={reorderable}
+            onChange={(e) => setReorderable(e.target.checked)}
+          />{" "}
+          reorderable
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={bordered}
+            onChange={(e) => setBordered(e.target.checked)}
+          />{" "}
+          bordered
         </label>
         <label>
           Size:{" "}
@@ -127,14 +182,6 @@ function App() {
             <option value="small">small</option>
           </select>
         </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={bordered}
-            onChange={(e) => setBordered(e.target.checked)}
-          />{" "}
-          bordered
-        </label>
       </div>
 
       <EditableTable
@@ -145,15 +192,19 @@ function App() {
           id: String(Date.now()),
           name: "",
           code: "",
-          department: "",
+          department: "IT",
+          status: "active",
+          active: "false",
+          joinDate: "",
           phone: "",
         })}
         height={560}
         size={size}
         bordered={bordered}
+        striped={striped}
+        reorderable={reorderable}
         sticky
-        theme={THEMES[themeName]}
-        rowClassName={(_, i) => (i % 2 === 1 ? "et-row-stripe" : "")}
+        theme={theme}
       />
     </div>
   );

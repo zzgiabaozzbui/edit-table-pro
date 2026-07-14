@@ -11,8 +11,7 @@
 
 ---
 
-<!-- TODO: add a demo GIF here — record with ScreenToGif or Kap -->
-<!-- Suggested flow: type → validate → fill handle drag → paste → Ctrl+Z -->
+<!-- Demo GIF: record with ScreenToGif/Kap (type → validate → fill-handle drag → paste → Ctrl+Z) and embed here — cannot be auto-recorded in CI (headless env). -->
 
 ---
 
@@ -190,6 +189,22 @@ The real difference:
 | **Custom render** | `col.render` for badges, buttons, links inside cells |
 | **CSV export** | One-call export with BOM prefix for Excel UTF-8 compatibility |
 | **Theming** | CSS variable overrides or `theme` prop |
+| **Boolean / Date / Select cells** | `type: 'boolean' \| 'date' \| 'select'` — checkbox, native date picker, dropdown (via `ColDef.options`) |
+| **Dark mode** | `theme="dark"` preset (WCAG-AA contrast) or import `DARK_THEME` |
+| **Striped rows** | `striped` prop for zebra striping |
+| **Empty state** | `emptyText` prop shown when there are no rows |
+| **Header tooltip** | `ColDef.tooltip` shown on header hover |
+| **Loading skeleton** | `loadingVariant="skeleton"` shimmer placeholder while `loading` |
+| **Sticky footer** | `footer` prop renders a summary/pinned row |
+| **Right-click context menu** | Built-in copy / clear on cell right-click (disable with `contextMenu={false}`) |
+| **Column sorting** | Click a header to sort asc / desc |
+| **Column visibility API** | `toggleColumn` / `setColumnHidden` on the imperative ref |
+| **Row filter** | `filter` prop applies a row-level predicate |
+| **Select all** | `Ctrl+A` selects the full grid |
+| **Scroll to active cell** | Keyboard navigation auto-scrolls the active cell into view |
+| **Imperative ref API** | `ref.scrollToRow` / `setData` / `validate` / `getDirtyRows` |
+| **Controlled mode** | `value` + `onChange` props drive the data externally |
+| **Row drag reorder** | `reorderable` prop enables drag-to-reorder rows |
 | **Zero runtime deps** | No lodash, no axios, no date library — just React |
 
 ---
@@ -290,15 +305,34 @@ These are things not yet built. Any of them would make a great PR — [claim one
 - [x] **Multi-cell selection** — click+drag, Shift+click, multi-col fill
 - [x] **Paste from Excel** — TSV paste with column mapping
 - [x] **Undo / Redo** — batch undo for fill and paste
-- [ ] **Horizontal fill drag** — drag fill handle left/right across columns
+- [x] **Horizontal fill drag** — drag fill handle left/right across columns
 - [ ] **Frozen/pinned columns** — lock leftmost columns during horizontal scroll
-- [ ] **Row drag to reorder** — drag rows up/down to reorder
-- [ ] **Column sorting** — click header to sort asc/desc
-- [ ] **Right-click context menu** — copy, paste, fill, clear
-- [ ] **Auto-scroll on drag edge** — scroll when dragging fill handle near viewport edge
-- [ ] **`number` cell type** — right-aligned with numeric keyboard on mobile
+- [x] **Row drag to reorder** — drag rows up/down to reorder (`reorderable`)
+- [x] **Column sorting** — click header to sort asc/desc
+- [x] **Right-click context menu** — copy / clear on cell right-click
+- [x] **Auto-scroll on drag edge** — scroll when dragging fill handle near viewport edge
+- [x] **`number` cell type** — right-aligned with numeric keyboard on mobile
+- [x] **Boolean / Date / Select cells** — checkbox, native date picker, dropdown
+- [x] **Dark mode** — `theme="dark"` preset tuned for WCAG-AA
+- [x] **Imperative ref API** — `scrollToRow` / `setData` / `validate` / `getDirtyRows`
+- [x] **Controlled mode** — `value` + `onChange` props
 
 Have an idea not on this list? [Open an issue](https://github.com/zzgiabaozzbui/edit-table-pro/issues/new) or just build it.
+
+---
+
+## 🚀 Launch
+
+**Demo GIF (manual step):** Record with [ScreenToGif](https://www.screentogif.com/) (Windows) or [Kap](https://getkap.co/) (macOS). Suggested flow: type in a cell → trigger validation error → drag the fill handle → paste from Excel → `Ctrl+Z` to undo. Save as `docs/demo.gif` and embed it at the top of this README (replace the comment near the top). *This cannot be auto-recorded in CI — the build environment is headless.*
+
+**Post to Hacker News ("Show HN") — manual step:**
+
+1. Make sure the package is published to npm (`npm publish`) and the GitHub repo is public.
+2. Record the demo GIF above and embed it in the README.
+3. Go to https://news.ycombinator.com/submit and choose **Show HN**.
+4. Title: `Show HN: edit-table-pro – an editable React table with fill handle, undo/redo, and paste-from-Excel (zero deps)`
+5. Text: one line — *"A drop-in `<EditableTable>` component: 50k-row virtual scroll, Excel-style fill handle, validation, undo/redo, and CSV export. No runtime deps beyond React."*
+6. Paste the repo URL (https://github.com/zzgiabaozzbui/edit-table-pro) and submit.
 
 ---
 
@@ -403,11 +437,9 @@ Xem [`good first issues`](https://github.com/zzgiabaozzbui/edit-table-pro/issues
 ### Roadmap
 
 - [x] Virtual scroll, fill handle, multi-cell selection, paste, undo/redo
-- [ ] Horizontal fill drag
+- [x] Horizontal fill drag, column sorting, context menu, row drag to reorder
+- [x] Boolean / Date / Select cells, dark mode, imperative ref API, controlled mode
 - [ ] Frozen/pinned columns
-- [ ] Row drag to reorder
-- [ ] Column sorting
-- [ ] Context menu
 
 [Nhận issue tại đây](https://github.com/zzgiabaozzbui/edit-table-pro/issues) hoặc tự build và gửi PR.
 

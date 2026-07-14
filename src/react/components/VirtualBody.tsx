@@ -9,6 +9,8 @@ import { ReadonlyCell } from "./ReadonlyCell";
 import { RenderCell } from "./RenderCell";
 import { SelectCell } from "./SelectCell";
 import { SelectInput } from "./SelectInput";
+import { getPinnedStyle } from "./pinned";
+import type { CSSProperties } from "react";
 
 function isColInRange(
   colKey: string,
@@ -45,6 +47,7 @@ export function VirtualBody<T extends Record<string, string>>({
     selectedRowIds,
     columnWidths,
     scrollContainerRef,
+    headerScrollRef,
     fillState,
     cellSelection,
     reorderRows,
@@ -64,9 +67,15 @@ export function VirtualBody<T extends Record<string, string>>({
   );
   const totalHeight = getTotalHeight(rows.length, rowHeight);
 
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    setScrollTop(e.currentTarget.scrollTop);
-  }, []);
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      setScrollTop(e.currentTarget.scrollTop);
+      // ponytail: #15 keep header pinned cols aligned during horizontal scroll
+      const h = headerScrollRef.current;
+      if (h) h.scrollLeft = e.currentTarget.scrollLeft;
+    },
+    [],
+  );
 
   return (
     <div
@@ -166,10 +175,10 @@ export function VirtualBody<T extends Record<string, string>>({
                     .filter(Boolean)
                     .join(" ") || undefined;
 
+                let cellNode: React.ReactNode;
                 if (col.render) {
-                  return (
+                  cellNode = (
                     <RenderCell
-                      key={col.key}
                       cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       render={col.render}
@@ -179,11 +188,9 @@ export function VirtualBody<T extends Record<string, string>>({
                       align={col.align}
                     />
                   );
-                }
-                if (col.type === "boolean") {
-                  return (
+                } else if (col.type === "boolean") {
+                  cellNode = (
                     <BooleanCell
-                      key={col.key}
                       cell={{ rowId, colKey: col.key }}
                       initialValue={liveRow[col.key] ?? ""}
                       width={colWidth}
@@ -192,11 +199,9 @@ export function VirtualBody<T extends Record<string, string>>({
                       data-rowid={rowId}
                     />
                   );
-                }
-                if (col.type === "date") {
-                  return (
+                } else if (col.type === "date") {
+                  cellNode = (
                     <DateCell
-                      key={col.key}
                       cell={{ rowId, colKey: col.key }}
                       initialValue={liveRow[col.key] ?? ""}
                       width={colWidth}
@@ -206,11 +211,9 @@ export function VirtualBody<T extends Record<string, string>>({
                       data-rowid={rowId}
                     />
                   );
-                }
-                if (col.type === "select" && col.options) {
-                  return (
+                } else if (col.type === "select" && col.options) {
+                  cellNode = (
                     <SelectInput
-                      key={col.key}
                       cell={{ rowId, colKey: col.key }}
                       initialValue={liveRow[col.key] ?? ""}
                       col={col}
@@ -221,11 +224,9 @@ export function VirtualBody<T extends Record<string, string>>({
                       data-rowid={rowId}
                     />
                   );
-                }
-                if (!isEditable) {
-                  return (
+                } else if (!isEditable) {
+                  cellNode = (
                     <ReadonlyCell
-                      key={col.key}
                       cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       width={colWidth}
@@ -236,20 +237,45 @@ export function VirtualBody<T extends Record<string, string>>({
                       data-rowid={rowId}
                     />
                   );
+                } else {
+                  cellNode = (
+                    <Cell
+                      cell={{ rowId, colKey: col.key }}
+                      initialValue={liveRow[col.key] ?? ""}
+                      width={colWidth}
+                      placeholder={col.placeholder}
+                      ellipsis={col.ellipsis}
+                      align={col.align}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
+                    />
+                  );
                 }
+
+                const pinnedStyle = getPinnedStyle(
+                  col,
+                  visibleCols,
+                  columnWidths,
+                  tableProps.hasSelection ? SELECTION_COL_WIDTH : 0,
+                );
+                const wrapperStyle: CSSProperties = {
+                  width: colWidth,
+                  minWidth: colWidth,
+                  height: "100%",
+                  ...pinnedStyle,
+                };
+
                 return (
-                  <Cell
+                  <div
                     key={col.key}
-                    cell={{ rowId, colKey: col.key }}
-                    initialValue={liveRow[col.key] ?? ""}
-                    width={colWidth}
-                    placeholder={col.placeholder}
-                    ellipsis={col.ellipsis}
-                    align={col.align}
-                    className={cellClass}
                     data-colkey={col.key}
                     data-rowid={rowId}
-                  />
+                    data-pinned={col.pinned}
+                    style={wrapperStyle}
+                  >
+                    {cellNode}
+                  </div>
                 );
               })}
             </div>

@@ -4,6 +4,7 @@ import {
   useEffect,
   useCallback,
   useImperativeHandle,
+  useRef,
   useState,
   type ForwardedRef,
   type ReactElement,
@@ -270,6 +271,8 @@ function EditableTableInner<T extends Record<string, string>>({
     getRowId,
   });
 
+  const headerScrollRef = useRef<HTMLDivElement | null>(null);
+
   const { handleContainerPointerDown } = useCellSelectionDrag({
     activeCellState,
     rowsDataRef,
@@ -350,7 +353,16 @@ function EditableTableInner<T extends Record<string, string>>({
             }}
           >
             {tableProps.showHeader !== false && (
-              <HeaderRow totalWidth={totalWidth} />
+              <div
+                ref={headerScrollRef}
+                style={{
+                  overflow: "hidden",
+                  width: "100%",
+                  flexShrink: 0,
+                }}
+              >
+                <HeaderRow totalWidth={totalWidth} />
+              </div>
             )}
             {tableProps.loading && tableProps.loadingVariant === "skeleton" ? (
               <SkeletonRows

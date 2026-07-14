@@ -129,6 +129,7 @@ export function useEditableTable<T extends Record<string, string>>(
   // Navigation state
   const activeCellRef = useRef<CellPos | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const headerScrollRef = useRef<HTMLDivElement | null>(null);
   const [activeCellState, setActiveCellState] = useState<CellPos | null>(null);
   const setActiveCell = useCallback((cell: CellPos | null) => {
     activeCellRef.current = cell;
@@ -393,6 +394,7 @@ export function useEditableTable<T extends Record<string, string>>(
     activeCellState,
     setActiveCell,
     scrollContainerRef,
+    headerScrollRef,
     getRowId,
     fillState,
     setFillState,

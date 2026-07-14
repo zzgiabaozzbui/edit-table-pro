@@ -56,6 +56,8 @@ export type ColDef<T = Record<string, string>> = {
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   hidden?: boolean;
+  // GitHub #15: sticky frozen columns — stay fixed on horizontal scroll
+  pinned?: "left" | "right";
   editable?: boolean | ((row: T) => boolean);
   validate?: (value: string, row: T) => ValidationResult;
   format?: (value: string) => string;

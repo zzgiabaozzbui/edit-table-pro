@@ -84,6 +84,8 @@ export type TableContextValue<T = Record<string, string>> = {
   activeCellState: CellPos | null;
   setActiveCell: (cell: CellPos | null) => void;
   scrollContainerRef: MutableRefObject<HTMLDivElement | null>;
+  // ponytail: #15 header track horizontal scroll (synced from body)
+  headerScrollRef: MutableRefObject<HTMLDivElement | null>;
   // Feature 8: Fill Handle
   getRowId: (row: T) => string;
   fillState: FillState;

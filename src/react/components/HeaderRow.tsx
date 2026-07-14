@@ -1,5 +1,6 @@
 import { useTableContext } from "../context/TableContext";
 import { ResizeHandle } from "./ResizeHandle";
+import { getPinnedStyle } from "./pinned";
 
 const SELECTION_COL_WIDTH = 40;
 
@@ -66,9 +67,16 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
             ? " ▲"
             : " ▼"
           : "";
+        const pinnedStyle = getPinnedStyle(
+          col,
+          visibleCols,
+          columnWidths,
+          tableProps.hasSelection ? SELECTION_COL_WIDTH : 0,
+        );
         return (
           <div
             key={col.key}
+            data-pinned={col.pinned}
             title={col.tooltip ?? undefined}
             onClick={() => toggleSort(col.key)}
             style={{
@@ -84,6 +92,7 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
               color: "var(--et-color-text)",
               cursor: "pointer",
               userSelect: "none",
+              ...pinnedStyle,
             }}
           >
             {col.header ?? col.key}

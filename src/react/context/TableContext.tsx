@@ -33,6 +33,8 @@ export type TableProps<T> = {
   striped?: boolean;
   emptyText?: string;
   filter?: (row: T) => boolean;
+  // ponytail: #17 row drag-to-reorder toggle
+  reorderable?: boolean;
 };
 
 export type TableContextValue<T = Record<string, string>> = {
@@ -90,6 +92,10 @@ export type TableContextValue<T = Record<string, string>> = {
   // Feature 9: Multi-cell selection
   cellSelection: CellSelectionRange | null;
   setCellSelection: (sel: CellSelectionRange | null) => void;
+  // Feature #17: row drag-to-reorder
+  reorderRows: (fromIndex: number, toIndex: number) => void;
+  // Feature #20: imperative data replacement
+  setData: (rows: T[]) => void;
 };
 
 // biome-ignore lint/suspicious/noExplicitAny: generic context default

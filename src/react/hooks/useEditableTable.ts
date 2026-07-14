@@ -26,7 +26,8 @@ import { useSideEffect } from "./useSideEffect";
 
 export type UseEditableTableOptions<T> = {
   columns: ColDef<T>[];
-  initialData: T[];
+  // ponytail: #21 optional in controlled mode (value provided instead)
+  initialData?: T[];
   rowHeight?: number;
   getRowId: (row: T) => string;
   theme?: TableTheme | "dark" | "light";
@@ -34,6 +35,11 @@ export type UseEditableTableOptions<T> = {
   onSelectionChange?: (ids: RowId[]) => void;
   onCellClick?: CellClickHandler;
   autoFocus?: boolean;
+  // Feature #21: controlled mode — value + onChange drive the data
+  value?: T[];
+  onChange?: (rows: T[]) => void;
+  // Feature #17: reorder callback
+  onReorder?: (rows: T[]) => void;
 } & TableProps<T>;
 
 export function useEditableTable<T extends Record<string, string>>(
@@ -61,6 +67,10 @@ export function useEditableTable<T extends Record<string, string>>(
     onSelectionChange,
     onCellClick,
     autoFocus = false,
+    value,
+    onChange,
+    onReorder,
+    reorderable,
   } = options;
 
   const rowHeight = rowHeightProp ?? SIZE_CONFIG[size].rowHeight;
@@ -78,12 +88,38 @@ export function useEditableTable<T extends Record<string, string>>(
     contextMenu,
     emptyText,
     filter,
+    reorderable,
     hasSelection,
   };
 
-  // Shared state
-  const [rows, setRows] = useState<T[]>(() => initialData);
-  const rowsDataRef = useRef<T[]>(initialData);
+  // Feature #21: controlled vs uncontrolled.
+  // ponytail: controlled mode mirrors `value` into rowsDataRef (copied so we
+  // never mutate the parent's array); uncontrolled keeps an internal copy.
+  const isControlled = value !== undefined;
+  const [internalRows, setInternalRows] = useState<T[]>(
+    () => initialData ?? [],
+  );
+  const rowsDataRef = useRef<T[]>(initialData ?? []);
+  rowsDataRef.current = isControlled ? [...(value as T[])] : internalRows;
+
+  const rows = isControlled ? (value as T[]) : internalRows;
+
+  // Unified setRows: keeps rowsDataRef in sync and fires onChange when controlled.
+  const setRows = useCallback(
+    (updater: T[] | ((prev: T[]) => T[])) => {
+      const next =
+        typeof updater === "function"
+          ? (updater as (prev: T[]) => T[])(rowsDataRef.current)
+          : updater;
+      rowsDataRef.current = next;
+      if (isControlled) {
+        onChange?.(next);
+      } else {
+        setInternalRows(next);
+      }
+    },
+    [isControlled, onChange],
+  );
   const editSessionStore = useMemo(() => new EditSessionStore(), []);
   const dirtyRowsRef = useRef<Map<RowId, DirtyRow>>(new Map());
   const historyRef = useRef<HistoryState>(createHistory());
@@ -257,11 +293,14 @@ export function useEditableTable<T extends Record<string, string>>(
     return () => cancelAnimationFrame(frame);
   }, [autoFocus, columns, focusCell, getRowId]);
 
-  const appendRows = useCallback((newRows: T[]) => {
-    const next = [...rowsDataRef.current, ...newRows];
-    rowsDataRef.current = next;
-    setRows(next);
-  }, []);
+  const appendRows = useCallback(
+    (newRows: T[]) => {
+      const next = [...rowsDataRef.current, ...newRows];
+      rowsDataRef.current = next;
+      setRows(next);
+    },
+    [setRows],
+  );
 
   const addRow = useCallback(() => {
     if (!createRow) return;
@@ -274,6 +313,43 @@ export function useEditableTable<T extends Record<string, string>>(
       });
     }
   }, [createRow, columns, getRowId, focusCell, appendRows]);
+
+  // Feature #20: imperative data replacement
+  const setData = useCallback(
+    (next: T[]) => {
+      rowsDataRef.current = next;
+      if (isControlled) {
+        onChange?.(next);
+      } else {
+        setInternalRows(next);
+      }
+    },
+    [isControlled, onChange],
+  );
+
+  // Feature #17: reorder rows by display index (mapped back via rowId)
+  const reorderRows = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const display = rows;
+      const fromId = display[fromIndex] ? getRowId(display[fromIndex]) : null;
+      const toId = display[toIndex] ? getRowId(display[toIndex]) : null;
+      if (!fromId || !toId || fromId === toId) return;
+      const raw = [...rowsDataRef.current];
+      const fromRaw = raw.findIndex((r) => getRowId(r) === fromId);
+      const toRaw = raw.findIndex((r) => getRowId(r) === toId);
+      if (fromRaw === -1 || toRaw === -1) return;
+      const [moved] = raw.splice(fromRaw, 1);
+      raw.splice(toRaw, 0, moved);
+      rowsDataRef.current = raw;
+      if (isControlled) {
+        onChange?.(raw);
+      } else {
+        setInternalRows(raw);
+      }
+      onReorder?.(raw);
+    },
+    [rows, getRowId, isControlled, onChange, onReorder],
+  );
 
   // ponytail: apply row filter on top of sort for display (#23)
   const displayRows = useMemo(
@@ -323,5 +399,7 @@ export function useEditableTable<T extends Record<string, string>>(
     applyFill,
     cellSelection,
     setCellSelection,
+    reorderRows,
+    setData,
   };
 }

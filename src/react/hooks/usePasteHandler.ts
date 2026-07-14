@@ -50,9 +50,15 @@ export function usePasteHandler<T extends Record<string, string>>({
         : -1;
 
       if (activeRowIndex !== -1 && activeColIndex !== -1) {
+        // #25: rows past the current last row are collected and appended as
+        // new rows (only when a createRow factory is provided).
+        const overflowLines: string[] = [];
         for (let li = 0; li < lines.length; li++) {
           const rowIndex = activeRowIndex + li;
-          if (rowIndex >= currentRows.length) break;
+          if (rowIndex >= currentRows.length) {
+            overflowLines.push(lines[li]);
+            continue;
+          }
           const row = currentRows[rowIndex];
           const rowId = getRowId(row);
           const values = lines[li].split("\t");
@@ -73,21 +79,11 @@ export function usePasteHandler<T extends Record<string, string>>({
             }
           }
         }
+        if (createRow && overflowLines.length > 0) {
+          appendRows(linesToRows(overflowLines, editableCols, createRow));
+        }
       } else if (createRow) {
-        const newRows = lines.map((line) => {
-          const values = line.split("\t");
-          const row = createRow();
-          editableCols.forEach((col, i) => {
-            if (values[i] === undefined) return;
-            const trimmed = values[i].trim();
-            const validation = validateCell(col, trimmed, row as T);
-            (row as Record<string, string>)[col.key] = validation.ok
-              ? formatCell(col, trimmed)
-              : trimmed;
-          });
-          return row;
-        });
-        appendRows(newRows);
+        appendRows(linesToRows(lines, editableCols, createRow));
       }
     },
     [
@@ -103,4 +99,26 @@ export function usePasteHandler<T extends Record<string, string>>({
   );
 
   return { handlePaste };
+}
+
+// Build rows from clipboard lines using a createRow factory + the current
+// editable column order. #25 reuses this for overflow rows past the last row.
+export function linesToRows<T extends Record<string, string>>(
+  lines: string[],
+  editableCols: ColDef<T>[],
+  createRow: () => T,
+): T[] {
+  return lines.map((line) => {
+    const values = line.split("\t");
+    const row = createRow();
+    editableCols.forEach((col, i) => {
+      if (values[i] === undefined) return;
+      const trimmed = values[i].trim();
+      const validation = validateCell(col, trimmed, row as T);
+      (row as Record<string, string>)[col.key] = validation.ok
+        ? formatCell(col, trimmed)
+        : trimmed;
+    });
+    return row;
+  });
 }

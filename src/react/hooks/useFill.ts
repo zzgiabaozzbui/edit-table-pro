@@ -1,5 +1,10 @@
 import { markDirty } from "@/core/dirty";
-import { detectSeriesType, generateFillValues } from "@/core/fill";
+import {
+  computeHorizontalFillEntries,
+  detectSeriesType,
+  generateFillValues,
+  resolveEditable,
+} from "@/core/fill";
 import { pushBatchHistory } from "@/core/history";
 import type {
   CellPos,
@@ -51,14 +56,53 @@ export function useFill<T extends Record<string, string>>({
 
   const applyFill = useCallback(
     (range: CellRange, sourceCell: CellPos) => {
-      const { rowIndexStart, rowIndexEnd } = range;
-      const colsToFill: ColKey[] = range.colKeys ?? [range.colKey];
-
       const allRows = rowsDataRef.current;
       const sourceRowIndex = allRows.findIndex(
         (r) => getRowId(r) === sourceCell.rowId,
       );
-      if (sourceRowIndex === -1) return;
+      if (sourceRowIndex === -1) {
+        setFillState(IDLE_FILL_STATE);
+        setCellSelection(null);
+        return;
+      }
+
+      // Horizontal fill: same row, span across columns (#14)
+      const isHorizontal = range.rowIndexStart === range.rowIndexEnd;
+      if (isHorizontal) {
+        const entries = computeHorizontalFillEntries(
+          columns,
+          allRows,
+          sourceRowIndex,
+          sourceCell.colKey,
+          range.colKeys ?? [range.colKey],
+          getRowId,
+        );
+        for (const e of entries) {
+          const row = rowsDataRef.current[sourceRowIndex];
+          rowsDataRef.current[sourceRowIndex] = {
+            ...row,
+            [e.colKey]: e.nextValue,
+          };
+          markDirty(
+            dirtyRowsRef.current,
+            e.rowId,
+            e.colKey,
+            e.prevValue,
+            e.nextValue,
+          );
+        }
+        if (entries.length > 0) {
+          pushBatchHistory(historyRef.current, entries);
+          setRows([...rowsDataRef.current]);
+        }
+        setFillState(IDLE_FILL_STATE);
+        setCellSelection(null);
+        return;
+      }
+
+      // Vertical fill (existing behavior)
+      const { rowIndexStart, rowIndexEnd } = range;
+      const colsToFill: ColKey[] = range.colKeys ?? [range.colKey];
 
       const minIdx = Math.min(rowIndexStart, rowIndexEnd);
       const maxIdx = Math.max(rowIndexStart, rowIndexEnd);
@@ -138,10 +182,4 @@ export function useFill<T extends Record<string, string>>({
   );
 
   return { fillState, setFillState, applyFill };
-}
-
-function resolveEditable<T>(editable: ColDef<T>["editable"], row: T): boolean {
-  if (editable === undefined || editable === true) return true;
-  if (editable === false) return false;
-  return editable(row);
 }

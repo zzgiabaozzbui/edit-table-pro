@@ -19,6 +19,8 @@ export type TableProps<T> = {
   bordered?: boolean;
   size?: "large" | "medium" | "small";
   loading?: boolean;
+  // ponytail: #29 loading skeleton variant (default "spinner")
+  loadingVariant?: "spinner" | "skeleton";
   showHeader?: boolean;
   sticky?: boolean;
   hasSelection?: boolean;

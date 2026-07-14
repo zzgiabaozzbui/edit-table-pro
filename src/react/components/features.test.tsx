@@ -139,4 +139,17 @@ describe("EditableTable additive features", () => {
     );
     expect(html).toContain('title="The name"');
   });
+
+  it("loading skeleton renders shimmer rows (#29)", () => {
+    const html = renderToStaticMarkup(
+      <EditableTable<Row>
+        loading
+        loadingVariant="skeleton"
+        columns={baseCols}
+        initialData={data}
+        getRowId={getRowId}
+      />,
+    );
+    expect(html).toContain("et-skeleton-row");
+  });
 });

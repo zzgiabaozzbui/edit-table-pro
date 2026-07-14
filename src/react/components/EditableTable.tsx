@@ -19,6 +19,53 @@ type EditableTableProps<T extends Record<string, string>> =
 const ADD_ROW_HEIGHT = 36;
 const SELECTION_COL_WIDTH = 40;
 
+// ponytail: #29 shimmer placeholders shown while loading with skeleton variant
+const SKELETON_ROWS = 8;
+
+type SkeletonRowsProps = Readonly<{
+  visibleCols: { key: string; width?: number }[];
+  columnWidths: Map<string, number>;
+  rowHeight: number;
+  totalWidth: number;
+}>;
+
+function SkeletonRows({
+  visibleCols,
+  columnWidths,
+  rowHeight,
+  totalWidth,
+}: SkeletonRowsProps) {
+  return (
+    <div style={{ flex: 1, overflow: "hidden" }}>
+      {Array.from({ length: SKELETON_ROWS }, (_, i) => (
+        <div
+          key={i}
+          className="et-skeleton-row"
+          style={{
+            height: rowHeight,
+            width: totalWidth,
+            display: "flex",
+            borderBottom: "1px solid var(--et-color-split)",
+          }}
+        >
+          {visibleCols.map((col) => (
+            <div
+              key={col.key}
+              className="et-skeleton-cell"
+              style={{
+                width: columnWidths.get(col.key) ?? col.width ?? 150,
+                height: "60%",
+                margin: "auto 8px",
+                borderRadius: 4,
+              }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function EditableTable<T extends Record<string, string>>({
   height = 600,
   ...options
@@ -124,7 +171,7 @@ export function EditableTable<T extends Record<string, string>>({
           overflow: "hidden",
         }}
       >
-        {tableProps.loading && (
+        {tableProps.loading && tableProps.loadingVariant !== "skeleton" && (
           <div className="et-loading-overlay">
             <div className="et-loading-spinner" />
           </div>
@@ -149,11 +196,20 @@ export function EditableTable<T extends Record<string, string>>({
             {tableProps.showHeader !== false && (
               <HeaderRow totalWidth={totalWidth} />
             )}
-            <VirtualBody
-              rows={rows}
-              getRowId={options.getRowId}
-              totalWidth={totalWidth}
-            />
+            {tableProps.loading && tableProps.loadingVariant === "skeleton" ? (
+              <SkeletonRows
+                visibleCols={visibleCols}
+                columnWidths={columnWidths}
+                rowHeight={rowHeight}
+                totalWidth={totalWidth}
+              />
+            ) : (
+              <VirtualBody
+                rows={rows}
+                getRowId={options.getRowId}
+                totalWidth={totalWidth}
+              />
+            )}
             {rows.length === 0 && !tableProps.loading && (
               <div className="et-empty">
                 {tableProps.emptyText ?? "Không có dữ liệu"}

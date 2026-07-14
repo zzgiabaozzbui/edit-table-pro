@@ -139,6 +139,31 @@
   }
 }
 
+/* ── Loading skeleton (#29) ─────────────────── */
+.et-skeleton-row {
+  background: var(--et-color-bg);
+}
+
+.et-skeleton-cell {
+  background: linear-gradient(
+    90deg,
+    var(--et-color-row-hover) 25%,
+    color-mix(in srgb, var(--et-color-row-hover) 60%, var(--et-color-bg)) 37%,
+    var(--et-color-row-hover) 63%
+  );
+  background-size: 400% 100%;
+  animation: et-shimmer 1.4s ease infinite;
+}
+
+@keyframes et-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
 /* ── Fill Handle ────────────────────────────── */
 .et-cell-fill-handle {
   position: absolute;

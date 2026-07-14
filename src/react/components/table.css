@@ -212,6 +212,22 @@
   width: 100%;
 }
 
+/* ── Sticky footer (#27) ───────────────────── */
+.et-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: var(--et-color-bg-header);
+  color: var(--et-color-text);
+  padding: 0 var(--et-padding-x);
+  font-size: var(--et-font-size);
+  font-family: var(--et-font-family);
+  line-height: var(--et-row-height);
+  min-height: var(--et-row-height);
+  display: flex;
+  align-items: center;
+}
+
 /* ── Dark mode overrides (#4, WCAG AA) ──────── */
 .et-dark .et-loading-overlay {
   background: rgba(0, 0, 0, 0.55);

@@ -13,7 +13,7 @@ import type {
   HistoryState,
   RowId,
 } from "@/core/types";
-import { type MutableRefObject, createContext, useContext } from "react";
+import { type MutableRefObject, type ReactNode, createContext, useContext } from "react";
 
 export type TableProps<T> = {
   bordered?: boolean;
@@ -25,6 +25,8 @@ export type TableProps<T> = {
   sticky?: boolean;
   hasSelection?: boolean;
   rowClassName?: (row: T, index: number) => string;
+  // ponytail: #27 sticky footer / summary row
+  footer?: ReactNode;
   // ponytail: additive UI props for open issues
   striped?: boolean;
   emptyText?: string;

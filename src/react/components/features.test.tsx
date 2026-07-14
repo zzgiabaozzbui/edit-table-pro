@@ -152,4 +152,17 @@ describe("EditableTable additive features", () => {
     );
     expect(html).toContain("et-skeleton-row");
   });
+
+  it("footer node renders when passed (#27)", () => {
+    const html = renderToStaticMarkup(
+      <EditableTable<Row>
+        columns={baseCols}
+        initialData={data}
+        getRowId={getRowId}
+        footer={<div className="et-footer-custom">Tổng: 2</div>}
+      />,
+    );
+    expect(html).toContain("et-footer");
+    expect(html).toContain("et-footer-custom");
+  });
 });

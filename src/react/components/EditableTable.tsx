@@ -247,6 +247,18 @@ export function EditableTable<T extends Record<string, string>>({
                 <span>Thêm dòng</span>
               </button>
             )}
+            {tableProps.footer !== undefined && (
+              <div
+                className="et-footer"
+                style={{
+                  flexShrink: 0,
+                  minWidth: totalWidth,
+                  borderTop: "1px solid var(--et-color-split)",
+                }}
+              >
+                {tableProps.footer}
+              </div>
+            )}
           </div>
         </div>
       </div>

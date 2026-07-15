@@ -1,7 +1,21 @@
 import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
+import Markdown from "react-markdown";
 import type { ColDef, TableTheme } from "../src/index";
 import { EditableTable } from "../src/index";
+import usage from "./USAGE.md?raw";
+
+const USAGE_DOC_CSS = `
+.usage-doc { font-size: 13px; line-height: 1.6; color: var(--et-color-text, #1f1f1f); }
+.usage-doc h1 { font-size: 18px; margin: 12px 0 8px; }
+.usage-doc h2 { font-size: 15px; margin: 16px 0 6px; border-bottom: 1px solid var(--et-color-border, #eee); padding-bottom: 4px; }
+.usage-doc p { margin: 6px 0; }
+.usage-doc ul { margin: 6px 0; padding-left: 18px; }
+.usage-doc li { margin: 2px 0; }
+.usage-doc code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.usage-doc pre { background: #1e1e1e; color: #e6e6e6; padding: 10px 12px; border-radius: 6px; overflow-x: auto; }
+.usage-doc pre code { background: none; padding: 0; color: inherit; }
+`;
 
 type Employee = {
   id: string;
@@ -137,24 +151,44 @@ function App() {
         </label>
       </div>
 
-      <EditableTable
-        columns={columns}
-        initialData={data}
-        getRowId={(r) => r.id}
-        createRow={() => ({
-          id: String(Date.now()),
-          name: "",
-          code: "",
-          department: "",
-          phone: "",
-        })}
-        height={560}
-        size={size}
-        bordered={bordered}
-        sticky
-        theme={THEMES[themeName]}
-        rowClassName={(_, i) => (i % 2 === 1 ? "et-row-stripe" : "")}
-      />
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <EditableTable
+            columns={columns}
+            initialData={data}
+            getRowId={(r) => r.id}
+            createRow={() => ({
+              id: String(Date.now()),
+              name: "",
+              code: "",
+              department: "",
+              phone: "",
+            })}
+            height={560}
+            size={size}
+            bordered={bordered}
+            sticky
+            theme={THEMES[themeName]}
+            rowClassName={(_, i) => (i % 2 === 1 ? "et-row-stripe" : "")}
+          />
+        </div>
+        <aside
+          className="usage-doc"
+          style={{
+            width: 360,
+            flexShrink: 0,
+            maxHeight: 560,
+            overflowY: "auto",
+            border: "1px solid var(--et-color-border)",
+            borderRadius: "var(--et-border-radius)",
+            padding: "4px 16px",
+            background: "var(--et-color-bg)",
+          }}
+        >
+          <Markdown>{usage}</Markdown>
+        </aside>
+      </div>
+      <style>{USAGE_DOC_CSS}</style>
     </div>
   );
 }

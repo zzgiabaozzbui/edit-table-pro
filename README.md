@@ -24,6 +24,7 @@
 - [🤔 Why not react-table / Handsontable / AG Grid?](#-why-not-react-table--handsontable--ag-grid)
 - [✨ Features](#-features)
 - [⌨️ Keyboard Shortcuts](#️-keyboard-shortcuts)
+- [🖱️ Using the Table](#️-using-the-table)
 - [🎨 Theming](#-theming)
 - [📖 Documentation](#-documentation)
 - [🤝 Contributing](#-contributing)
@@ -206,6 +207,39 @@ The real difference:
 | `Ctrl+Y` / `Ctrl+Shift+Z` | Redo |
 | `Ctrl+D` | Fill down one row |
 | `Ctrl+R` | Fill right one column |
+
+---
+
+## 🖱️ Using the Table (Dành cho người dùng cuối)
+
+### Chọn và di chuyển
+- Click ô để chọn — ô được chọn có viền sáng và nút **fill handle** (ô vuông nhỏ góc dưới-phải).
+- Mũi tên `↑ ↓ ← →`: di chuyển giữa các ô.
+- `Tab` / `Enter`: sang ô kế tiếp (`Shift+Tab` / `Shift+Enter`: lùi lại).
+- `Ctrl+A`: chọn toàn bộ ô của hàng hiện tại.
+
+### Sửa dữ liệu
+- Click ô (hoặc điều hướng tới) rồi gõ — giá trị cập nhật ngay.
+- `Enter` / `Tab`: lưu và sang ô tiếp.
+- `Esc`: hủy, trả về giá trị cũ, thoát ô.
+- Rời ô (click ra ngoài): tự động lưu.
+- Cột `select` / `date` / `boolean`: hiện dropdown / picker ngày / checkbox thay input thường.
+
+### Hoàn tác
+- `Ctrl+Z`: undo. `Ctrl+Y` hoặc `Ctrl+Shift+Z`: redo.
+
+### Fill (copy giá trị)
+- Kéo **fill handle** (góc dưới-phải ô đang chọn) qua các ô kế để copy giá trị.
+- `Ctrl+D`: copy ô hiện tại xuống ô dưới.
+- `Ctrl+R`: copy ô hiện tại sang ô bên phải.
+
+### Dán (paste)
+- `Ctrl+V` dán clipboard vào ô đang chọn.
+- Dán nhiều ô (TSV từ Excel/Sheets) điền theo lưới.
+- Dán vượt quá dòng cuối → tự động tạo dòng mới (nếu bảng bật thêm dòng qua `createRow`).
+
+### Tìm kiếm
+- Bật `searchable`: gõ vào ô tìm kiếm trên thanh công cụ để lọc hàng theo mọi cột.
 
 ---
 

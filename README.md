@@ -201,7 +201,7 @@ The real difference:
 | --- | --- |
 | `Tab` / `Enter` | Move to next cell |
 | `Shift+Tab` | Move to previous cell |
-| `Arrow keys` | Navigate between cells |
+| `ArrowUp` / `ArrowDown` | Move between rows (document-level; see known limits) |
 | `Escape` | Cancel edit, restore committed value |
 | `Ctrl+Z` | Undo (including multi-cell fill) |
 | `Ctrl+Y` / `Ctrl+Shift+Z` | Redo |
@@ -214,7 +214,7 @@ The real difference:
 
 ### Chọn và di chuyển
 - Click ô để chọn — ô được chọn có viền sáng và nút **fill handle** (ô vuông nhỏ góc dưới-phải).
-- Mũi tên `↑ ↓ ← →`: di chuyển giữa các ô.
+- Mũi tên `↑ ↓`: di chuyển giữa các hàng (trái/phải chưa hỗ trợ).
 - `Tab` / `Enter`: sang ô kế tiếp (`Shift+Tab` / `Shift+Enter`: lùi lại).
 - `Ctrl+A`: chọn toàn bộ ô của hàng hiện tại.
 

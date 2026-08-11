@@ -1,5 +1,6 @@
 node_modules/
 dist/
+coverage/
 .env
 # docs — ignore internal/AI docs, allow user-facing docs
 docs/context/
@@ -7,6 +8,8 @@ docs/history/
 docs/ai-handbook/
 docs/human-context/
 docs/*.md
+# ...but the roadmap is public: README, CHANGELOG and open issues all link it.
+!docs/06-roadmap.md
 .playwright-mcp/
 
 # AI tools

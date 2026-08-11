@@ -24,6 +24,8 @@ export type {
   CellError,
   CellRange,
   FillState,
+  SideEffectContext,
+  SideEffectFn,
 } from "./core/types";
 
 export type { FillSeriesType } from "./core/fill";

@@ -20,7 +20,7 @@ jobs:
 
       # Node 20 only, deliberately: the package ships no Node runtime code, so a
       # matrix would run the identical tsc/biome/vitest/vite job three times.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: npm

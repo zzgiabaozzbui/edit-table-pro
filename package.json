@@ -8,11 +8,17 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -43,13 +49,23 @@
     "url": "https://github.com/zzgiabaozzbui/edit-table-pro/issues"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build && node scripts/post-build.mjs",
     "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
-    "prepublishOnly": "npm run typecheck && npm run build && npm test -- --run"
+    "test:run": "vitest run",
+    "coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run typecheck && npm run check:ci && npm run build && npm run test:run"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -59,9 +75,11 @@
     "@biomejs/biome": "^1.9.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.3",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "@vitest/coverage-v8": "^2.1.9",
     "happy-dom": "^15.11.7",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",

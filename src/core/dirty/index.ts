@@ -7,10 +7,11 @@ export function markDirty(
   originalValue: string,
   newValue: string,
 ): void {
-  if (!dirtyMap.has(rowId)) {
-    dirtyMap.set(rowId, { original: {}, current: {} });
+  let row = dirtyMap.get(rowId);
+  if (!row) {
+    row = { original: {}, current: {} };
+    dirtyMap.set(rowId, row);
   }
-  const row = dirtyMap.get(rowId)!;
   if (!(colKey in row.original)) {
     row.original[colKey] = originalValue;
   }

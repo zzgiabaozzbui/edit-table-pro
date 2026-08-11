@@ -200,13 +200,18 @@ The real difference:
 | Key | Action |
 | --- | --- |
 | `Tab` / `Enter` | Move to next cell |
-| `Shift+Tab` | Move to previous cell |
-| `Arrow keys` | Navigate between cells |
+| `Shift+Tab` / `Shift+Enter` | Move to previous cell |
+| `↑` / `↓` | Move one row up / down |
 | `Escape` | Cancel edit, restore committed value |
 | `Ctrl+Z` | Undo (including multi-cell fill) |
 | `Ctrl+Y` / `Ctrl+Shift+Z` | Redo |
+| `Ctrl+A` | Select every cell in the current row |
 | `Ctrl+D` | Fill down one row |
 | `Ctrl+R` | Fill right one column |
+
+`←` / `→`, `Home`, `End`, `PageUp`, `PageDown` and `F2` are **not implemented yet** —
+tracked in [#42](https://github.com/zzgiabaozzbui/edit-table-pro/issues/42). Use `Tab` /
+`Shift+Tab` to move horizontally in the meantime.
 
 ---
 
@@ -214,7 +219,7 @@ The real difference:
 
 ### Chọn và di chuyển
 - Click ô để chọn — ô được chọn có viền sáng và nút **fill handle** (ô vuông nhỏ góc dưới-phải).
-- Mũi tên `↑ ↓ ← →`: di chuyển giữa các ô.
+- Mũi tên `↑ ↓`: di chuyển lên/xuống một hàng (`← →` chưa hỗ trợ — xem [#42](https://github.com/zzgiabaozzbui/edit-table-pro/issues/42)).
 - `Tab` / `Enter`: sang ô kế tiếp (`Shift+Tab` / `Shift+Enter`: lùi lại).
 - `Ctrl+A`: chọn toàn bộ ô của hàng hiện tại.
 
@@ -333,6 +338,26 @@ These are things not yet built. Any of them would make a great PR — [claim one
 - [ ] **`number` cell type** — right-aligned with numeric keyboard on mobile
 
 Have an idea not on this list? [Open an issue](https://github.com/zzgiabaozzbui/edit-table-pro/issues/new) or just build it.
+
+The full phased plan from 0.2 to 1.0 — including what is deliberately **out** of scope —
+lives in [`docs/06-roadmap.md`](./docs/06-roadmap.md).
+
+**Deliberately not planned**: row grouping, pivot, tree data, master-detail, pagination,
+`.xlsx` export, server-side data sources, canvas rendering, a formula engine and variable
+row height. If you need those, [AG Grid](https://www.ag-grid.com/) is the honest answer.
+
+---
+
+## 🌐 Browser Support
+
+Modern evergreen browsers. Concretely: **Chrome / Edge 111+, Firefox 113+, Safari 16.4+**
+— the floor is set by [`color-mix()`](https://caniuse.com/mdn-css_types_color_color-mix),
+which the stylesheet uses for selection and hover tints.
+
+Also relied on: Pointer Events with `setPointerCapture` (fill-handle drag) and CSS
+`position: sticky`. No polyfills are bundled — add your own if you need older targets.
+
+Node **18+** for building and testing.
 
 ---
 

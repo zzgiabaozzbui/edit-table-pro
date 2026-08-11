@@ -1,0 +1,10 @@
+# Keep the working tree LF on every platform so Biome's formatter (which emits LF)
+# agrees with what is on disk. Without this, `biome ci` fails on Windows checkouts
+# with core.autocrlf=true while passing in Linux CI.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.ico binary

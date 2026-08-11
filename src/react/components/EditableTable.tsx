@@ -29,7 +29,6 @@ function EditableTableInner<T extends Record<string, string>>(
     tableProps,
     theme,
     columns,
-    rows,
     displayRows,
     displayRowsRef,
     searchable,
@@ -82,7 +81,10 @@ function EditableTableInner<T extends Record<string, string>>(
 
   const headerHeight = tableProps.showHeader !== false ? rowHeight : 0;
   const footerHeight = canAddRow ? ADD_ROW_HEIGHT : 0;
-  const contentHeight = rows.length * rowHeight + headerHeight + footerHeight;
+  // displayRows, not rows — the body renders the filtered set, so reserving scroll
+  // height for the unfiltered one leaves dead space under an active search.
+  const contentHeight =
+    displayRows.length * rowHeight + headerHeight + footerHeight;
   const actualHeight = Math.min(height, contentHeight);
 
   useKeyboardNav({

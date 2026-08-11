@@ -13,6 +13,9 @@ export default defineConfig(({ command }) => ({
     dts({
       include: ["src"],
       exclude: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+      // One flattened, self-contained dist/index.d.ts. post-build.mjs copies it to
+      // index.d.cts so `require()` consumers on node16 resolution get types too.
+      rollupTypes: true,
     }),
   ],
   build: {
@@ -23,7 +26,11 @@ export default defineConfig(({ command }) => ({
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime"],
-      output: { globals: { react: "React", "react-dom": "ReactDOM" } },
+      output: {
+        globals: { react: "React", "react-dom": "ReactDOM" },
+        // Without this the package throws when imported from a React Server Component.
+        banner: '"use client";',
+      },
     },
   },
   resolve: { alias: { "@": resolve(__dirname, "src") } },
@@ -32,5 +39,11 @@ export default defineConfig(({ command }) => ({
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     environment: "happy-dom",
     globals: true,
+    coverage: {
+      provider: "v8",
+      include: ["src/**"],
+      exclude: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+      reporter: ["text-summary", "json-summary"],
+    },
   },
 }));

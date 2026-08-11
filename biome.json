@@ -1,5 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
+  "files": {
+    "ignore": ["dist", "coverage", "node_modules", "docs/ai-handbook"]
+  },
   "organizeImports": { "enabled": true },
   "linter": {
     "enabled": true,
@@ -8,6 +11,7 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "indentWidth": 2
+    "indentWidth": 2,
+    "ignore": ["package.json", "package-lock.json"]
   }
 }

@@ -4,6 +4,12 @@ import { useEffect, useRef } from "react";
 import { useTableContext } from "../context/TableContext";
 import { FillHandle } from "./FillHandle";
 
+/** Values that should render as checked when pasted from CSV / forms. */
+export function isTruthyBooleanValue(value: string): boolean {
+  const v = value.trim().toLowerCase();
+  return v === "true" || v === "1" || v === "yes" || v === "y" || v === "on";
+}
+
 type BooleanCellProps = Readonly<{
   cell: CellPos;
   value: string;
@@ -19,7 +25,7 @@ export function BooleanCell({
   cell,
   value,
   width,
-  align,
+  align: _align,
   disabled,
   className,
   "data-colkey": dataColKey,
@@ -57,12 +63,12 @@ export function BooleanCell({
       <input
         ref={inputRef}
         type="checkbox"
-        checked={value === "true"}
+        checked={isTruthyBooleanValue(value)}
         disabled={disabled}
         onClick={() => onCellClick?.(cell.rowId, cell.colKey, value)}
         onChange={(e) => commitCell(cell, e.target.checked ? "true" : "false")}
         onFocus={() => setActiveCell(cell)}
-        style={{ textAlign: align ?? "center" }}
+        aria-label={`${cell.colKey} for row ${cell.rowId}`}
       />
       {(isActiveCell ||
         (cellSelection?.rowId === cell.rowId &&

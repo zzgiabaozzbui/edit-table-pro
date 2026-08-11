@@ -4,7 +4,7 @@ import { act, fireEvent, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { TableProvider } from "../context/TableContext";
 import { useEditableTable } from "../hooks/useEditableTable";
-import { BooleanCell } from "./BooleanCell";
+import { BooleanCell, isTruthyBooleanValue } from "./BooleanCell";
 
 type Row = { id: string; active: string };
 

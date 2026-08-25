@@ -55,4 +55,37 @@ describe("row search (#23)", () => {
     act(() => result.current.setQuery("ALPHA"));
     expect(result.current.displayRows.map((r) => r.id)).toEqual(["1"]);
   });
+
+  it("re-evaluates only the committed row against an active filter (#46)", async () => {
+    const { result } = renderHook(() =>
+      useEditableTable<Row>({
+        ...base,
+        initialData: [
+          { id: "1", a: "alpha", b: "y", c: "z" },
+          { id: "2", a: "beta", b: "q", c: "r" },
+          { id: "3", a: "gamma", b: "q", c: "r" },
+        ],
+      }),
+    );
+    act(() => result.current.setQuery("a"));
+    expect(result.current.displayRows.map((r) => r.id)).toEqual([
+      "1",
+      "2",
+      "3",
+    ]);
+
+    await act(async () => {
+      await result.current.commitCell({ rowId: "2", colKey: "a" }, "zzz");
+    });
+    expect(result.current.displayRows.map((r) => r.id)).toEqual(["1", "3"]);
+
+    await act(async () => {
+      await result.current.commitCell({ rowId: "2", colKey: "b" }, "ann");
+    });
+    expect(result.current.displayRows.map((r) => r.id)).toEqual([
+      "1",
+      "2",
+      "3",
+    ]);
+  });
 });

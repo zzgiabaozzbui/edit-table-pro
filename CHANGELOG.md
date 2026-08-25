@@ -10,6 +10,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
 
 ### Added
+- **Keyboard navigation** — `←`/`→` (caret-aware: only hijacked at text boundaries, so
+  intra-cell editing survives), `Home`/`End`, `PageUp`/`PageDown` and `F2` re-enter active
+  cell (#42).
 - **CI** — typecheck, `biome ci`, `vitest run` and `build` on every PR (Node 20).
 - **Packaging** — `"use client"` banner on both bundles (the package previously threw in any
   Next.js App Router project), flattened `dist/index.d.ts` via `rollupTypes`, `dist/index.d.cts`
@@ -26,8 +29,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 ### Fixed
 - Scroll height reserved rows from the **unfiltered** dataset, leaving dead space below the
   last match whenever a search was active (`EditableTable.tsx`).
-- `README` documented `Arrow keys | Navigate between cells`; `←`/`→`, `Home`, `End`, `PageUp`,
-  `PageDown` and `F2` have never been implemented (#42).
+- Arrow keys are no longer swallowed by the document-level keydown handler while a native
+  control has focus — `<select>` cells keep `↑`/`↓`, date cells keep all arrows (#33).
 - `biome ci` now passes: `dist/` and `docs/ai-handbook/` excluded (400 of 431 diagnostics came
   from unignored build output), plus four real lint violations in `src/` and `examples/`.
 

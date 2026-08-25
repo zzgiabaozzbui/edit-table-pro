@@ -125,9 +125,33 @@ export function useKeyboardNav<T extends Record<string, string>>({
         sc.scrollTop = bottom - sc.clientHeight;
     };
 
+    const ae = document.activeElement;
+    const nativeControl =
+      ae instanceof HTMLSelectElement ||
+      (ae instanceof HTMLInputElement && ae.type === "date");
+    const caretAtBoundary = (at: "start" | "end") => {
+      const el = ae instanceof HTMLInputElement ? ae : null;
+      if (!el || el.type === "date" || el.type === "checkbox") return true;
+      if (el.selectionStart === null || el.selectionEnd === null) return true;
+      return at === "start"
+        ? el.selectionStart === 0 && el.selectionEnd === 0
+        : el.selectionStart === el.value.length &&
+            el.selectionEnd === el.value.length;
+    };
+
     const navigate = (
       from: CellPos,
-      direction: "next" | "prev" | "up" | "down",
+      direction:
+        | "next"
+        | "prev"
+        | "up"
+        | "down"
+        | "left"
+        | "right"
+        | "home"
+        | "end"
+        | "pageup"
+        | "pagedown",
     ) => {
       const allRows = displayRowsRef.current;
       const colIdx = navigableCols.findIndex((c) => c.key === from.colKey);
@@ -148,12 +172,32 @@ export function useKeyboardNav<T extends Record<string, string>>({
           nextColIdx = navigableCols.length - 1;
           nextRowIdx = rowIdx - 1;
         } else return;
+      } else if (direction === "left") {
+        if (colIdx <= 0) return;
+        nextColIdx = colIdx - 1;
+      } else if (direction === "right") {
+        if (colIdx >= navigableCols.length - 1) return;
+        nextColIdx = colIdx + 1;
+      } else if (direction === "home") {
+        nextColIdx = 0;
+      } else if (direction === "end") {
+        nextColIdx = navigableCols.length - 1;
       } else if (direction === "up") {
         if (rowIdx <= 0) return;
         nextRowIdx = rowIdx - 1;
-      } else {
+      } else if (direction === "down") {
         if (rowIdx >= allRows.length - 1) return;
         nextRowIdx = rowIdx + 1;
+      } else {
+        const clientHeight = scrollContainerRef.current?.clientHeight ?? 600;
+        const pageSize = Math.max(1, Math.floor(clientHeight / rowHeight) - 1);
+        if (direction === "pageup") {
+          if (rowIdx <= 0) return;
+          nextRowIdx = Math.max(0, rowIdx - pageSize);
+        } else {
+          if (rowIdx >= allRows.length - 1) return;
+          nextRowIdx = Math.min(allRows.length - 1, rowIdx + pageSize);
+        }
       }
 
       const nextCell: CellPos = {
@@ -186,14 +230,59 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    if (e.key === "ArrowUp") {
+    if (!nativeControl && e.key === "ArrowUp") {
       e.preventDefault();
       navigate(active, "up");
       return;
     }
-    if (e.key === "ArrowDown") {
+    if (!nativeControl && e.key === "ArrowDown") {
       e.preventDefault();
       navigate(active, "down");
+      return;
+    }
+    if (
+      !nativeControl &&
+      !e.shiftKey &&
+      e.key === "ArrowLeft" &&
+      caretAtBoundary("start")
+    ) {
+      e.preventDefault();
+      navigate(active, "left");
+      return;
+    }
+    if (
+      !nativeControl &&
+      !e.shiftKey &&
+      e.key === "ArrowRight" &&
+      caretAtBoundary("end")
+    ) {
+      e.preventDefault();
+      navigate(active, "right");
+      return;
+    }
+    if (!nativeControl && !e.shiftKey && e.key === "Home") {
+      e.preventDefault();
+      navigate(active, "home");
+      return;
+    }
+    if (!nativeControl && !e.shiftKey && e.key === "End") {
+      e.preventDefault();
+      navigate(active, "end");
+      return;
+    }
+    if (!nativeControl && !e.shiftKey && e.key === "PageUp") {
+      e.preventDefault();
+      navigate(active, "pageup");
+      return;
+    }
+    if (!nativeControl && !e.shiftKey && e.key === "PageDown") {
+      e.preventDefault();
+      navigate(active, "pagedown");
+      return;
+    }
+    if (e.key === "F2") {
+      e.preventDefault();
+      focusCell(active);
       return;
     }
   };

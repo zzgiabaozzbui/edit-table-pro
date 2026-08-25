@@ -202,6 +202,10 @@ The real difference:
 | `Tab` / `Enter` | Move to next cell |
 | `Shift+Tab` / `Shift+Enter` | Move to previous cell |
 | `↑` / `↓` | Move one row up / down |
+| `←` / `→` | Move one column left / right (only when the caret is at the cell's text boundary) |
+| `Home` / `End` | Jump to first / last editable column of the row |
+| `PageUp` / `PageDown` | Move up / down one page of rows |
+| `F2` | Re-enter the active cell |
 | `Escape` | Cancel edit, restore committed value |
 | `Ctrl+Z` | Undo (including multi-cell fill) |
 | `Ctrl+Y` / `Ctrl+Shift+Z` | Redo |
@@ -209,9 +213,8 @@ The real difference:
 | `Ctrl+D` | Fill down one row |
 | `Ctrl+R` | Fill right one column |
 
-`←` / `→`, `Home`, `End`, `PageUp`, `PageDown` and `F2` are **not implemented yet** —
-tracked in [#42](https://github.com/zzgiabaozzbui/edit-table-pro/issues/42). Use `Tab` /
-`Shift+Tab` to move horizontally in the meantime.
+Native controls keep their own arrow keys — `↑`/`↓` inside a `<select>` or date input is
+never intercepted.
 
 ---
 

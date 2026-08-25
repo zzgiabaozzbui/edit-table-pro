@@ -18,6 +18,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   intra-cell editing survives), `Home`/`End`, `PageUp`/`PageDown` and `F2` re-enter active
   cell (#42).
 - **CI** — typecheck, `biome ci`, `vitest run` and `build` on every PR (Node 20).
+- **Perf** — row lookups across commit/fill/paste/keyboard paths go through an identity-keyed
+  `Map` index (`createRowIndexGetter`) instead of an O(n) `findIndex` per keystroke (#43).
+- **Bundle-size budget** — `index.js` raised 56 kB → 66 kB (baseline 57.4 kB + headroom) to
+  cover the keyboard navigation completion, batch paste and dirty-tracker API above.
 - **Packaging** — `"use client"` banner on both bundles (the package previously threw in any
   Next.js App Router project), flattened `dist/index.d.ts` via `rollupTypes`, `dist/index.d.cts`
   for `require()` consumers on `node16` resolution, per-condition `exports` map, `engines`,

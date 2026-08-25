@@ -15,7 +15,9 @@ const dist = resolve(fileURLToPath(new URL("..", import.meta.url)), "dist");
 // Budget = current baseline + ~15% headroom. Raise deliberately, in the same PR that
 // earns the bytes, and say why in CHANGELOG.
 const BUDGET = {
-  "index.js": 56_000,
+  // 57.4 kB after #33/#35/#36/#37/#42/#43 (keyboard nav completion, batch paste,
+  // dirty-tracker API, row-index cache) — see CHANGELOG [Unreleased].
+  "index.js": 66_000,
   "index.cjs": 55_000,
   "style.css": 6_000,
 };

@@ -1,3 +1,4 @@
+import { createRowIndexGetter } from "@/core/row-index";
 import type { EditSessionStore } from "@/core/session";
 import type {
   CellKey,
@@ -7,7 +8,7 @@ import type {
   ColDef,
 } from "@/core/types";
 import { makeCellKey } from "@/core/types";
-import { type MutableRefObject, useEffect, useRef } from "react";
+import { type MutableRefObject, useEffect, useMemo, useRef } from "react";
 
 type UseKeyboardNavOptions<T> = {
   activeCellRef: MutableRefObject<CellPos | null>;
@@ -40,6 +41,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
   focusCell,
   setCellSelection,
 }: UseKeyboardNavOptions<T>) {
+  const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const keyHandlerRef = useRef<(e: KeyboardEvent) => void>();
 
   keyHandlerRef.current = (e: KeyboardEvent) => {
@@ -65,9 +67,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       e.preventDefault();
       const visibleCols = columns.filter((c) => !c.hidden);
       if (visibleCols.length === 0) return;
-      const rowIdx = displayRowsRef.current.findIndex(
-        (r) => getRowId(r) === active.rowId,
-      );
+      const rowIdx = getRowIndex(displayRowsRef.current, active.rowId);
       if (rowIdx === -1) return;
       setCellSelection({
         rowId: active.rowId,
@@ -81,7 +81,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     if (e.ctrlKey && e.key === "d") {
       e.preventDefault();
       const allRows = displayRowsRef.current;
-      const rowIdx = allRows.findIndex((r) => getRowId(r) === active.rowId);
+      const rowIdx = getRowIndex(allRows, active.rowId);
       if (rowIdx !== -1 && rowIdx < allRows.length - 1) {
         applyFill(
           {
@@ -98,7 +98,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     if (e.ctrlKey && e.key === "r") {
       e.preventDefault();
       const allRows = displayRowsRef.current;
-      const rowIdx = allRows.findIndex((r) => getRowId(r) === active.rowId);
+      const rowIdx = getRowIndex(allRows, active.rowId);
       const colIdx = navigableCols.findIndex((c) => c.key === active.colKey);
       if (rowIdx !== -1 && colIdx !== -1 && colIdx < navigableCols.length - 1) {
         const nextColKey = navigableCols[colIdx + 1].key;
@@ -155,7 +155,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     ) => {
       const allRows = displayRowsRef.current;
       const colIdx = navigableCols.findIndex((c) => c.key === from.colKey);
-      const rowIdx = allRows.findIndex((r) => getRowId(r) === from.rowId);
+      const rowIdx = getRowIndex(allRows, from.rowId);
 
       let nextColIdx = colIdx;
       let nextRowIdx = rowIdx;
@@ -212,7 +212,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       e.preventDefault();
       const key = makeCellKey(active.rowId, active.colKey);
       const snapRows = displayRowsRef.current;
-      const rowIndex = snapRows.findIndex((r) => getRowId(r) === active.rowId);
+      const rowIndex = getRowIndex(snapRows, active.rowId);
       const originalValue =
         rowIndex !== -1 ? (snapRows[rowIndex][active.colKey] ?? "") : "";
       editSessionStore.delete(key);

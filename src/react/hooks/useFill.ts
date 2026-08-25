@@ -1,6 +1,7 @@
 import { markDirty } from "@/core/dirty";
 import { detectSeriesType, generateFillValues } from "@/core/fill";
 import { pushBatchHistory } from "@/core/history";
+import { createRowIndexGetter } from "@/core/row-index";
 import type {
   CellPos,
   CellRange,
@@ -17,6 +18,7 @@ import {
   type MutableRefObject,
   type SetStateAction,
   useCallback,
+  useMemo,
   useState,
 } from "react";
 
@@ -48,6 +50,7 @@ export function useFill<T extends Record<string, string>>({
   setCellSelection,
 }: UseFillOptions<T>) {
   const [fillState, setFillState] = useState<FillState>(IDLE_FILL_STATE);
+  const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
 
   const applyFill = useCallback(
     (range: CellRange, sourceCell: CellPos) => {
@@ -55,9 +58,7 @@ export function useFill<T extends Record<string, string>>({
       const colsToFill: ColKey[] = range.colKeys ?? [range.colKey];
 
       const allRows = rowsDataRef.current;
-      const sourceRowIndex = allRows.findIndex(
-        (r) => getRowId(r) === sourceCell.rowId,
-      );
+      const sourceRowIndex = getRowIndex(allRows, sourceCell.rowId);
       if (sourceRowIndex === -1) return;
 
       const minIdx = Math.min(rowIndexStart, rowIndexEnd);
@@ -134,6 +135,7 @@ export function useFill<T extends Record<string, string>>({
       historyRef,
       setRows,
       setCellSelection,
+      getRowIndex,
     ],
   );
 

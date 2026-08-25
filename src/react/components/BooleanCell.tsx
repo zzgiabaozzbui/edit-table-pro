@@ -8,18 +8,18 @@ type BooleanCellProps = Readonly<{
   cell: CellPos;
   value: string;
   width: number;
-  align?: "left" | "center" | "right";
   disabled?: boolean;
   className?: string;
   "data-colkey"?: string;
   "data-rowid"?: string;
 }>;
 
+const TRUTHY_VALUES = new Set(["true", "1", "yes"]);
+
 export function BooleanCell({
   cell,
   value,
   width,
-  align,
   disabled,
   className,
   "data-colkey": dataColKey,
@@ -57,12 +57,12 @@ export function BooleanCell({
       <input
         ref={inputRef}
         type="checkbox"
-        checked={value === "true"}
+        aria-label={cell.colKey}
+        checked={TRUTHY_VALUES.has(value.trim().toLowerCase())}
         disabled={disabled}
         onClick={() => onCellClick?.(cell.rowId, cell.colKey, value)}
         onChange={(e) => commitCell(cell, e.target.checked ? "true" : "false")}
         onFocus={() => setActiveCell(cell)}
-        style={{ textAlign: align ?? "center" }}
       />
       {(isActiveCell ||
         (cellSelection?.rowId === cell.rowId &&

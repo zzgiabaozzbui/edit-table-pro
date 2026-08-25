@@ -48,6 +48,33 @@ describe("BooleanCell (#13)", () => {
     );
   });
 
+  it.each(["1", "TRUE", "True", "yes"])(
+    "renders truthy value '%s' as checked (#34)",
+    (truthy) => {
+      renderCell(truthy);
+      expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(
+        true,
+      );
+    },
+  );
+
+  it.each(["0", "no", "", "maybe"])(
+    "renders non-truthy value '%s' as unchecked (#34)",
+    (falsy) => {
+      renderCell(falsy);
+      expect((screen.getByRole("checkbox") as HTMLInputElement).checked).toBe(
+        false,
+      );
+    },
+  );
+
+  it("exposes an accessible name (#34)", () => {
+    renderCell("true");
+    expect(screen.getByRole("checkbox").getAttribute("aria-label")).toBe(
+      "active",
+    );
+  });
+
   it("toggle on commits 'true' and updates row", async () => {
     const { ctx } = renderCell("false");
     const checkbox = screen.getByRole("checkbox");

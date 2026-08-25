@@ -186,7 +186,6 @@ export function VirtualBody<T extends Record<string, string>>({
                       cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       width={colWidth}
-                      align={col.align}
                       disabled={!isEditable}
                       className={cellClass}
                       data-colkey={col.key}

@@ -26,16 +26,24 @@ gate sau mỗi item: `npm run check && npm run typecheck && npm run test:run` (+
 | 8 | #33 preventDefault nuốt arrow keys trong select/date cell | bug/a11y | DONE (gộp với #42) | a13af3e |
 | 9 | #47 cell-selection drag thiếu RAF + elementsFromPoint | perf | TODO | |
 | 10 | #43 row lookup O(n) findIndex → map O(1) | perf | DONE (createRowIndexGetter, budget 56k→66k) | 66d11bf |
-| 11 | #46 search re-scan toàn dataset mỗi keystroke/commit | perf | DOING | |
-| 12 | #44 memoize visible cells (scroll/keystroke re-render) | perf | TODO | |
-| 13 | #49 ResizeHandle: touch + keyboard resize | a11y | TODO | |
-| 14 | #28 striped prop zebra rows | ui | TODO | |
-| 15 | #26 empty state khi data rỗng | ui | TODO | |
-| 16 | #31 column header tooltip | ui | TODO | |
-| 17 | #30 scroll tới active cell khi điều hướng bàn phím | ui | TODO | |
-| 18 | #39 Ctrl+A chọn whole grid (đã có ctrl-a test — kiểm tra hiện trạng) | feat | TODO | |
+| 11 | #46 search re-scan toàn dataset mỗi keystroke/commit | perf | DONE (deferred query + WeakMap cache) | 1d1fd4a |
+| 12 | #44 memoize visible cells | perf | PARTIAL → chuyển Deferred (phần RAF/offsets đã xong qua #47) | 06078dc |
+| 13 | #49 ResizeHandle: touch + keyboard resize | a11y | DEFERRED | |
+| 14 | #28 striped prop zebra rows | ui | DONE | 6ca894d |
+| 15 | #26 empty state khi data rỗng | ui | DONE | 6ca894d |
+| 16 | #31 column header tooltip | ui | DEFERRED | |
+| 17 | #30 scroll tới active cell khi điều hướng bàn phím | ui | PARTIAL (navigate() đã scroll dọc; scrollLeft + addRow/autoFocus còn lại) | a13af3e |
+| 18 | #39 Ctrl+A chọn whole grid | feat | PARTIAL (Ctrl+A chọn cả row hiện có; mở rộng cả grid cần CellSelectionRange mới) | |
 | 19 | #14 horizontal fill drag (roadmap CLAUDE.md) | feat | STRETCH | |
 | 20 | #19 auto-scroll khi drag fill tới edge (roadmap) | feat | STRETCH | |
+
+## Kết quả phiên (2026-08-26)
+
+- PRs: #59 checkout@v7 MERGED · #60 setup-node@v7 MERGED · #61 dev-deps CLOSED (TS7/vite8
+  cần migration riêng) · ci.yml bỏ changelog gate cho dependabot.
+- Issues đóng: #33 #42 #34 #36 #37 #35 #43 #46 #47 #28 #26 (11 issues).
+- Tests: 100 → 141 PASS. Gates: check / typecheck / test / build đều xanh;
+  bundle index.js 57.4 kB (budget nâng 56→66 kB theo đúng quy ước script).
 
 ## Deferred (hard/large, cần design riêng — làm session sau)
 

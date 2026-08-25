@@ -45,6 +45,7 @@ jobs:
   changelog:
     if: >-
       github.event_name == 'pull_request' &&
+      github.actor != 'dependabot[bot]' &&
       !contains(github.event.pull_request.labels.*.name, 'no-changelog')
     runs-on: ubuntu-latest
     steps:

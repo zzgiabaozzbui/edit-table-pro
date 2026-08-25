@@ -26,6 +26,7 @@ import {
   type Dispatch,
   type SetStateAction,
   useCallback,
+  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -109,14 +110,32 @@ export function useEditableTable<T extends Record<string, string>>(
 
   // Feature 11: Row search (#23)
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
+  const searchTextCacheRef = useRef<{
+    cols: ColDef<T>[];
+    map: WeakMap<T, string>;
+  } | null>(null);
   const displayRows = useMemo(() => {
-    if (!query) return rows;
-    const q = query.toLowerCase();
-    const visibleCols = effectiveColumns.filter((c) => !c.hidden);
-    return rows.filter((r) =>
-      visibleCols.some((c) => (r[c.key] ?? "").toLowerCase().includes(q)),
-    );
-  }, [rows, query, effectiveColumns]);
+    if (!deferredQuery) return rows;
+    const q = deferredQuery.toLowerCase();
+    const cols = effectiveColumns.filter((c) => !c.hidden);
+    let cache = searchTextCacheRef.current;
+    if (!cache || cache.cols !== cols) {
+      cache = { cols, map: new WeakMap() };
+      searchTextCacheRef.current = cache;
+    }
+    return rows.filter((r) => {
+      let text = cache.map.get(r);
+      if (text === undefined) {
+        text = cols
+          .map((c) => r[c.key] ?? "")
+          .join("\n")
+          .toLowerCase();
+        cache.map.set(r, text);
+      }
+      return text.includes(q);
+    });
+  }, [rows, deferredQuery, effectiveColumns]);
   const displayRowsRef = useRef<T[]>(displayRows);
   displayRowsRef.current = displayRows;
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);

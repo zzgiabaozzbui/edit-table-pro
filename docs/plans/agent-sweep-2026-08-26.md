@@ -21,12 +21,12 @@ gate sau mỗi item: `npm run check && npm run typecheck && npm run test:run` (+
 | 3 | #42 README keyboard shortcuts không tồn tại → đã implement đủ ←/→, Home/End, PageUp/PageDown, F2 | bug/feat | DONE | a13af3e |
 | 4 | #34 BooleanCell chỉ nhận chuỗi "true"; align no-op | bug | DONE | 9dc1abb |
 | 5 | #36 dirty tracker không clear sau save → getDirtyRows sai | bug | DONE | df3c817 |
-| 6 | #37 paste N cells tạo N undo entries | bug/perf | DONE (batch write + pushBatchHistory) | (xem log sau commit) |
-| 7 | #35 scrollToRow dùng index chưa filter | bug | DOING | |
-| 8 | #33 preventDefault nuốt arrow keys trong select/date cell | bug/a11y | TODO | |
+| 6 | #37 paste N cells tạo N undo entries | bug/perf | DONE (batch write + pushBatchHistory) | ee5d5a2 |
+| 7 | #35 scrollToRow dùng index chưa filter | bug | DONE | f75d6d8 |
+| 8 | #33 preventDefault nuốt arrow keys trong select/date cell | bug/a11y | DONE (gộp với #42) | a13af3e |
 | 9 | #47 cell-selection drag thiếu RAF + elementsFromPoint | perf | TODO | |
-| 10 | #43 row lookup O(n) findIndex → map O(1) | perf | TODO | |
-| 11 | #46 search re-scan toàn dataset mỗi keystroke/commit | perf | TODO | |
+| 10 | #43 row lookup O(n) findIndex → map O(1) | perf | DONE (createRowIndexGetter, budget 56k→66k) | 66d11bf |
+| 11 | #46 search re-scan toàn dataset mỗi keystroke/commit | perf | DOING | |
 | 12 | #44 memoize visible cells (scroll/keystroke re-render) | perf | TODO | |
 | 13 | #49 ResizeHandle: touch + keyboard resize | a11y | TODO | |
 | 14 | #28 striped prop zebra rows | ui | TODO | |

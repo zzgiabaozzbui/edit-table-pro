@@ -297,7 +297,9 @@ export function useEditableTable<T extends Record<string, string>>(
     (rowId: RowId) => {
       const container = scrollContainerRef.current;
       if (!container) return;
-      const idx = rowsDataRef.current.findIndex((r) => getRowId(r) === rowId);
+      const idx = displayRowsRef.current.findIndex(
+        (r) => getRowId(r) === rowId,
+      );
       if (idx < 0) return;
       container.scrollTop = getRowOffset(idx, rowHeight);
     },

@@ -1,6 +1,7 @@
 import { markDirty } from "@/core/dirty";
 import { formatCell, validateCell } from "@/core/engine/pipeline";
 import { pushHistory } from "@/core/history";
+import { createRowIndexGetter } from "@/core/row-index";
 import type { EditSessionStore } from "@/core/session";
 import type {
   CellCommitInfo,
@@ -16,6 +17,7 @@ import {
   type MutableRefObject,
   type SetStateAction,
   useCallback,
+  useMemo,
 } from "react";
 
 type UseCellCommitOptions<T> = {
@@ -45,14 +47,13 @@ export function useCellCommit<T extends Record<string, string>>({
   runSideEffect,
   onCellCommit,
 }: UseCellCommitOptions<T>) {
+  const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const commitCell = useCallback(
     async (cell: CellPos, rawValue: string) => {
       const col = columns.find((c) => c.key === cell.colKey);
       if (!col) return;
 
-      const rowIndex = rowsDataRef.current.findIndex(
-        (r) => getRowId(r) === cell.rowId,
-      );
+      const rowIndex = getRowIndex(rowsDataRef.current, cell.rowId);
       if (rowIndex === -1) return;
       const row = rowsDataRef.current[rowIndex];
 
@@ -104,7 +105,6 @@ export function useCellCommit<T extends Record<string, string>>({
     },
     [
       columns,
-      getRowId,
       editSessionStore,
       runSideEffect,
       rowsDataRef,
@@ -112,6 +112,7 @@ export function useCellCommit<T extends Record<string, string>>({
       historyRef,
       setRows,
       onCellCommit,
+      getRowIndex,
     ],
   );
 

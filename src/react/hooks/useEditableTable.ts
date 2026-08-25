@@ -2,6 +2,7 @@ import { collectDirtyRows, discardRow } from "@/core/dirty";
 import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
 import { createHistory } from "@/core/history";
+import { createRowIndexGetter } from "@/core/row-index";
 import { EditSessionStore } from "@/core/session";
 import { SIZE_CONFIG } from "@/core/theme";
 import type { TableTheme } from "@/core/theme";
@@ -118,6 +119,7 @@ export function useEditableTable<T extends Record<string, string>>(
   }, [rows, query, effectiveColumns]);
   const displayRowsRef = useRef<T[]>(displayRows);
   displayRowsRef.current = displayRows;
+  const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const dirtyRowsRef = useRef<Map<RowId, DirtyRow>>(new Map());
   const historyRef = useRef<HistoryState>(createHistory());
   const pendingRowsRef = useRef<Set<RowId>>(new Set());
@@ -297,24 +299,23 @@ export function useEditableTable<T extends Record<string, string>>(
     (rowId: RowId) => {
       const container = scrollContainerRef.current;
       if (!container) return;
-      const idx = displayRowsRef.current.findIndex(
-        (r) => getRowId(r) === rowId,
-      );
+      const idx = getRowIndex(displayRowsRef.current, rowId);
       if (idx < 0) return;
       container.scrollTop = getRowOffset(idx, rowHeight);
     },
-    [getRowId, rowHeight],
+    [rowHeight, getRowIndex],
   );
 
   const validate = useCallback(
     (rowId: RowId, colKey: ColKey): ValidationResult => {
-      const row = rowsDataRef.current.find((r) => getRowId(r) === rowId);
+      const idx = getRowIndex(rowsDataRef.current, rowId);
+      const row = idx >= 0 ? rowsDataRef.current[idx] : undefined;
       if (!row) return { ok: true };
       const col = columns.find((c) => c.key === colKey);
       if (!col) return { ok: true };
       return validateCell(col, row[colKey] ?? "", row);
     },
-    [columns, getRowId],
+    [columns, getRowIndex],
   );
 
   const getDirtyRows = useCallback((): SubmitRow[] => {

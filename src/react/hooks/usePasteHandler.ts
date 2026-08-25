@@ -1,6 +1,7 @@
 import { markDirty } from "@/core/dirty";
 import { formatCell, validateCell } from "@/core/engine/pipeline";
 import { pushBatchHistory } from "@/core/history";
+import { createRowIndexGetter } from "@/core/row-index";
 import type { EditSessionStore } from "@/core/session";
 import type {
   CellPos,
@@ -15,6 +16,7 @@ import {
   type MutableRefObject,
   type SetStateAction,
   useCallback,
+  useMemo,
 } from "react";
 
 type UsePasteHandlerOptions<T> = {
@@ -48,6 +50,7 @@ export function usePasteHandler<T extends Record<string, string>>({
   createRow,
   getRowId,
 }: UsePasteHandlerOptions<T>) {
+  const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       const text = e.clipboardData.getData("text/plain").trim();
@@ -66,7 +69,7 @@ export function usePasteHandler<T extends Record<string, string>>({
       const active = activeCellRef.current;
       const currentRows = rowsDataRef.current;
       const activeRowIndex = active
-        ? currentRows.findIndex((r) => getRowId(r) === active.rowId)
+        ? getRowIndex(currentRows, active.rowId)
         : -1;
       const activeColIndex = active
         ? editableCols.findIndex((c) => c.key === active.colKey)
@@ -171,6 +174,7 @@ export function usePasteHandler<T extends Record<string, string>>({
       appendRows,
       createRow,
       getRowId,
+      getRowIndex,
     ],
   );
 

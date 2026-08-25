@@ -109,7 +109,21 @@
 
 /* ── Stripe row ─────────────────────────────── */
 .et-row-stripe {
-  background: var(--et-color-bg-header);
+  background: var(--et-color-row-stripe);
+}
+
+/* ── Empty state ────────────────────────────── */
+.et-empty-text {
+  font-size: var(--et-font-size);
+}
+
+.et-empty-add {
+  border: none;
+  background: transparent;
+  color: var(--et-color-primary);
+  cursor: pointer;
+  font-size: var(--et-font-size);
+  padding: 4px 8px;
 }
 
 /* ── Loading overlay ────────────────────────── */

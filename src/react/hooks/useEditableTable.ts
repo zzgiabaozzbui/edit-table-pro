@@ -54,6 +54,8 @@ export type UseEditableTableOptions<T> = {
   autoFocus?: boolean;
   value?: T[];
   onChange?: (rows: T[]) => void;
+  emptyText?: string;
+  emptyRender?: () => React.ReactNode;
 } & TableProps<T>;
 
 export function useEditableTable<T extends Record<string, string>>(
@@ -71,6 +73,7 @@ export function useEditableTable<T extends Record<string, string>>(
     loading,
     showHeader,
     sticky,
+    striped,
     rowClassName,
     searchable = false,
     onSelectionChange,
@@ -90,6 +93,7 @@ export function useEditableTable<T extends Record<string, string>>(
     loading,
     showHeader,
     sticky,
+    striped,
     rowClassName,
     hasSelection,
   };

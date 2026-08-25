@@ -10,6 +10,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
 
 ### Added
+- **`striped` prop** — zebra rows via `.et-row-stripe`, composes with `rowClassName`,
+  color overridable through `--et-color-row-stripe` / `theme.colorRowStripe` (#28).
+- **Empty state** — centered message when the dataset is empty (`emptyText`), custom node
+  override (`emptyRender`), and a default "Add row" action when `createRow` is set (#26).
 - **`markSaved(rowIds?)`** on the imperative ref API and table context — clears the dirty
   tracker after a successful save so `getDirtyRows()` stops re-reporting saved rows (#36).
 - **`onCellCommit({ rowId, colKey, value })`** callback — fires after each successful commit,
@@ -20,6 +24,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - **CI** — typecheck, `biome ci`, `vitest run` and `build` on every PR (Node 20).
 - **Perf** — row lookups across commit/fill/paste/keyboard paths go through an identity-keyed
   `Map` index (`createRowIndexGetter`) instead of an O(n) `findIndex` per keystroke (#43).
+- **Perf** — search runs on a deferred query against pre-lowercased per-row text cached by
+  identity, instead of lowercasing every cell of every row per keystroke and per commit (#46).
+- **Perf** — cell-selection drag computes hit targets from precomputed column offsets (zero
+  layout reads per move), coalesces state through requestAnimationFrame and skips unchanged
+  ranges (#47).
 - **Bundle-size budget** — `index.js` raised 56 kB → 66 kB (baseline 57.4 kB + headroom) to
   cover the keyboard navigation completion, batch paste and dirty-tracker API above.
 - **Packaging** — `"use client"` banner on both bundles (the package previously threw in any
@@ -41,6 +50,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   last match whenever a search was active (`EditableTable.tsx`).
 - Arrow keys are no longer swallowed by the document-level keydown handler while a native
   control has focus — `<select>` cells keep `↑`/`↓`, date cells keep all arrows (#33).
+- `scrollToRow` resolved against the unfiltered dataset while the body positions by filtered
+  index, so an active search scrolled to the wrong row (#35).
 - `biome ci` now passes: `dist/` and `docs/ai-handbook/` excluded (400 of 431 diagnostics came
   from unignored build output), plus four real lint violations in `src/` and `examples/`.
 

@@ -30,12 +30,18 @@ type VirtualBodyProps<T> = Readonly<{
   rows: T[];
   getRowId: (row: T) => string;
   totalWidth: number;
+  emptyText?: string;
+  emptyRender?: () => React.ReactNode;
+  showAddRow?: boolean;
 }>;
 
 export function VirtualBody<T extends Record<string, string>>({
   rows,
   getRowId,
   totalWidth,
+  emptyText,
+  emptyRender,
+  showAddRow,
 }: VirtualBodyProps<T>) {
   const {
     columns,
@@ -47,6 +53,7 @@ export function VirtualBody<T extends Record<string, string>>({
     scrollContainerRef,
     fillState,
     cellSelection,
+    addRow,
   } = useTableContext<T>();
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -74,6 +81,41 @@ export function VirtualBody<T extends Record<string, string>>({
       <div
         style={{ height: totalHeight, position: "relative", width: totalWidth }}
       >
+        {rows.length === 0 && (
+          <div
+            className="et-empty"
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              minHeight: 120,
+              padding: "24px 0",
+              color: "var(--et-color-text)",
+              opacity: 0.6,
+              boxSizing: "border-box",
+            }}
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v4h6v-4H5zm8 0v4h6v-4h-6zm-8 6v4h6v-4H5zm8 0v4h6v-4h-6z"
+                fill="currentColor"
+              />
+            </svg>
+            {emptyRender ? (
+              emptyRender()
+            ) : (
+              <div className="et-empty-text">{emptyText ?? "No data"}</div>
+            )}
+            {showAddRow && !emptyRender && (
+              <button type="button" className="et-empty-add" onClick={addRow}>
+                Add row
+              </button>
+            )}
+          </div>
+        )}
         {rows.slice(start, end).map((row, i) => {
           const rowIndex = start + i;
           const rowId = getRowId(row);
@@ -90,6 +132,7 @@ export function VirtualBody<T extends Record<string, string>>({
               className={[
                 "et-row",
                 isSelected ? "et-row-selected" : "",
+                tableProps.striped && rowIndex % 2 === 1 ? "et-row-stripe" : "",
                 extraClass,
               ]
                 .filter(Boolean)

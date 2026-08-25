@@ -29,6 +29,7 @@ export type TableProps<T> = {
   loading?: boolean;
   showHeader?: boolean;
   sticky?: boolean;
+  striped?: boolean;
   hasSelection?: boolean;
   rowClassName?: (row: T, index: number) => string;
   searchable?: boolean;

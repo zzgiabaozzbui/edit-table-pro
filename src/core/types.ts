@@ -128,6 +128,12 @@ export type SubmitRow = {
   changes: Record<ColKey, string>;
 };
 
+export type CellCommitInfo = {
+  rowId: RowId;
+  colKey: ColKey;
+  value: string;
+};
+
 export type VirtualRange = {
   start: number;
   end: number;

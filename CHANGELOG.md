@@ -10,6 +10,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
 
 ### Added
+- **`markSaved(rowIds?)`** on the imperative ref API and table context — clears the dirty
+  tracker after a successful save so `getDirtyRows()` stops re-reporting saved rows (#36).
+- **`onCellCommit({ rowId, colKey, value })`** callback — fires after each successful commit,
+  letting consumers drive their own persistence (#36).
 - **Keyboard navigation** — `←`/`→` (caret-aware: only hijacked at text boundaries, so
   intra-cell editing survives), `Home`/`End`, `PageUp`/`PageDown` and `F2` re-enter active
   cell (#42).

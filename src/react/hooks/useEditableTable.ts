@@ -1,4 +1,4 @@
-import { collectDirtyRows } from "@/core/dirty";
+import { collectDirtyRows, discardRow } from "@/core/dirty";
 import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
 import { createHistory } from "@/core/history";
@@ -7,6 +7,7 @@ import { SIZE_CONFIG } from "@/core/theme";
 import type { TableTheme } from "@/core/theme";
 import type {
   CellClickHandler,
+  CellCommitInfo,
   CellKey,
   CellPos,
   CellSelectionRange,
@@ -46,6 +47,7 @@ export type UseEditableTableOptions<T> = {
   createRow?: () => T;
   onSelectionChange?: (ids: RowId[]) => void;
   onCellClick?: CellClickHandler;
+  onCellCommit?: (info: CellCommitInfo) => void;
   autoFocus?: boolean;
   value?: T[];
   onChange?: (rows: T[]) => void;
@@ -70,6 +72,7 @@ export function useEditableTable<T extends Record<string, string>>(
     searchable = false,
     onSelectionChange,
     onCellClick,
+    onCellCommit,
     value,
     onChange,
     autoFocus = false,
@@ -185,6 +188,7 @@ export function useEditableTable<T extends Record<string, string>>(
     editSessionStore,
     setRows: updateRows,
     runSideEffect,
+    onCellCommit,
   });
 
   // Feature 7: Undo/Redo
@@ -300,6 +304,14 @@ export function useEditableTable<T extends Record<string, string>>(
     return collectDirtyRows(dirtyRowsRef.current);
   }, []);
 
+  const markSaved = useCallback((rowIds?: RowId[]) => {
+    if (rowIds === undefined) {
+      dirtyRowsRef.current.clear();
+      return;
+    }
+    for (const id of rowIds) discardRow(dirtyRowsRef.current, id);
+  }, []);
+
   // Feature 10b: Column visibility (#24)
   const setColumnVisibility = useCallback((key: ColKey, visible: boolean) => {
     setHiddenKeys((prev) => {
@@ -367,6 +379,8 @@ export function useEditableTable<T extends Record<string, string>>(
     scrollToRow,
     validate,
     getDirtyRows,
+    markSaved,
+    onCellCommit,
     // Feature 10b: Column visibility (#24)
     setColumnVisibility,
     toggleColumn,

@@ -2,6 +2,7 @@ import type { EditSessionStore } from "@/core/session";
 import type { TableTheme } from "@/core/theme";
 import type {
   CellClickHandler,
+  CellCommitInfo,
   CellKey,
   CellPos,
   CellRange,
@@ -81,6 +82,8 @@ export type TableContextValue<T = Record<string, string>> = {
   scrollToRow: (rowId: RowId) => void;
   validate: (rowId: RowId, colKey: ColKey) => ValidationResult;
   getDirtyRows: () => SubmitRow[];
+  markSaved: (rowIds?: RowId[]) => void;
+  onCellCommit?: (info: CellCommitInfo) => void;
   // Feature 11: Row search (#23)
   searchable: boolean;
   query: string;
@@ -98,6 +101,7 @@ export type EditableTableRef<T = Record<string, string>> = Pick<
   | "scrollToRow"
   | "validate"
   | "getDirtyRows"
+  | "markSaved"
   | "setColumnVisibility"
   | "toggleColumn"
 >;

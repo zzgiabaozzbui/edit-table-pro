@@ -3,6 +3,7 @@ import { formatCell, validateCell } from "@/core/engine/pipeline";
 import { pushHistory } from "@/core/history";
 import type { EditSessionStore } from "@/core/session";
 import type {
+  CellCommitInfo,
   CellPos,
   ColDef,
   DirtyRow,
@@ -30,6 +31,7 @@ type UseCellCommitOptions<T> = {
     value: string,
     trigger: "change" | "blur",
   ) => void;
+  onCellCommit?: (info: CellCommitInfo) => void;
 };
 
 export function useCellCommit<T extends Record<string, string>>({
@@ -41,6 +43,7 @@ export function useCellCommit<T extends Record<string, string>>({
   editSessionStore,
   setRows,
   runSideEffect,
+  onCellCommit,
 }: UseCellCommitOptions<T>) {
   const commitCell = useCallback(
     async (cell: CellPos, rawValue: string) => {
@@ -93,6 +96,11 @@ export function useCellCommit<T extends Record<string, string>>({
       });
 
       runSideEffect(cell, formatted, "blur");
+      onCellCommit?.({
+        rowId: cell.rowId,
+        colKey: cell.colKey,
+        value: formatted,
+      });
     },
     [
       columns,
@@ -103,6 +111,7 @@ export function useCellCommit<T extends Record<string, string>>({
       dirtyRowsRef,
       historyRef,
       setRows,
+      onCellCommit,
     ],
   );
 

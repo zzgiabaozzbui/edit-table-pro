@@ -1,15 +1,35 @@
+import { markDirty } from "@/core/dirty";
 import { formatCell, validateCell } from "@/core/engine/pipeline";
+import { pushBatchHistory } from "@/core/history";
 import type { EditSessionStore } from "@/core/session";
-import type { CellPos, ColDef } from "@/core/types";
+import type {
+  CellPos,
+  ColDef,
+  DirtyRow,
+  HistoryState,
+  RowId,
+} from "@/core/types";
 import { makeCellKey } from "@/core/types";
-import { type MutableRefObject, useCallback } from "react";
+import {
+  type Dispatch,
+  type MutableRefObject,
+  type SetStateAction,
+  useCallback,
+} from "react";
 
 type UsePasteHandlerOptions<T> = {
   columns: ColDef<T>[];
   activeCellRef: MutableRefObject<CellPos | null>;
   rowsDataRef: MutableRefObject<T[]>;
+  dirtyRowsRef: MutableRefObject<Map<RowId, DirtyRow>>;
+  historyRef: MutableRefObject<HistoryState>;
   editSessionStore: EditSessionStore;
-  commitCell: (cell: CellPos, rawValue: string) => Promise<void>;
+  setRows: Dispatch<SetStateAction<T[]>>;
+  runSideEffect: (
+    cell: CellPos,
+    value: string,
+    trigger: "change" | "blur",
+  ) => void;
   appendRows: (newRows: T[]) => void;
   createRow?: () => T;
   getRowId: (row: T) => string;
@@ -19,8 +39,11 @@ export function usePasteHandler<T extends Record<string, string>>({
   columns,
   activeCellRef,
   rowsDataRef,
+  dirtyRowsRef,
+  historyRef,
   editSessionStore,
-  commitCell,
+  setRows,
+  runSideEffect,
   appendRows,
   createRow,
   getRowId,
@@ -56,18 +79,27 @@ export function usePasteHandler<T extends Record<string, string>>({
           const extra = needed - allRows.length;
           appendRows(Array.from({ length: extra }, () => createRow()));
         }
-        const rowsForWrite = rowsDataRef.current;
+        const batchEntries: Array<{
+          rowId: RowId;
+          colKey: string;
+          prevValue: string;
+          nextValue: string;
+        }> = [];
+        const sideEffectCells: Array<{ cell: CellPos; value: string }> = [];
         for (let li = 0; li < lines.length; li++) {
           const rowIndex = activeRowIndex + li;
-          if (rowIndex >= rowsForWrite.length) break;
-          const row = rowsForWrite[rowIndex];
-          const rowId = getRowId(row);
+          if (rowIndex >= rowsDataRef.current.length) break;
+          const rowId = getRowId(rowsDataRef.current[rowIndex]);
           const values = lines[li].split("\t");
           for (let ci = 0; ci < values.length; ci++) {
             const col = editableCols[activeColIndex + ci];
             if (!col) break;
             const trimmed = values[ci].trim();
-            const validation = validateCell(col, trimmed, row);
+            const validation = validateCell(
+              col,
+              trimmed,
+              rowsDataRef.current[rowIndex],
+            );
             const cellKey = makeCellKey(rowId, col.key);
             if (!validation.ok) {
               editSessionStore.update(cellKey, {
@@ -75,9 +107,39 @@ export function usePasteHandler<T extends Record<string, string>>({
                 status: "error",
                 errors: [{ type: "validation", msg: validation.error }],
               });
-            } else {
-              commitCell({ rowId, colKey: col.key }, formatCell(col, trimmed));
+              continue;
             }
+            const formatted = formatCell(col, trimmed);
+            const prevValue = rowsDataRef.current[rowIndex][col.key] ?? "";
+            if (formatted === prevValue) continue;
+            rowsDataRef.current[rowIndex] = {
+              ...rowsDataRef.current[rowIndex],
+              [col.key]: formatted,
+            };
+            markDirty(
+              dirtyRowsRef.current,
+              rowId,
+              col.key,
+              prevValue,
+              formatted,
+            );
+            batchEntries.push({
+              rowId,
+              colKey: col.key,
+              prevValue,
+              nextValue: formatted,
+            });
+            sideEffectCells.push({
+              cell: { rowId, colKey: col.key },
+              value: formatted,
+            });
+          }
+        }
+        if (batchEntries.length > 0) {
+          pushBatchHistory(historyRef.current, batchEntries);
+          setRows([...rowsDataRef.current]);
+          for (const { cell, value } of sideEffectCells) {
+            runSideEffect(cell, value, "blur");
           }
         }
       } else if (createRow) {
@@ -101,8 +163,11 @@ export function usePasteHandler<T extends Record<string, string>>({
       columns,
       activeCellRef,
       rowsDataRef,
+      dirtyRowsRef,
+      historyRef,
       editSessionStore,
-      commitCell,
+      setRows,
+      runSideEffect,
       appendRows,
       createRow,
       getRowId,

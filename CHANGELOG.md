@@ -31,6 +31,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - Repo health: `SECURITY.md`, `CODE_OF_CONDUCT.md`, PR template, issue template, Dependabot.
 
 ### Fixed
+- Multi-cell paste now writes all cells in one batch with a **single undo entry** — a
+  100×20 paste no longer needs 2000 Ctrl+Z presses; one reverts the whole block (#37).
 - Scroll height reserved rows from the **unfiltered** dataset, leaving dead space below the
   last match whenever a search was active (`EditableTable.tsx`).
 - Arrow keys are no longer swallowed by the document-level keydown handler while a native

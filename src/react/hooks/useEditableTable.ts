@@ -35,6 +35,7 @@ import { useCellCommit } from "./useCellCommit";
 import { useColumnResize } from "./useColumnResize";
 import { useFill } from "./useFill";
 import { useHistoryOps } from "./useHistoryOps";
+import { usePasteHandler } from "./usePasteHandler";
 import { useRowSelection } from "./useRowSelection";
 import { useSideEffect } from "./useSideEffect";
 
@@ -269,6 +270,20 @@ export function useEditableTable<T extends Record<string, string>>(
     }
   }, [createRow, columns, getRowId, focusCell, appendRows]);
 
+  const { handlePaste } = usePasteHandler({
+    columns: effectiveColumns,
+    activeCellRef,
+    rowsDataRef,
+    dirtyRowsRef,
+    historyRef,
+    editSessionStore,
+    setRows: updateRows,
+    runSideEffect,
+    appendRows,
+    createRow,
+    getRowId,
+  });
+
   // Feature 10: Imperative ref API (#20)
   const setData = useCallback(
     (next: T[]) => {
@@ -381,6 +396,7 @@ export function useEditableTable<T extends Record<string, string>>(
     getDirtyRows,
     markSaved,
     onCellCommit,
+    handlePaste,
     // Feature 10b: Column visibility (#24)
     setColumnVisibility,
     toggleColumn,

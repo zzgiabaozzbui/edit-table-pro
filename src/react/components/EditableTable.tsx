@@ -8,7 +8,6 @@ import {
   useEditableTable,
 } from "../hooks/useEditableTable";
 import { useKeyboardNav } from "../hooks/useKeyboardNav";
-import { usePasteHandler } from "../hooks/usePasteHandler";
 import { HeaderRow } from "./HeaderRow";
 import { VirtualBody } from "./VirtualBody";
 
@@ -51,6 +50,7 @@ function EditableTableInner<T extends Record<string, string>>(
     setCellSelection,
     commitCell,
     getRowId,
+    handlePaste,
   } = ctx;
 
   useImperativeHandle(
@@ -102,17 +102,6 @@ function EditableTableInner<T extends Record<string, string>>(
     applyFill,
     focusCell,
     setCellSelection,
-  });
-
-  const { handlePaste } = usePasteHandler({
-    columns,
-    activeCellRef,
-    rowsDataRef,
-    editSessionStore,
-    commitCell,
-    appendRows,
-    createRow: options.createRow,
-    getRowId,
   });
 
   const { handleContainerPointerDown } = useCellSelectionDrag({

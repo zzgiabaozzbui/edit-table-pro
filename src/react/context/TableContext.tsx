@@ -16,7 +16,12 @@ import type {
   SubmitRow,
   ValidationResult,
 } from "@/core/types";
-import { type MutableRefObject, createContext, useContext } from "react";
+import {
+  type ClipboardEvent,
+  type MutableRefObject,
+  createContext,
+  useContext,
+} from "react";
 
 export type TableProps<T> = {
   bordered?: boolean;
@@ -84,6 +89,7 @@ export type TableContextValue<T = Record<string, string>> = {
   getDirtyRows: () => SubmitRow[];
   markSaved: (rowIds?: RowId[]) => void;
   onCellCommit?: (info: CellCommitInfo) => void;
+  handlePaste: (e: ClipboardEvent<HTMLDivElement>) => void;
   // Feature 11: Row search (#23)
   searchable: boolean;
   query: string;

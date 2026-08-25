@@ -20,9 +20,9 @@ gate sau mỗi item: `npm run check && npm run typecheck && npm run test:run` (+
 | 2 | Merge/clean 3 Dependabot PRs (#59 checkout v7, #60 setup-node v7, #61 dev-deps group) | pr | DONE (#59/#60 merged; #61 closed-lý do TS7/vite8) | f01fbf9, 6ca8531, 9d831aa |
 | 3 | #42 README keyboard shortcuts không tồn tại → đã implement đủ ←/→, Home/End, PageUp/PageDown, F2 | bug/feat | DONE | a13af3e |
 | 4 | #34 BooleanCell chỉ nhận chuỗi "true"; align no-op | bug | DONE | 9dc1abb |
-| 5 | #36 dirty tracker không clear sau save → getDirtyRows sai | bug | DOING | |
-| 6 | #37 paste N cells tạo N undo entries | bug/perf | TODO | |
-| 7 | #35 scrollToRow dùng index chưa filter | bug | TODO | |
+| 5 | #36 dirty tracker không clear sau save → getDirtyRows sai | bug | DONE | df3c817 |
+| 6 | #37 paste N cells tạo N undo entries | bug/perf | DONE (batch write + pushBatchHistory) | (xem log sau commit) |
+| 7 | #35 scrollToRow dùng index chưa filter | bug | DOING | |
 | 8 | #33 preventDefault nuốt arrow keys trong select/date cell | bug/a11y | TODO | |
 | 9 | #47 cell-selection drag thiếu RAF + elementsFromPoint | perf | TODO | |
 | 10 | #43 row lookup O(n) findIndex → map O(1) | perf | TODO | |

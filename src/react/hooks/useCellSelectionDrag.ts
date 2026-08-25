@@ -143,6 +143,7 @@ export function useCellSelectionDrag<T>({
       columnWidths,
       setCellSelection,
       getRowIndex,
+      commitRange,
     ],
   );
 

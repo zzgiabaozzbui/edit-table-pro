@@ -176,6 +176,9 @@ function EditableTableInner<T extends Record<string, string>>(
               rows={displayRows}
               getRowId={options.getRowId}
               totalWidth={totalWidth}
+              emptyText={options.emptyText}
+              emptyRender={options.emptyRender}
+              showAddRow={canAddRow}
             />
             {canAddRow && (
               <button

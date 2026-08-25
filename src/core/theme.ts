@@ -8,6 +8,7 @@ export type TableTheme = {
   colorErrorBg?: string;
   colorErrorBorder?: string;
   colorRowHover?: string;
+  colorRowStripe?: string;
   colorSplit?: string;
   fontFamily?: string;
   fontSize?: number;
@@ -24,6 +25,7 @@ export const DEFAULT_THEME: Required<TableTheme> = {
   colorErrorBg: "#fff2f0",
   colorErrorBorder: "#ffccc7",
   colorRowHover: "rgba(0,0,0,0.02)",
+  colorRowStripe: "rgba(0,0,0,0.02)",
   colorSplit: "#f0f0f0",
   fontFamily:
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
@@ -53,6 +55,7 @@ export function themeToVars(
     "--et-color-error-bg": t.colorErrorBg,
     "--et-color-error-border": t.colorErrorBorder,
     "--et-color-row-hover": t.colorRowHover,
+    "--et-color-row-stripe": t.colorRowStripe,
     "--et-color-split": t.colorSplit,
     "--et-font-family": t.fontFamily,
     "--et-font-size": `${t.fontSize}px`,

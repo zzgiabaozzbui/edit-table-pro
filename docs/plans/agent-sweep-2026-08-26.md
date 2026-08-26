@@ -120,3 +120,8 @@ Ket qua sweep 4:
 - Fix lint ARIA override config ea2d9db
 Tests 184 -> 190 PASS. Con lai: #17 #18 #44 #45 #52 #50 #10 #55 - lon/structural/manual,
 ghi ly do trong runbook sweep 3; uu tien phien sau: #44 memoize ctx/cell/RAF scroll, #17 row reorder, sau do #52/#18 menu hoac #45 col-virtualization can mini-spec.
+
+## Sweep 5 ket luan
+- #17 row reorder DONE d5386de (dong) - move op structural history
+- #45 col-virtualization CLOSED not-planned (ly do: scale contract theo hang, so cot thuc te nho)
+- Con mo 6 tracker co ly do: #44 (partial: liveRowsById xong, con ctx-memo/RAF-scroll), #18, #52, #50 (major 0.4.0), #10, #55 (manual)

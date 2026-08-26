@@ -86,6 +86,7 @@ export type TableContextValue<T = Record<string, string>> = {
   // Feature 9: Multi-cell selection
   cellSelection: CellSelectionRange | null;
   setCellSelection: (sel: CellSelectionRange | null) => void;
+  clearCellSelection: () => boolean;
   // Feature 10: Imperative ref API (#20)
   setData: (rows: T[]) => void;
   scrollToRow: (rowId: RowId) => void;

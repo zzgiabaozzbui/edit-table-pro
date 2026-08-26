@@ -49,6 +49,7 @@ function EditableTableInner<T extends Record<string, string>>(
     applyFill,
     setCellSelection,
     cellSelection,
+    clearCellSelection,
     commitCell,
     getRowId,
     handlePaste,
@@ -105,6 +106,7 @@ function EditableTableInner<T extends Record<string, string>>(
     focusCell,
     setCellSelection,
     cellSelection,
+    clearCellSelection,
   });
 
   const { handleContainerPointerDown } = useCellSelectionDrag({

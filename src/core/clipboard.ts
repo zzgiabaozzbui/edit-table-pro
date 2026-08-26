@@ -1,5 +1,21 @@
 import type { CellSelectionRange, ColDef } from "./types";
 
+/** Copy text to the clipboard with a hidden-textarea fallback. */
+export function writeClipboardText(text: string): void {
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    void navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand("copy");
+  document.body.removeChild(ta);
+}
+
 export function isRowInSelection(
   rowIndex: number,
   sel: CellSelectionRange,

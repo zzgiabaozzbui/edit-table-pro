@@ -27,6 +27,24 @@ export function useHistoryOps<T extends Record<string, string>>({
   const undo = useCallback(() => {
     const entry = undoHistory(historyRef.current);
     if (!entry) return;
+    if (entry.type === "structural") {
+      if (entry.op === "remove") {
+        // Undo a delete: re-insert rows at original positions (stable, desc order)
+        const ordered = [...entry.rows].sort((a, b) => b.index - a.index);
+        for (const { rowId, index, row } of ordered) {
+          if (rowsDataRef.current.some((r) => getRowId(r) === rowId)) continue;
+          const at = Math.min(index, rowsDataRef.current.length);
+          rowsDataRef.current.splice(at, 0, row as T);
+        }
+      } else {
+        const ids = new Set(entry.rows.map((r) => r.rowId));
+        rowsDataRef.current = rowsDataRef.current.filter(
+          (r) => !ids.has(getRowId(r)),
+        );
+      }
+      setRows([...rowsDataRef.current]);
+      return;
+    }
     if (entry.type === "batch") {
       for (const e of entry.entries) {
         const idx = rowsDataRef.current.findIndex(
@@ -59,6 +77,22 @@ export function useHistoryOps<T extends Record<string, string>>({
   const redo = useCallback(() => {
     const entry = redoHistory(historyRef.current);
     if (!entry) return;
+    if (entry.type === "structural") {
+      if (entry.op === "remove") {
+        const ids = new Set(entry.rows.map((r) => r.rowId));
+        rowsDataRef.current = rowsDataRef.current.filter(
+          (r) => !ids.has(getRowId(r)),
+        );
+      } else {
+        const ordered = [...entry.rows].sort((a, b) => a.index - b.index);
+        for (const { index, row } of ordered) {
+          const at = Math.min(index, rowsDataRef.current.length);
+          rowsDataRef.current.splice(at, 0, row as T);
+        }
+      }
+      setRows([...rowsDataRef.current]);
+      return;
+    }
     if (entry.type === "batch") {
       for (const e of entry.entries) {
         const idx = rowsDataRef.current.findIndex(

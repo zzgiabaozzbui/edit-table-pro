@@ -94,7 +94,19 @@ export type HistoryBatchEntry = {
   timestamp: number;
 };
 
-export type HistoryStackEntry = HistoryEntry | HistoryBatchEntry;
+export type HistoryStructuralEntry<
+  T extends Record<string, string> = Record<string, string>,
+> = {
+  type: "structural";
+  op: "remove" | "insert";
+  rows: Array<{ rowId: RowId; index: number; row: T }>;
+  timestamp: number;
+};
+
+export type HistoryStackEntry =
+  | HistoryEntry
+  | HistoryBatchEntry
+  | HistoryStructuralEntry;
 
 export type HistoryState = {
   stack: HistoryStackEntry[];

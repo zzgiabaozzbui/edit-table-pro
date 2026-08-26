@@ -371,7 +371,7 @@ export function useEditableTable<T extends Record<string, string>>(
       for (const { rowId } of removed) dirtyRowsRef.current.delete(rowId);
       updateRows([...rowsDataRef.current]);
     },
-    [getRowId, historyRef, dirtyRowsRef, updateRows],
+    [getRowId, updateRows],
   );
 
   const addRow = useCallback(() => {

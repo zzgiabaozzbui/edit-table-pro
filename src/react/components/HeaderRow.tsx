@@ -77,6 +77,16 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
                 : undefined
           }
           onClick={col.sortable ? () => toggleSort(col.key) : undefined}
+          onKeyDown={
+            col.sortable
+              ? (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleSort(col.key);
+                  }
+                }
+              : undefined
+          }
           title={col.headerTooltip}
           style={{
             cursor: col.sortable ? "pointer" : undefined,

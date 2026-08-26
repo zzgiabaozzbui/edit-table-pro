@@ -62,6 +62,7 @@ export function VirtualBody<T extends Record<string, string>>({
   // Live values must be looked up by rowId (data order can differ from the
   // sorted/filtered view order rendered here).
   const liveRowsById = useMemo(() => {
+    void rows;
     const m = new Map<string, T>();
     const src = rowsDataRef.current ?? [];
     for (const r of src) m.set(getRowId(r), r);

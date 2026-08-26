@@ -350,15 +350,7 @@ export function useEditableTable<T extends Record<string, string>>(
       runSideEffect({ rowId: entry.rowId, colKey: entry.colKey }, "", "blur");
     }
     return true;
-  }, [
-    cellSelection,
-    columns,
-    getRowId,
-    historyRef,
-    dirtyRowsRef,
-    updateRows,
-    runSideEffect,
-  ]);
+  }, [cellSelection, columns, getRowId, updateRows, runSideEffect]);
 
   const { handlePaste } = usePasteHandler({
     columns: effectiveColumns,

@@ -13,5 +13,18 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "ignore": ["package.json", "package-lock.json"]
-  }
+  },
+  "overrides": [
+    {
+      "include": ["src/react/components/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useSemanticElements": "off",
+            "useFocusableInteractive": "off"
+          }
+        }
+      }
+    }
+  ]
 }

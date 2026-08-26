@@ -6,7 +6,7 @@ import { EditableTable } from "./EditableTable";
 type Row = { id: string; dau: string };
 
 const columns: ColDef<Row>[] = [
-  { key: "dau", header: "DAU", headerTooltip: "Daily Active Users" },
+  { key: "dau", type: "text", header: "DAU", headerTooltip: "Daily Active Users" },
 ];
 
 describe("headerTooltip (#31)", () => {

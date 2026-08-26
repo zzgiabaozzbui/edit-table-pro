@@ -73,3 +73,26 @@ gate sau mỗi item: `npm run check && npm run typecheck && npm run test:run` (+
 
 Ket qua sweep 2: dong them 5 issue (#31 #29 #30 #49 #39), 2 issue tien do lon (#48, #51).
 Tests 141 -> 166 PASS. Gates xanh.
+
+## Sweep 3 (2026-08-26 tiep) - dong not phan vua
+
+| # | Task | Loai | Status | Commit |
+|---|------|------|--------|--------|
+| T1 | #54 labels prop + defaultLabels | i18n | DONE | 98e767f |
+| T2 | #4 darkTheme WCAG AA + contrastRatio | ui | DONE | 27a4f7b |
+| T3 | #48 gridcell role + readonly tabIndex | a11y | DONE (dong issue) | 8a12d87 |
+| T4 | #51 Ctrl+X cut + Delete/Backspace + Shift+Arrow | feat | DONE (dong issue) | 7e7c907 |
+| T5 | #27 footer row sum/count/avg/fn | ui | DONE | d1aa152 |
+| T6 | #14 horizontal fill drag | feat | DONE | aba611b |
+| T7 | #19 edge auto-scroll khi drag fill | feat | DONE (pure fn + RAF loop) | 501eec1 |
+
+Tests 166 -> 178 PASS. Gates xanh.
+
+## Con lai sau sweep 3 (11 issues mo) - deu lon/structural/manual
+
+- #16 column sorting, #53 delete rows + structural history, #38 controlled props:
+  feature trung binh, lam tiep truoc.
+- #17 row drag reorder, #18 context menu, #52 header menu, #15 frozen columns: UI lon.
+- #44 memoize, #45 col virtualization: perf refactor cau truc.
+- #50 breaking type change: can major version.
+- #55 docs site, #10 launch demo/GIF/HN: manual, ngoai pham vi code session.

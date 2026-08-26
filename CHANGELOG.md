@@ -10,6 +10,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
 
 ### Added
+- **Horizontal fill drag** — dragging the fill handle left/right fills the same row across
+  the column span, alongside the existing vertical behaviour (#14).
+- **Edge auto-scroll** while dragging the fill handle near the viewport top/bottom, speed
+  proportional to edge proximity (#19).
+- **`labels` prop** (`TableLabels` + `defaultLabels`) so consumers can localize the add-row
+  action and search placeholder — English defaults ship out of the box (#54).
+- **`darkTheme` preset** audited against WCAG AA (text ≥ 4.5:1, UI boundaries ≥ 3:1), with a
+  pure `contrastRatio` helper exported from `core/contrast` (#4).
+- **Footer summary row** via `col.footer: "sum" | "count" | "avg" | ((rows) => string)` (#27).
 - **`headerTooltip`** column option renders a native tooltip on the header cell (#31).
 - **`loadingType="skeleton"`** with `skeletonRows` renders shimmer placeholder rows instead
   of the spinner overlay while loading (#29).
@@ -62,6 +71,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   last match whenever a search was active (`EditableTable.tsx`).
 - Column resize now uses Pointer Events with pointer capture (`touch-action: none`), so it
   works on touch, and the handle is keyboard-operable (`role="separator"`, Arrow/Home resize) (#49).
+- Every cell renders `role="gridcell"` and readonly cells are keyboard-reachable (`tabIndex`),
+  completing the ARIA grid semantics work (#48).
+- Selection keyboard surface completed: Ctrl+X cuts through one batch undo entry,
+  Delete/Backspace clear the selection, Shift+Arrows extend/shrink the range (#51).
 - Arrow keys are no longer swallowed by the document-level keydown handler while a native
   control has focus — `<select>` cells keep `↑`/`↓`, date cells keep all arrows (#33).
 - `scrollToRow` resolved against the unfiltered dataset while the body positions by filtered

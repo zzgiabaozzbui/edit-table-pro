@@ -1,3 +1,4 @@
+import { computeEdgeScrollSpeed } from "@/core/auto-scroll";
 import type { CellRange, ColKey, FillState, RowId } from "@/core/types";
 import { useRef } from "react";
 import { useTableContext } from "../context/TableContext";
@@ -56,6 +57,22 @@ export function FillHandle({
     });
 
     let rafId = 0;
+    let lastX = 0;
+    let lastY = 0;
+    let autoScrollRaf = 0;
+    const visibleColsForDir = () =>
+      columns.filter((c) => !c.hidden).map((c) => c.key);
+    const startAutoScroll = (container: HTMLDivElement, speed: number) => {
+      cancelAnimationFrame(autoScrollRaf);
+      const step = () => {
+        container.scrollTop += speed;
+        const range = computeRange(lastY, lastX);
+        if (range) previewRangeRef.current = range;
+        autoScrollRaf = requestAnimationFrame(step);
+      };
+      autoScrollRaf = requestAnimationFrame(step);
+    };
+    const stopAutoScroll = () => cancelAnimationFrame(autoScrollRaf);
 
     // Pre-compute colKeys from cellSelection so preview highlights all selected cols
     const sel = cellSelection;
@@ -118,14 +135,22 @@ export function FillHandle({
     };
 
     const onPointerMove = (ev: PointerEvent) => {
-      const range = computeRange(ev.clientY, ev.clientX);
+      lastX = ev.clientX;
+      lastY = ev.clientY;
+      const range = computeRange(lastY, lastX);
       if (range) previewRangeRef.current = range;
 
       cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         if (!range) return;
         let direction: FillState["direction"] = null;
-        if (range.rowIndexEnd > sourceRowIndex) direction = "down";
+        if (range.targetColKey && range.targetColKey !== range.colKey)
+          direction =
+            visibleColsForDir().indexOf(range.targetColKey) >
+            visibleColsForDir().indexOf(range.colKey)
+              ? "right"
+              : "left";
+        else if (range.rowIndexEnd > sourceRowIndex) direction = "down";
         else if (range.rowIndexEnd < sourceRowIndex) direction = "up";
         setFillState({
           mode: "dragging",
@@ -135,6 +160,14 @@ export function FillHandle({
           direction,
         });
       });
+
+      // Edge auto-scroll loop (#19)
+      const container = scrollContainerRef.current;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const speed = computeEdgeScrollSpeed(ev.clientY, rect.top, rect.bottom);
+        if (speed !== 0) startAutoScroll(container, speed);
+      }
     };
 
     const onPointerUp = () => {
@@ -142,6 +175,7 @@ export function FillHandle({
       btn.removeEventListener("pointermove", onPointerMove);
       btn.removeEventListener("pointerup", onPointerUp);
       btn.removeEventListener("pointercancel", onPointerUp);
+      stopAutoScroll();
       const range = previewRangeRef.current;
       if (range) {
         // Multi-col fill when a cell selection is active for this row

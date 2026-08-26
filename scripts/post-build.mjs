@@ -16,8 +16,11 @@ const dist = resolve(fileURLToPath(new URL("..", import.meta.url)), "dist");
 // earns the bytes, and say why in CHANGELOG.
 const BUDGET = {
   // 57.4 kB after #33/#35/#36/#37/#42/#43 (keyboard nav completion, batch paste,
-  // dirty-tracker API, row-index cache) — see CHANGELOG [Unreleased].
-  "index.js": 66_000,
+  // dirty-tracker API, row-index cache) - see CHANGELOG [Unreleased].
+  // 66.0 -> 76.0 kB after #4/#14/#19/#26/#27/#28/#29/#30/#31/#39/#48/#49/#51/#54
+  // (clipboard/selection keyboard surface, horizontal fill, auto-scroll, footer,
+  // skeleton, ARIA grid semantics, labels, dark theme) - see CHANGELOG [Unreleased].
+  "index.js": 76_000,
   "index.cjs": 55_000,
   "style.css": 6_000,
 };

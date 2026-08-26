@@ -1,7 +1,7 @@
-import { collectDirtyRows, discardRow } from "@/core/dirty";
+import { collectDirtyRows, discardRow, markDirty } from "@/core/dirty";
 import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
-import { createHistory } from "@/core/history";
+import { createHistory, pushBatchHistory } from "@/core/history";
 import { resolveLabels } from "@/core/labels";
 import { createRowIndexGetter } from "@/core/row-index";
 import { EditSessionStore } from "@/core/session";
@@ -302,6 +302,64 @@ export function useEditableTable<T extends Record<string, string>>(
     }
   }, [createRow, columns, getRowId, focusCell, appendRows]);
 
+  const clearCellSelection = useCallback((): boolean => {
+    const sel = cellSelection;
+    if (!sel) return false;
+    const rows = rowsDataRef.current;
+    const visibleCols = columns.filter(
+      (c) => !c.hidden && c.editable !== false && !c.render,
+    );
+    const startIdx = visibleCols.findIndex((c) => c.key === sel.colKeyStart);
+    const endIdx = visibleCols.findIndex((c) => c.key === sel.colKeyEnd);
+    if (startIdx === -1 || endIdx === -1) return false;
+    const lo = Math.min(startIdx, endIdx);
+    const hi = Math.max(startIdx, endIdx);
+    const rowEnd = sel.rowIndexEnd ?? sel.rowIndex;
+    const rLo = Math.min(sel.rowIndex, rowEnd);
+    const rHi = Math.max(sel.rowIndex, rowEnd);
+    const batchEntries: Array<{
+      rowId: RowId;
+      colKey: string;
+      prevValue: string;
+      nextValue: string;
+    }> = [];
+    for (let r = rLo; r <= rHi; r++) {
+      const row = rows[r];
+      if (!row) continue;
+      const rowId = getRowId(row);
+      let mutated: Record<string, string> | null = null;
+      for (let c = lo; c <= hi; c++) {
+        const colKey = visibleCols[c].key;
+        const prevValue = row[colKey] ?? "";
+        if (prevValue === "") continue;
+        mutated = { ...(mutated ?? row), [colKey]: "" };
+        markDirty(dirtyRowsRef.current, rowId, colKey, prevValue, "");
+        batchEntries.push({
+          rowId,
+          colKey,
+          prevValue,
+          nextValue: "",
+        });
+      }
+      if (mutated) rowsDataRef.current[r] = mutated as T;
+    }
+    if (batchEntries.length === 0) return false;
+    pushBatchHistory(historyRef.current, batchEntries);
+    updateRows([...rowsDataRef.current]);
+    for (const entry of batchEntries) {
+      runSideEffect({ rowId: entry.rowId, colKey: entry.colKey }, "", "blur");
+    }
+    return true;
+  }, [
+    cellSelection,
+    columns,
+    getRowId,
+    historyRef,
+    dirtyRowsRef,
+    updateRows,
+    runSideEffect,
+  ]);
+
   const { handlePaste } = usePasteHandler({
     columns: effectiveColumns,
     activeCellRef,
@@ -425,6 +483,7 @@ export function useEditableTable<T extends Record<string, string>>(
     // Feature 10: Imperative ref API
     setData,
     scrollToRow,
+    clearCellSelection,
     validate,
     getDirtyRows,
     markSaved,

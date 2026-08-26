@@ -1,4 +1,4 @@
-import { buildSelectionTsv } from "@/core/clipboard";
+import { buildSelectionTsv, writeClipboardText } from "@/core/clipboard";
 import { createRowIndexGetter } from "@/core/row-index";
 import type { EditSessionStore } from "@/core/session";
 import type {
@@ -27,6 +27,7 @@ type UseKeyboardNavOptions<T> = {
   focusCell: (cell: CellPos) => void;
   setCellSelection: (sel: CellSelectionRange | null) => void;
   cellSelection: CellSelectionRange | null;
+  clearCellSelection?: () => void;
 };
 
 export function useKeyboardNav<T extends Record<string, string>>({
@@ -44,6 +45,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
   applyFill,
   focusCell,
   cellSelection,
+  clearCellSelection,
   setCellSelection,
 }: UseKeyboardNavOptions<T>) {
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
@@ -99,18 +101,68 @@ export function useKeyboardNav<T extends Record<string, string>>({
         getRowId,
         cellSelection,
       );
-      if (!tsv) return;
-      if (navigator.clipboard?.writeText) {
-        void navigator.clipboard.writeText(tsv);
+      if (tsv) writeClipboardText(tsv);
+      return;
+    }
+
+    if (e.ctrlKey && e.key === "x" && !isTypingTarget && cellSelection) {
+      e.preventDefault();
+      const tsv = buildSelectionTsv(
+        displayRowsRef.current,
+        columns,
+        getRowId,
+        cellSelection,
+      );
+      if (tsv) {
+        writeClipboardText(tsv);
+        clearCellSelection?.();
+      }
+      return;
+    }
+
+    if (
+      (e.key === "Delete" || e.key === "Backspace") &&
+      !isTypingTarget &&
+      cellSelection
+    ) {
+      e.preventDefault();
+      clearCellSelection?.();
+      return;
+    }
+
+    if (
+      e.shiftKey &&
+      cellSelection &&
+      (e.key === "ArrowUp" ||
+        e.key === "ArrowDown" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight")
+    ) {
+      e.preventDefault();
+      const rows = displayRowsRef.current;
+      const visibleCols = columns.filter((c) => !c.hidden);
+      const endRow = cellSelection.rowIndexEnd ?? cellSelection.rowIndex;
+      const endColIdx = visibleCols.findIndex(
+        (c) => c.key === cellSelection.colKeyEnd,
+      );
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        const next = Math.min(
+          rows.length - 1,
+          Math.max(0, endRow + (e.key === "ArrowDown" ? 1 : -1)),
+        );
+        setCellSelection({
+          ...cellSelection,
+          rowIndexEnd: next,
+          rowIdEnd: getRowId(rows[next]),
+        });
       } else {
-        const ta = document.createElement("textarea");
-        ta.value = tsv;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
+        const dir = e.key === "ArrowRight" ? 1 : -1;
+        const nextCol =
+          visibleCols[
+            Math.min(visibleCols.length - 1, Math.max(0, endColIdx + dir))
+          ];
+        if (nextCol)
+          setCellSelection({ ...cellSelection, colKeyEnd: nextCol.key });
       }
       return;
     }

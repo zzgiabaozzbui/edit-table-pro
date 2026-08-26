@@ -10,6 +10,7 @@ import { DateCell } from "./DateCell";
 import { DropdownCell } from "./DropdownCell";
 import { ReadonlyCell } from "./ReadonlyCell";
 import { RenderCell } from "./RenderCell";
+import { RowDragHandle } from "./RowDragHandle";
 import { SelectCell } from "./SelectCell";
 
 function isColInRange(
@@ -55,6 +56,7 @@ export function VirtualBody<T extends Record<string, string>>({
     scrollContainerRef,
     fillState,
     cellSelection,
+    rowDrag,
     addRow,
   } = useTableContext<T>();
   const [scrollTop, setScrollTop] = useState(0);
@@ -65,7 +67,10 @@ export function VirtualBody<T extends Record<string, string>>({
     void rows;
     const m = new Map<string, T>();
     const src = rowsDataRef.current ?? [];
-    for (const r of src) m.set(getRowId(r), r);
+    for (const r of src) {
+      if (!r) continue; // sparse entry safety during batched updates
+      m.set(getRowId(r), r);
+    }
     return m;
   }, [rows, rowsDataRef, getRowId]);
 
@@ -141,6 +146,7 @@ export function VirtualBody<T extends Record<string, string>>({
         )}
         {rows.slice(start, end).map((row, i) => {
           const rowIndex = start + i;
+          if (!row) return null; // defensive: skip sparse entries during batched updates
           const rowId = getRowId(row);
           const extraClass = tableProps.rowClassName?.(row, rowIndex) ?? "";
           const isSelected =
@@ -175,8 +181,19 @@ export function VirtualBody<T extends Record<string, string>>({
                 width: totalWidth,
                 display: "flex",
                 borderBottom: "1px solid var(--et-color-split)",
+                boxShadow:
+                  rowDrag.active && rowIndex === rowDrag.targetIndex
+                    ? "inset 0 2px 0 var(--et-color-primary)"
+                    : undefined,
+                opacity:
+                  rowDrag.active && rowIndex === rowDrag.fromIndex
+                    ? 0.5
+                    : undefined,
               }}
             >
+              {tableProps.rowDraggable && (
+                <RowDragHandle rowId={rowId} rowIndex={rowIndex} />
+              )}
               {tableProps.hasSelection && (
                 <SelectCell rowId={rowId} width={SELECTION_COL_WIDTH} />
               )}

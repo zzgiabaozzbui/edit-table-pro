@@ -100,8 +100,14 @@ export type HistoryStructuralEntry<
   T extends Record<string, string> = Record<string, string>,
 > = {
   type: "structural";
-  op: "remove" | "insert";
-  rows: Array<{ rowId: RowId; index: number; row: T }>;
+  op: "remove" | "insert" | "move";
+  rows: Array<{
+    rowId: RowId;
+    index: number;
+    row: T;
+    /** For op="move": the index the row came from */
+    prevIndex?: number;
+  }>;
   timestamp: number;
 };
 

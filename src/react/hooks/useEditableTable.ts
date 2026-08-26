@@ -69,6 +69,9 @@ export type UseEditableTableOptions<T> = {
   onColumnWidthsChange?: (widths: Record<ColKey, number>) => void;
   /** Controlled row selection (#38) */
   selectedRowIds?: RowId[];
+  /** Enable the row drag handle for reordering (#17) */
+  rowDraggable?: boolean;
+  onRowReorder?: (fromIndex: number, toIndex: number) => void;
   autoFocus?: boolean;
   value?: T[];
   onChange?: (rows: T[]) => void;
@@ -96,6 +99,7 @@ export function useEditableTable<T extends Record<string, string>>(
     loadingType,
     skeletonRows,
     searchable = false,
+    rowDraggable,
     labels,
     onSelectionChange,
     onCellClick,
@@ -119,6 +123,7 @@ export function useEditableTable<T extends Record<string, string>>(
     loadingType,
     skeletonRows,
     labels: resolveLabels(labels),
+    rowDraggable,
     hasSelection,
   };
 
@@ -355,6 +360,30 @@ export function useEditableTable<T extends Record<string, string>>(
   );
 
   // Row delete (#53): structural, undoable
+  // Row reorder (#17): structural move, undoable
+  const onRowReorderRef = useRef(options.onRowReorder);
+  onRowReorderRef.current = options.onRowReorder;
+  const [rowDrag, setRowDrag] = useState({
+    active: false,
+    fromIndex: 0,
+    targetIndex: 0,
+  });
+  const moveRow = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      const next = [...rowsDataRef.current];
+      const [row] = next.splice(fromIndex, 1);
+      if (!row) return;
+      next.splice(toIndex, 0, row);
+      rowsDataRef.current = next;
+      pushStructuralHistory(historyRef.current, "move", [
+        { rowId: getRowId(row), index: toIndex, prevIndex: fromIndex, row },
+      ]);
+      updateRows(next);
+      onRowReorderRef.current?.(fromIndex, toIndex);
+    },
+    [getRowId, historyRef, updateRows],
+  );
+
   const removeRows = useCallback(
     (rowIds: RowId[]) => {
       const ids = new Set(rowIds);
@@ -578,6 +607,9 @@ export function useEditableTable<T extends Record<string, string>>(
     sortState,
     toggleSort,
     removeRows,
+    rowDrag,
+    setRowDrag,
+    moveRow,
     validate,
     getDirtyRows,
     markSaved,

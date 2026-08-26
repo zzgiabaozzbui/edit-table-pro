@@ -11,6 +11,7 @@ import { createRowIndexGetter } from "@/core/row-index";
 import { EditSessionStore } from "@/core/session";
 import { SIZE_CONFIG } from "@/core/theme";
 import type { TableTheme } from "@/core/theme";
+import type { PinSide } from "@/core/types";
 import type {
   CellClickHandler,
   CellCommitInfo,
@@ -424,6 +425,28 @@ export function useEditableTable<T extends Record<string, string>>(
     });
   }, []);
 
+  // Runtime pin override (#52): wins over static col.fixed
+  const [pins, setPins] = useState<Record<string, PinSide>>({});
+  const effectiveFixed = useCallback(
+    (colKey: string): PinSide =>
+      pins[colKey] ?? columns.find((c) => c.key === colKey)?.fixed,
+    [pins, columns],
+  );
+  const setPin = useCallback((colKey: ColKey, side: PinSide) => {
+    setPins((prev) => {
+      const next = { ...prev };
+      if (side) next[colKey] = side;
+      else delete next[colKey];
+      return next;
+    });
+  }, []);
+  const sortColumn = useCallback(
+    (colKey: ColKey, dir: "asc" | "desc" | null) => {
+      setSortState(dir ? { colKey, dir } : null);
+    },
+    [],
+  );
+
   const clearCellSelection = useCallback((): boolean => {
     const sel = cellSelection;
     if (!sel) return false;
@@ -606,6 +629,9 @@ export function useEditableTable<T extends Record<string, string>>(
     clearCellSelection,
     sortState,
     toggleSort,
+    sortColumn,
+    effectiveFixed,
+    setPin,
     removeRows,
     rowDrag,
     setRowDrag,

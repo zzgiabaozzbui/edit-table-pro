@@ -15,15 +15,30 @@
 .et-input {
   width: 100%;
   height: 100%;
-  border: 1px solid var(--et-color-border);
-  border-radius: var(--et-border-radius);
-  background: var(--et-color-bg);
+  border: 1px solid transparent;
+  border-radius: calc(var(--et-border-radius) - 2px);
+  background: transparent;
   color: var(--et-color-text);
   font-family: inherit;
   font-size: inherit;
+  font-variant-numeric: tabular-nums;
   padding: var(--et-padding-y) var(--et-padding-x);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.et-input:hover:not(:focus):not(.error) {
+  border-color: var(--et-color-border);
+}
+
+.et-input:focus:not(.error) {
+  background: var(--et-color-bg);
+  border-color: var(--et-color-primary);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--et-color-primary) 12%, transparent);
 }
 
 .et-input:hover:not(:focus):not(.error) {

@@ -34,10 +34,11 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
         display: "flex",
         flexShrink: 0,
         width: totalWidth,
-        borderBottom: "2px solid var(--et-color-border)",
+        borderBottom: "1px solid var(--et-color-border)",
         background: "var(--et-color-bg-header)",
-        fontWeight: 600,
-        fontSize: "var(--et-font-size)",
+        fontWeight: 500,
+        fontSize: "calc(var(--et-font-size) - 2px)",
+        letterSpacing: "0.02em",
         ...(tableProps.sticky
           ? { position: "sticky", top: 0, zIndex: 10 }
           : {}),

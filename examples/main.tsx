@@ -122,6 +122,7 @@ function Demo() {
   const [selected, setSelected] = useState<string[]>([]);
   const [lastAction, setLastAction] = useState("Ready.");
   const [showDocs, setShowDocs] = useState(true);
+  const guideOnly = new URLSearchParams(window.location.search).get("view") === "guide";
   const theme: TableTheme | undefined = dark ? DARK_THEME : undefined;
 
   const btn = (label: string, fn: () => void): React.ReactNode => (
@@ -150,8 +151,10 @@ function Demo() {
   );
 
   return (
-    <div
-      style={{
+      {!guideOnly && (
+      <>
+      <div
+        style={{
         padding: 24,
         background: dark ? "#141414" : "#f7f7f8",
         minHeight: "100vh",
@@ -250,6 +253,24 @@ function Demo() {
         · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo · Shift+Arrow extend
         selection
       </p>
+      </>
+      )}
+      {guideOnly && (
+        <aside
+          style={{
+            maxWidth: 860,
+            margin: "0 auto",
+            border: "1px solid var(--et-color-border)",
+            borderRadius: 10,
+            padding: "16px 22px",
+            background: dark ? "#1b1b1b" : "#fff",
+          }}
+        >
+          <div className="usage-doc">
+            <Markdown>{usage}</Markdown>
+          </div>
+        </aside>
+      )}
       {EMPTY.length > 0 && null}
       {/* Empty-state demo: delete all rows via selection → centered empty state with Add row */}
       <style>{`

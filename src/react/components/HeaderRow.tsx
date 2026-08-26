@@ -37,8 +37,9 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
         borderBottom: "1px solid var(--et-color-border)",
         background: "var(--et-color-bg-header)",
         fontWeight: 500,
-        fontSize: "calc(var(--et-font-size) - 2px)",
-        letterSpacing: "0.02em",
+        fontSize: "calc(var(--et-font-size) - 3px)",
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
         ...(tableProps.sticky
           ? { position: "sticky", top: 0, zIndex: 10 }
           : {}),

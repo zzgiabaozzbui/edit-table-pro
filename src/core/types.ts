@@ -51,6 +51,7 @@ export type ColDef<T = Record<string, string>> = {
   key: keyof T & string;
   type: "text" | "number" | "date" | "select" | "boolean";
   header?: string;
+  headerTooltip?: string;
   placeholder?: string;
   width?: number;
   align?: "left" | "center" | "right";

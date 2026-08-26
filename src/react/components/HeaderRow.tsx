@@ -54,6 +54,7 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
       {visibleCols.map((col) => (
         <div
           key={col.key}
+          title={col.headerTooltip}
           style={{
             position: "relative",
             width: columnWidths.get(col.key) ?? col.width ?? 150,

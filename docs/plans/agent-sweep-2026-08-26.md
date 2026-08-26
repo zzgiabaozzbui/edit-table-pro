@@ -111,3 +111,12 @@ Tests 166 -> 178 PASS. Gates xanh.
 | U8 | #50 breaking types (major), #55 docs site, #10 launch manual | DOC-ONLY ly do |
 
 Quy tac: TDD RED, gates moi task, commit tung task.
+
+Ket qua sweep 4:
+- U1 #16 sorting DONE d16ab05
+- U2 #53 removeRows+structural+onRowSave DONE 79c0f8a
+- U3 #38 controlled props DONE fe558b1
+- U4 #15 frozen columns DONE f87a2b8
+- Fix lint ARIA override config ea2d9db
+Tests 184 -> 190 PASS. Con lai: #17 #18 #44 #45 #52 #50 #10 #55 - lon/structural/manual,
+ghi ly do trong runbook sweep 3; uu tien phien sau: #44 memoize ctx/cell/RAF scroll, #17 row reorder, sau do #52/#18 menu hoac #45 col-virtualization can mini-spec.

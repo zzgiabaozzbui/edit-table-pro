@@ -15,19 +15,26 @@ export function HeaderMenu({ colKey }: { colKey: string }) {
   const pinned = effectiveFixed(colKey);
 
   const item = (label: string, action: () => void, key: string) => (
-    <div
+    <button
       key={key}
+      type="button"
       role="menuitem"
-      tabIndex={-1}
       onClick={() => {
         action();
         setOpen(false);
       }}
       style={{
+        display: "block",
+        width: "100%",
+        textAlign: "left",
+        border: "none",
+        background: "transparent",
         padding: "6px 12px",
         cursor: "pointer",
         whiteSpace: "nowrap",
         fontSize: "var(--et-font-size)",
+        color: "inherit",
+        fontFamily: "inherit",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.background = "var(--et-color-row-hover)";
@@ -37,7 +44,7 @@ export function HeaderMenu({ colKey }: { colKey: string }) {
       }}
     >
       {label}
-    </div>
+    </button>
   );
 
   return (
@@ -66,8 +73,12 @@ export function HeaderMenu({ colKey }: { colKey: string }) {
       {open && (
         <>
           <div
+            role="presentation"
             style={{ position: "fixed", inset: 0, zIndex: 30 }}
             onClick={() => setOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setOpen(false);
+            }}
           />
           <div
             role="menu"

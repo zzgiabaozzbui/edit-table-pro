@@ -7,6 +7,9 @@ type UseColumnResizeOptions = {
   onColumnWidthsChange?: (widths: Record<ColKey, number>) => void;
 };
 
+const toMap = (record: Record<ColKey, number>) =>
+  new Map(Object.entries(record));
+
 export function useColumnResize<T>(
   columns: ColDef<T>[],
   {
@@ -22,9 +25,6 @@ export function useColumnResize<T>(
           : columns.map((c) => [c.key, c.width ?? 150]),
       ),
   );
-
-  const toMap = (record: Record<ColKey, number>) =>
-    new Map(Object.entries(record));
 
   const columnWidths = controlled ? toMap(controlled) : internal;
 

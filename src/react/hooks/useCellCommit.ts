@@ -119,6 +119,7 @@ export function useCellCommit<T extends Record<string, string>>({
       historyRef,
       setRows,
       onCellCommit,
+      onRowSave,
       getRowIndex,
     ],
   );

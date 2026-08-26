@@ -381,7 +381,7 @@ export function useEditableTable<T extends Record<string, string>>(
       updateRows(next);
       onRowReorderRef.current?.(fromIndex, toIndex);
     },
-    [getRowId, historyRef, updateRows],
+    [getRowId, updateRows],
   );
 
   const removeRows = useCallback(

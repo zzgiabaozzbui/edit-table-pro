@@ -32,6 +32,27 @@ describe("ARIA grid semantics (#48)", () => {
     expect(grid?.getAttribute("aria-colcount")).toBe("1");
   });
 
+  it("exposes gridcell roles and focusable readonly cells", () => {
+    const cols2: ColDef<Row>[] = [
+      { key: "a", type: "text", editable: false },
+      { key: "b", type: "text" },
+    ];
+    const { container } = render(
+      <EditableTable<Row>
+        columns={cols2}
+        getRowId={(r) => r.id}
+        initialData={[{ id: "1", a: "ro", b: "" }]}
+      />,
+    );
+    expect(
+      container.querySelectorAll('[role="gridcell"]').length,
+    ).toBeGreaterThanOrEqual(2);
+    const readonly = container.querySelector(
+      '[data-rowid="1"][data-colkey="a"][role="gridcell"]',
+    ) as HTMLElement;
+    expect(readonly.tabIndex).toBe(0);
+  });
+
   it("marks rows and headers with roles and indexes", () => {
     const { container } = render(
       <EditableTable<Row>

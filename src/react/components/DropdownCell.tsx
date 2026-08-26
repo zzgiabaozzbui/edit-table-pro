@@ -52,6 +52,7 @@ export function DropdownCell({
 
   return (
     <div
+      role="gridcell"
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}

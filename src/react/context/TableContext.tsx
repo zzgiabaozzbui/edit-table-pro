@@ -87,6 +87,8 @@ export type TableContextValue<T = Record<string, string>> = {
   cellSelection: CellSelectionRange | null;
   setCellSelection: (sel: CellSelectionRange | null) => void;
   clearCellSelection: () => boolean;
+  sortState: { colKey: ColKey; dir: "asc" | "desc" } | null;
+  toggleSort: (colKey: ColKey) => void;
   // Feature 10: Imperative ref API (#20)
   setData: (rows: T[]) => void;
   scrollToRow: (rowId: RowId) => void;

@@ -59,6 +59,8 @@ export type ColDef<T = Record<string, string>> = {
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   hidden?: boolean;
+  sortable?: boolean;
+  sortComparator?: (a: string, b: string) => number;
   editable?: boolean | ((row: T) => boolean);
   options?: { label: string; value: string }[];
   validate?: (value: string, row: T) => ValidationResult;

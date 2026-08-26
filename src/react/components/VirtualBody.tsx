@@ -1,7 +1,7 @@
 import { isRowInSelection } from "@/core/clipboard";
 import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTableContext } from "../context/TableContext";
 import { BooleanCell } from "./BooleanCell";
 import { Cell } from "./Cell";
@@ -57,6 +57,15 @@ export function VirtualBody<T extends Record<string, string>>({
     addRow,
   } = useTableContext<T>();
   const [scrollTop, setScrollTop] = useState(0);
+
+  // Live values must be looked up by rowId (data order can differ from the
+  // sorted/filtered view order rendered here).
+  const liveRowsById = useMemo(() => {
+    const m = new Map<string, T>();
+    const src = rowsDataRef.current ?? [];
+    for (const r of src) m.set(getRowId(r), r);
+    return m;
+  }, [rows, rowsDataRef, getRowId]);
 
   const viewportHeight = scrollContainerRef.current?.clientHeight ?? 600;
   const visibleCols = columns.filter((c) => !c.hidden);
@@ -129,7 +138,7 @@ export function VirtualBody<T extends Record<string, string>>({
             tableProps.hasSelection && selectedRowIds.has(rowId);
           // rowsDataRef is always updated synchronously in commitCell — use it
           // to get the latest committed value even if React state hasn't re-rendered yet
-          const liveRow = rowsDataRef.current?.[rowIndex] ?? row;
+          const liveRow = liveRowsById.get(rowId) ?? row;
 
           return (
             <div

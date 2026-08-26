@@ -182,6 +182,10 @@ export function Cell({
         onBlur={handleBlur}
         onFocus={handleFocus}
         className={hasError ? "et-input error" : "et-input"}
+        aria-invalid={hasError || undefined}
+        aria-describedby={
+          hasError ? `et-err-${cell.rowId}-${cell.colKey}` : undefined
+        }
         style={{
           textAlign: align ?? "left",
           ...(ellipsis
@@ -203,7 +207,11 @@ export function Cell({
       >
         !
       </span>
-      <div ref={tooltipRef} className="et-error-tooltip">
+      <div
+        ref={tooltipRef}
+        id={`et-err-${cell.rowId}-${cell.colKey}`}
+        className="et-error-tooltip"
+      >
         {errorMsg}
       </div>
       {(isActiveCell ||

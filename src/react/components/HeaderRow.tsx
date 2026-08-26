@@ -15,6 +15,8 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
 
   return (
     <div
+      role="row"
+      aria-rowindex={1}
       style={{
         display: "flex",
         flexShrink: 0,
@@ -54,6 +56,8 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
       {visibleCols.map((col) => (
         <div
           key={col.key}
+          role="columnheader"
+          aria-colindex={visibleCols.indexOf(col) + 1}
           title={col.headerTooltip}
           style={{
             position: "relative",

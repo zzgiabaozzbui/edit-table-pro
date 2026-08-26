@@ -265,6 +265,7 @@ function Demo() {
       )}
       {guideOnly && (
         <aside
+          className="guide-root"
           style={{
             maxWidth: 860,
             margin: "0 auto",
@@ -272,6 +273,7 @@ function Demo() {
             borderRadius: 10,
             padding: "16px 22px",
             background: dark ? "#1b1b1b" : "#fff",
+            color: "var(--et-color-text)",
           }}
         >
           <div className="usage-doc">
@@ -284,6 +286,24 @@ function Demo() {
       <style>{`
         body { margin: 0; font-family: Inter, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         .et-row-stripe { background: ${dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"}; }
+        .guide-root {
+          --et-color-text: ${dark ? "#e9e9e9" : "#1f1f1f"};
+          --et-color-border: ${dark ? "#454545" : "#e2e2e2"};
+          --et-color-split: ${dark ? "#333" : "#eee"};
+          --et-font-size: 14px;
+        }
+        .usage-doc { font-size: 13px; line-height: 1.65; color: var(--et-color-text); }
+        .usage-doc h1 { font-size: 17px; margin: 8px 0; }
+        .usage-doc h2 { font-size: 14px; margin: 20px 0 6px; padding-bottom: 3px; border-bottom: 1px solid var(--et-color-border); }
+        .usage-doc p { margin: 6px 0; }
+        .usage-doc ul { margin: 6px 0; padding-left: 18px; }
+        .usage-doc li { margin: 3px 0; }
+        .usage-doc code { background: ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"}; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+        .usage-doc pre { background: #16181d; color: #e6e6e6; padding: 10px 12px; border-radius: 6px; overflow-x: auto; }
+        .usage-doc pre code { background: none; padding: 0; color: inherit; }
+        .usage-doc table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 8px 0; }
+        .usage-doc th, .usage-doc td { border: 1px solid var(--et-color-border); padding: 4px 8px; text-align: left; }
+        .usage-doc th { background: ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"}; }
       `}</style>
     </div>
   );

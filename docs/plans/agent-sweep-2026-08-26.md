@@ -125,3 +125,10 @@ ghi ly do trong runbook sweep 3; uu tien phien sau: #44 memoize ctx/cell/RAF scr
 - #17 row reorder DONE d5386de (dong) - move op structural history
 - #45 col-virtualization CLOSED not-planned (ly do: scale contract theo hang, so cot thuc te nho)
 - Con mo 6 tracker co ly do: #44 (partial: liveRowsById xong, con ctx-memo/RAF-scroll), #18, #52, #50 (major 0.4.0), #10, #55 (manual)
+
+## Sweep 6 - #50 research + #52 menu
+- #50: research dang tren issue - CHAP NHAN breaking/major 0.4.0 (cho phep cua user); keo dai engine audit, lam release branch rieng
+- #52: header menu sort/hide/pin DONE 650a7f9 (dong); filter tach sang #62
+- #44: them skip-redundant-scroll ac28f8b; con ctx-memo + stable cell props
+- Con mo cuoi cung: #44 #18 #62 #10 #55 - tat ca co comment trang thai + ly do
+Tests 190 -> 195 PASS.

@@ -5,6 +5,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added (sweep 5)
+- **Column header menu** — per-column dropdown with Sort ascending/descending/clear, Hide
+  column and Pin left/right/Unpin; runtime pin overrides take precedence over static
+  `col.fixed` (#52). Column filter spun off to #62.
+- **Row drag to reorder** — `rowDraggable` + `onRowReorder(fromIndex, toIndex)`, drag handle
+  with Pointer Events, drop indicator, undo/redo via a typed structural `move` entry (#17).
+- **Perf** — VirtualBody skips redundant scroll state updates and resolves cell values through
+  a rowId-keyed live map so view transforms stay correct (#44, partial).
+
 > **Note**: `0.2.0` was tagged in git but never published to npm — `npm view edit-table-pro`
 > still shows `0.1.1` as latest. The next release is therefore free to change the API without
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).

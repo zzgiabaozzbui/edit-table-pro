@@ -36,6 +36,7 @@ export type TableProps<T> = {
   rowClassName?: (row: T, index: number) => string;
   searchable?: boolean;
   labels?: Partial<import("@/core/labels").TableLabels>;
+  rowDraggable?: boolean;
 };
 
 export type TableContextValue<T = Record<string, string>> = {
@@ -107,6 +108,15 @@ export type TableContextValue<T = Record<string, string>> = {
   setColumnVisibility: (key: ColKey, visible: boolean) => void;
   toggleColumn: (key: ColKey) => void;
   removeRows: (rowIds: RowId[]) => void;
+  rowDrag: { active: boolean; fromIndex: number; targetIndex: number };
+  setRowDrag: React.Dispatch<
+    React.SetStateAction<{
+      active: boolean;
+      fromIndex: number;
+      targetIndex: number;
+    }>
+  >;
+  moveRow: (fromIndex: number, toIndex: number) => void;
 };
 
 export type EditableTableRef<T = Record<string, string>> = Pick<

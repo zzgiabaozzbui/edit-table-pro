@@ -42,8 +42,8 @@ export function pushBatchHistory(
 
 export function pushStructuralHistory<T extends Record<string, string>>(
   state: HistoryState,
-  op: "remove" | "insert",
-  rows: Array<{ rowId: RowId; index: number; row: T }>,
+  op: "remove" | "insert" | "move",
+  rows: Array<{ rowId: RowId; index: number; row: T; prevIndex?: number }>,
 ): void {
   state.stack = state.stack.slice(0, state.pointer + 1);
   state.stack.push({

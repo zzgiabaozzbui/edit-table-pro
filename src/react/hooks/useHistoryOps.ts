@@ -28,7 +28,19 @@ export function useHistoryOps<T extends Record<string, string>>({
     const entry = undoHistory(historyRef.current);
     if (!entry) return;
     if (entry.type === "structural") {
-      if (entry.op === "remove") {
+      if (entry.op === "move") {
+        // Undo a move: bring the row back from `index` to `prevIndex`
+        const { rowId, index, prevIndex } = entry.rows[0];
+        const arr = [...rowsDataRef.current];
+        const cur = arr.findIndex((r) => getRowId(r) === rowId);
+        if (cur !== -1) {
+          const [r] = arr.splice(cur, 1);
+          const at = Math.min(prevIndex ?? index ?? cur, arr.length);
+          arr.splice(at, 0, r);
+        }
+        rowsDataRef.current = arr;
+        setRows([...arr]);
+      } else if (entry.op === "remove") {
         // Undo a delete: re-insert rows at original positions (stable, desc order)
         const ordered = [...entry.rows].sort((a, b) => b.index - a.index);
         for (const { rowId, index, row } of ordered) {
@@ -78,12 +90,25 @@ export function useHistoryOps<T extends Record<string, string>>({
     const entry = redoHistory(historyRef.current);
     if (!entry) return;
     if (entry.type === "structural") {
-      if (entry.op === "remove") {
+      if (entry.op === "move") {
+        // Redo a move: place the row back at `index`
+        const { rowId, index } = entry.rows[0];
+        const arr = [...rowsDataRef.current];
+        const cur = arr.findIndex((r) => getRowId(r) === rowId);
+        if (cur !== -1 && index !== undefined) {
+          const [r] = arr.splice(cur, 1);
+          const at = Math.min(index, arr.length);
+          arr.splice(at, 0, r);
+        }
+        rowsDataRef.current = arr;
+        setRows([...arr]);
+      } else if (entry.op === "remove") {
         const ids = new Set(entry.rows.map((r) => r.rowId));
         rowsDataRef.current = rowsDataRef.current.filter(
           (r) => !ids.has(getRowId(r)),
         );
       } else {
+        // insert
         const ordered = [...entry.rows].sort((a, b) => a.index - b.index);
         for (const { index, row } of ordered) {
           const at = Math.min(index, rowsDataRef.current.length);

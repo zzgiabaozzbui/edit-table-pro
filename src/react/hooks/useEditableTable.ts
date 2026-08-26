@@ -409,12 +409,17 @@ export function useEditableTable<T extends Record<string, string>>(
     const newRow = createRow();
     appendRows([newRow]);
     const firstCol = columns.find((c) => !c.hidden && c.editable !== false);
-    if (firstCol) {
-      requestAnimationFrame(() => {
-        focusCell({ rowId: getRowId(newRow), colKey: firstCol.key });
-      });
-    }
-  }, [createRow, columns, getRowId, focusCell, appendRows]);
+    // Scroll the new (virtualized) row into view, then focus once mounted
+    requestAnimationFrame(() => {
+      const sc = scrollContainerRef.current;
+      if (sc) sc.scrollTop = sc.scrollHeight;
+      if (firstCol) {
+        setTimeout(() => {
+          focusCell({ rowId: getRowId(newRow), colKey: firstCol.key });
+        }, 50);
+      }
+    });
+  }, [createRow, columns, getRowId, focusCell, appendRows, scrollContainerRef]);
 
   const toggleSort = useCallback((colKey: ColKey) => {
     setSortState((prev) => {

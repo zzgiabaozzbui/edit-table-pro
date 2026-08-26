@@ -1,7 +1,8 @@
 # Hướng dẫn sử dụng edit-table-pro
 
-Bảng editable hiệu năng cao cho React: virtual scroll, validation, undo/redo,
-fill handle, zero runtime dependencies.
+Bảng editable hiệu năng cao cho React: virtual scroll hàng chục nghìn rows,
+validation pipeline, undo/redo cấu trúc, clipboard Excel-compatible — **zero runtime
+dependencies** (peer: react ≥ 18).
 
 ## Cài đặt
 
@@ -9,172 +10,92 @@ fill handle, zero runtime dependencies.
 npm install edit-table-pro
 ```
 
-## Sử dụng cơ bản
+## Khởi tạo nhanh
 
 ```tsx
 import { EditableTable } from "edit-table-pro";
-import "edit-table-pro/style.css";
 
-const columns = [
-  { key: "name", type: "text", header: "Họ tên", width: 200 },
-  { key: "age", type: "number", header: "Tuổi", width: 100 },
+type Row = { id: string; name: string; qty: string };
+
+const columns: ColDef<Row>[] = [
+  { key: "id", type: "text", editable: false },
+  { key: "name", type: "text", sortable: true },
+  { key: "qty", type: "number", validate: (v) =>
+      Number(v) >= 1 ? { ok: true } : { ok: false, error: "≥ 1" } },
 ];
 
-<EditableTable columns={columns} initialData={rows} getRowId={(r) => r.id} />;
-```
-
-## Các prop chính
-
-- `columns: ColDef[]` — định nghĩa cột: `key`, `type`, `header`, `width`,
-  `align`, `editable`, `validate`, `render`, `format`, `ellipsis`, `hidden`,
-  `options`.
-- `initialData` — mảng dữ liệu ban đầu (uncontrolled).
-- `value` + `onChange` — dữ liệu do parent quản lý (controlled).
-- `getRowId` — hàm lấy id duy nhất mỗi dòng.
-- `createRow` — template dòng mới khi bấm thêm.
-- `height` — chiều cao bảng (px), bật virtual scroll.
-- `size` — `"large" | "medium" | "small"`.
-- `bordered` — hiển thị đường viền.
-- `sticky` — header cố định khi cuộn.
-- `theme` — tùy biến màu / font (`TableTheme`).
-- `searchable` — bật toolbar tìm kiếm hàng.
-
-## Validation
-
-```tsx
-{
-  key: "phone",
-  type: "text",
-  header: "SĐT",
-  validate: (v) =>
-    v.replace(/\D/g, "").length >= 10
-      ? { ok: true }
-      : { ok: false, error: "Tối thiểu 10 số" },
-}
-```
-
-Hàm `validate` trả về `{ ok: true }` hoặc `{ ok: false, error: "..." }`.
-Ô không hợp lệ sẽ báo lỗi và chặn thao tác copy/fill.
-
-## Các trường hợp sử dụng (use cases)
-
-### Ô đa kiểu (cell types)
-
-Ngoài `text` / `number`, cột hỗ trợ `select`, `date`, `boolean` — mỗi loại có
-editor riêng (DropdownCell, DateCell, BooleanCell).
-
-```tsx
-const columns = [
-  { key: "name", type: "text", header: "Họ tên", width: 200 },
-  {
-    key: "status",
-    type: "select",
-    header: "Trạng thái",
-    width: 150,
-    options: [
-      { label: "Mới", value: "new" },
-      { label: "Đang xử lý", value: "doing" },
-      { label: "Xong", value: "done" },
-    ],
-  },
-  { key: "birth", type: "date", header: "Ngày sinh", width: 140 },
-  { key: "active", type: "boolean", header: "Kích hoạt", width: 100 },
-];
-```
-
-### Tìm kiếm hàng
-
-```tsx
-<EditableTable
+<EditableTable<Row>
   columns={columns}
+  getRowId={(r) => r.id}
   initialData={rows}
-  getRowId={(r) => r.id}
-  searchable // hiện toolbar, lọc theo tất cả cột
-/>;
+/>
 ```
 
-### Ẩn / hiện cột
+## Kiểu cột
 
-Cột đánh dấu `hidden: true` sẽ không hiển thị ban đầu; bật/tắt động qua ref.
+`text` · `number` · `date` · `select` (+`options`) · `boolean` · readonly
+(`editable: false`) · custom (`render: (value, row) => ReactNode`).
 
-```tsx
-const columns = [
-  { key: "name", type: "text", header: "Họ tên" },
-  { key: "note", type: "text", header: "Ghi chú", hidden: true },
-];
+Tuỳ chọn cột hay dùng: `header`, `headerTooltip`, `width`, `align`,
+`sortable` + `sortComparator`, `fixed: 'left' | 'right'` (đóng băng cột),
+`footer: 'sum' | 'count' | 'avg' | ((rows) => string)`.
 
-const ref = useRef<EditableTableRef<Row>>(null);
-ref.current?.toggleColumn("note");            // đảo trạng thái
-ref.current?.setColumnVisibility("note", true); // true = hiện, false = ẩn
-```
+## Header menu ⋮
 
-### Controlled mode
+Mỗi header có nút ⋮: **Sort ascending / descending / Clear**, **Pin left /
+right / Unpin** (ghi đè `col.fixed` lúc runtime), **Hide column**.
+Ẩn/hiện cũng điều khiển được bằng ref: `toggleColumn(key)`,
+`setColumnVisibility(key, visible)`.
 
-Parent sở hữu dữ liệu; mọi thay đổi báo qua `onChange`.
+## Đóng gói & thao tác nhanh
 
-```tsx
-const [data, setData] = useState(rows);
+| Hành động | Cách làm |
+| --- | --- |
+| Điều hướng | `Tab` `Enter` `↑↓←→` `Home/End` `PageUp/PageDown` |
+| Sửa ô | Gõ trực tiếp · `F2` vào lại ô · `Esc` huỷ |
+| Chọn vùng | Kéo chuột · `Shift+Click` · `Shift+Arrow` mở rộng · `Ctrl+A` cả grid |
+| Clipboard | `Ctrl+C` copy TSV · `Ctrl+X` cắt · dán TSV từ Excel/Sheets |
+| Xoá nội dung | `Delete` / `Backspace` trên vùng chọn |
+| Fill | Kéo handle ↓↑←→ · `Ctrl+D` fill xuống (nhận diện series số/ngày) |
+| Undo/redo | `Ctrl+Z` / `Ctrl+Y` — gồm cả xoá/di chuyển row |
+| Reorder row | Kéo ⠿ đầu hàng |
 
-<EditableTable
-  columns={columns}
-  value={data}
-  onChange={(next) => setData(next)}
-  getRowId={(r) => r.id}
-/>;
-```
+## Props thường dùng
 
-### Imperative ref API
+| Prop | Ý nghĩa |
+| --- | --- |
+| `value` / `onChange` | Controlled rows |
+| `searchable` | Thanh tìm kiếm (deferred, cache theo row) |
+| `striped` | Zebra rows |
+| `size` | `"small" \| "medium" \| "large"` (density) |
+| `sticky` / `bordered` / `loading` | Header dính · viền · trạng thái loading |
+| `loadingType="skeleton"` + `skeletonRows` | Skeleton shimmer thay spinner |
+| `emptyText` / `emptyRender` | Trạng thái rỗng tuỳ biến |
+| `createRow` | Bật nút Add row (tự scroll tới dòng mới) |
+| `rowDraggable` + `onRowReorder(from,to)` | Drag để sắp xếp lại hàng |
+| `selectedRowIds` / `onSelectionChange` | Selection controlled/callback |
+| `searchValue` / `onSearchChange` | Search controlled |
+| `hiddenColumnKeys` / `onHiddenColumnKeysChange` | Ẩn cột controlled |
+| `columnWidths` / `onColumnWidthsChange` | Lưu/trả độ rộng cột |
+| `labels` | i18n (Add row, Sort…, Hide column…) |
+| `theme` | Token màu — dùng `DARK_THEME` cho dark mode |
+| `onCellCommit` / `onRowSave` | Lifecycle ghi dữ liệu |
+
+## Ref API
 
 ```tsx
 const ref = useRef<EditableTableRef<Row>>(null);
-
-<EditableTable
-  ref={ref}
-  columns={columns}
-  initialData={rows}
-  getRowId={(r) => r.id}
-/>;
-
-ref.current?.scrollToRow(row.id);   // cuộn tới dòng theo id
-const dirty = ref.current?.getDirtyRows(); // các dòng đã sửa
-ref.current?.setData(newRows);      // ghi đè toàn bộ dữ liệu
-const res = ref.current?.validate(row.id, "phone"); // validate 1 ô
+ref.current?.removeRows(ids);     // xoá row (undo được)
+ref.current?.markSaved();         // clear dirty sau khi persist
+ref.current?.getDirtyRows();      // các row đã sửa
+ref.current?.validate(rowId, key);
+ref.current?.scrollToRow(id);
+ref.current?.setData(rows);
 ```
 
-## Dành cho người dùng cuối (end-user)
+## Xuất CSV
 
-### Chọn và di chuyển
-- Click ô để chọn — ô được chọn có viền sáng và nút **fill handle** (ô vuông nhỏ góc dưới-phải).
-- Mũi tên `↑ ↓ ← →`: di chuyển giữa các ô.
-- `Tab` / `Enter`: sang ô kế tiếp (`Shift+Tab` / `Shift+Enter`: lùi lại).
-- `Ctrl+A`: chọn toàn bộ ô của hàng hiện tại.
-
-### Sửa dữ liệu
-- Click ô (hoặc điều hướng tới) rồi gõ — giá trị cập nhật ngay.
-- `Enter` / `Tab`: lưu và sang ô tiếp.
-- `Esc`: hủy, trả về giá trị cũ, thoát ô.
-- Rời ô (click ra ngoài): tự động lưu.
-- Cột `select` / `date` / `boolean`: hiện dropdown / picker ngày / checkbox thay input thường.
-
-### Hoàn tác
-- `Ctrl+Z`: undo. `Ctrl+Y` hoặc `Ctrl+Shift+Z`: redo.
-
-### Fill (copy giá trị)
-- Kéo **fill handle** (góc dưới-phải ô đang chọn) qua các ô kế để copy giá trị.
-- `Ctrl+D`: copy ô hiện tại xuống ô dưới.
-- `Ctrl+R`: copy ô hiện tại sang ô bên phải.
-
-### Dán (paste)
-- `Ctrl+V` dán clipboard vào ô đang chọn.
-- Dán nhiều ô (TSV từ Excel/Sheets) điền theo lưới.
-- Dán vượt quá dòng cuối → tự động tạo dòng mới (nếu bảng bật thêm dòng qua `createRow`).
-
-### Tìm kiếm
-- Bật `searchable`: gõ vào ô tìm kiếm trên thanh công cụ để lọc hàng theo mọi cột.
-
-## Tính năng
-
-- Virtual scroll cho hàng vạn dòng mà không giật.
-- Undo / redo toàn cục.
-- Fill handle: kéo để copy hoặc dãn chuỗi.
-- Export dữ liệu, session, dirty tracking tích hợp sẵn.
+```ts
+import { exportCsv } from "edit-table-pro";
+exportCsv("orders", columns, rows); // BOM UTF-8, bỏ cột hidden/render
+```

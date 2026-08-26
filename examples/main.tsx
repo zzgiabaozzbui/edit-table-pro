@@ -1,9 +1,11 @@
 import { StrictMode, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import type { ColDef, EditableTableRef, TableTheme } from "../src/index";
-import { DARK_THEME } from "../src/core/theme";
+import Markdown from "react-markdown";
 import { exportCsv } from "../src/core/export";
+import { DARK_THEME } from "../src/core/theme";
+import type { ColDef, EditableTableRef, TableTheme } from "../src/index";
 import { EditableTable } from "../src/index";
+import usage from "./USAGE.md?raw";
 
 type Order = {
   id: string;
@@ -17,7 +19,13 @@ type Order = {
 };
 
 const CATEGORIES = ["Electronics", "Apparel", "Home", "Beauty"];
-const CUSTOMERS = ["Nguyễn Văn A", "Trần Thị B", "Lê Minh C", "Phạm D", "Evan You"];
+const CUSTOMERS = [
+  "Nguyễn Văn A",
+  "Trần Thị B",
+  "Lê Minh C",
+  "Phạm D",
+  "Evan You",
+];
 const PRODUCTS: Record<string, string[]> = {
   Electronics: ["Keyboard", "Mouse", "Monitor"],
   Apparel: ["T-Shirt", "Hoodie", "Cap"],
@@ -43,8 +51,23 @@ function sample(n: number): Order[] {
 }
 
 const columns: ColDef<Order>[] = [
-  { key: "id", type: "text", header: "Order ID", editable: false, fixed: "left", width: 96, sortable: true },
-  { key: "customer", type: "text", header: "Customer", width: 150, sortable: true, headerTooltip: "Tên khách hàng" },
+  {
+    key: "id",
+    type: "text",
+    header: "Order ID",
+    editable: false,
+    fixed: "left",
+    width: 96,
+    sortable: true,
+  },
+  {
+    key: "customer",
+    type: "text",
+    header: "Customer",
+    width: 150,
+    sortable: true,
+    headerTooltip: "Tên khách hàng",
+  },
   {
     key: "category",
     type: "select",
@@ -52,7 +75,13 @@ const columns: ColDef<Order>[] = [
     width: 140,
     options: CATEGORIES.map((c) => ({ label: c, value: c })),
   },
-  { key: "product", type: "text", header: "Product", width: 130, sortable: true },
+  {
+    key: "product",
+    type: "text",
+    header: "Product",
+    width: 130,
+    sortable: true,
+  },
   {
     key: "qty",
     type: "number",
@@ -61,7 +90,8 @@ const columns: ColDef<Order>[] = [
     align: "right",
     sortable: true,
     footer: "count",
-    validate: (v) => (Number(v) >= 1 ? { ok: true } : { ok: false, error: "Qty must be ≥ 1" }),
+    validate: (v) =>
+      Number(v) >= 1 ? { ok: true } : { ok: false, error: "Qty must be ≥ 1" },
   },
   {
     key: "price",
@@ -71,7 +101,8 @@ const columns: ColDef<Order>[] = [
     align: "right",
     sortable: true,
     footer: "sum",
-    validate: (v) => (Number(v) >= 0 ? { ok: true } : { ok: false, error: "Price must be ≥ 0" }),
+    validate: (v) =>
+      Number(v) >= 0 ? { ok: true } : { ok: false, error: "Price must be ≥ 0" },
   },
   {
     key: "orderedAt",
@@ -90,6 +121,7 @@ function Demo() {
   const [dark, setDark] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [lastAction, setLastAction] = useState("Ready.");
+  const [showDocs, setShowDocs] = useState(true);
   const theme: TableTheme | undefined = dark ? DARK_THEME : undefined;
 
   const btn = (label: string, fn: () => void): React.ReactNode => (
@@ -117,13 +149,29 @@ function Demo() {
   );
 
   return (
-    <div style={{ padding: 24, background: dark ? "#141414" : "#f7f7f8", minHeight: "100vh" }}>
-      <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>edit-table-pro — full demo</h1>
+    <div
+      style={{
+        padding: 24,
+        background: dark ? "#141414" : "#f7f7f8",
+        minHeight: "100vh",
+      }}
+    >
+      <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
+        edit-table-pro — full demo
+      </h1>
       <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
-        Header ⋮ menu: sort / hide / pin · Drag column edges to resize · Drag rows by ⠿ · Fill handle drag
-        (↓↑←→) · Ctrl+D fill down
+        Header ⋮ menu: sort / hide / pin · Drag column edges to resize · Drag
+        rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
       </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10, alignItems: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          marginBottom: 10,
+          alignItems: "center",
+        }}
+      >
         {btn("＋ Add row", () => setLastAction("Row added at the bottom"))}
         {btn(`🗑 Delete selected (${selected.length})`, () => {
           if (!selected.length) return;
@@ -140,9 +188,17 @@ function Demo() {
           setLastAction("Loading skeleton…");
           setTimeout(() => setLastAction("Loaded."), 2000);
         })}
-        <span style={{ fontSize: 12.5, opacity: 0.75, marginLeft: 4 }}>{lastAction}</span>
+        <span style={{ fontSize: 12.5, opacity: 0.75, marginLeft: 4 }}>
+          {lastAction}
+        </span>
       </div>
-      <div style={{ background: dark ? "#141414" : "#fff", borderRadius: 10, padding: 2 }}>
+      <div
+        style={{
+          background: dark ? "#141414" : "#fff",
+          borderRadius: 10,
+          padding: 2,
+        }}
+      >
         <EditableTable<Order>
           ref={ref}
           columns={columns}
@@ -165,7 +221,9 @@ function Demo() {
             active: "false",
           })}
           onSelectionChange={setSelected}
-          onCellCommit={(info) => setLastAction(`Committed ${info.colKey} = "${info.value}"`)}
+          onCellCommit={(info) =>
+            setLastAction(`Committed ${info.colKey} = "${info.value}"`)
+          }
           loadingType="spinner"
           labels={{
             addRow: "Add row",
@@ -178,9 +236,17 @@ function Demo() {
           }}
         />
       </div>
-      <p style={{ margin: "10px 0 0", fontSize: 12, opacity: 0.65, lineHeight: 1.6 }}>
-        Keyboard: Tab/Enter/Arrows navigate · F2 edit · Esc cancel · Home/End first/last col · PageUp/Down page ·
-        Ctrl+A select grid · Ctrl+C copy TSV · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo · Shift+Arrow extend
+      <p
+        style={{
+          margin: "10px 0 0",
+          fontSize: 12,
+          opacity: 0.65,
+          lineHeight: 1.6,
+        }}
+      >
+        Keyboard: Tab/Enter/Arrows navigate · F2 edit · Esc cancel · Home/End
+        first/last col · PageUp/Down page · Ctrl+A select grid · Ctrl+C copy TSV
+        · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo · Shift+Arrow extend
         selection
       </p>
       {EMPTY.length > 0 && null}

@@ -24,10 +24,8 @@
   font-variant-numeric: tabular-nums;
   padding: var(--et-padding-y) var(--et-padding-x);
   outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    background-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color
+    0.15s ease;
 }
 
 .et-input:hover:not(:focus):not(.error) {

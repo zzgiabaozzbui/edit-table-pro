@@ -10,6 +10,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
 
 ### Added
+- **Column sorting** — `sortable` + optional `sortComparator` on `ColDef`; header click cycles
+  asc → desc → unsorted with `aria-sort` and an indicator; pure view transform (#16).
+- **Row deletion** — `removeRows(rowIds)` on the ref/context API records a typed structural
+  history entry so Ctrl+Z restores deleted rows and redo re-deletes them; `onRowSave(row)`
+  lifecycle hook fires after a cell commit persists (#53).
+- **Controlled props** under one `X` / `onXChange` convention via `useControllableState`:
+  `searchValue`, `hiddenColumnKeys`, `columnWidths` and `selectedRowIds` (#38).
+- **Frozen columns** — `fixed: "left" | "right"` computes cumulative sticky offsets for
+  header and body cells (#15).
 - **Horizontal fill drag** — dragging the fill handle left/right fills the same row across
   the column span, alongside the existing vertical behaviour (#14).
 - **Edge auto-scroll** while dragging the fill handle near the viewport top/bottom, speed

@@ -74,6 +74,7 @@ function EditableTableInner<T extends Record<string, string>>(
 
   const visibleCols = columns.filter((c) => !c.hidden);
   const selectionWidth = tableProps.hasSelection ? SELECTION_COL_WIDTH : 0;
+  const hasFooter = visibleCols.some((c) => c.footer);
   const totalWidth =
     selectionWidth +
     visibleCols.reduce(
@@ -212,6 +213,60 @@ function EditableTableInner<T extends Record<string, string>>(
                 emptyRender={options.emptyRender}
                 showAddRow={canAddRow}
               />
+            )}
+            {hasFooter && (
+              <div
+                className="et-footer-row"
+                style={{
+                  flexShrink: 0,
+                  display: "flex",
+                  width: totalWidth,
+                  borderTop: "1px solid var(--et-color-border)",
+                  background: "var(--et-color-bg-header)",
+                  fontWeight: 600,
+                  fontSize: "var(--et-font-size)",
+                }}
+              >
+                {visibleCols.map((col) => {
+                  const rows = rowsDataRef.current;
+                  let text = "";
+                  if (typeof col.footer === "function") text = col.footer(rows);
+                  else if (col.footer === "sum")
+                    text = String(
+                      rows.reduce(
+                        (s, r) => s + (Number.parseFloat(r[col.key]) || 0),
+                        0,
+                      ),
+                    );
+                  else if (col.footer === "avg") {
+                    const vals = rows
+                      .map((r) => Number.parseFloat(r[col.key]))
+                      .filter((n) => !Number.isNaN(n));
+                    text = vals.length
+                      ? String(vals.reduce((s, n) => s + n, 0) / vals.length)
+                      : "";
+                  } else if (col.footer === "count")
+                    text = String(
+                      rows.filter((r) => (r[col.key] ?? "") !== "").length,
+                    );
+                  return (
+                    <div
+                      key={col.key}
+                      style={{
+                        width: columnWidths.get(col.key) ?? col.width ?? 150,
+                        minWidth: columnWidths.get(col.key) ?? col.width ?? 150,
+                        padding: "var(--et-padding-y) var(--et-padding-x)",
+                        textAlign: col.align ?? "right",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {text}
+                    </div>
+                  );
+                })}
+              </div>
             )}
             {canAddRow && (
               <button

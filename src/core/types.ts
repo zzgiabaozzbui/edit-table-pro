@@ -52,6 +52,8 @@ export type ColDef<T = Record<string, string>> = {
   type: "text" | "number" | "date" | "select" | "boolean";
   header?: string;
   headerTooltip?: string;
+  /** Sticky footer summary for this column: auto-computed or custom renderer */
+  footer?: "sum" | "count" | "avg" | ((rows: T[]) => string);
   placeholder?: string;
   width?: number;
   align?: "left" | "center" | "right";

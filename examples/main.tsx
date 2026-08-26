@@ -127,6 +127,7 @@ function Demo() {
   const btn = (label: string, fn: () => void): React.ReactNode => (
     <button
       key={label}
+      type="button"
       onClick={() => {
         try {
           fn();
@@ -259,7 +260,7 @@ function Demo() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <Demo />
   </StrictMode>,

@@ -56,3 +56,19 @@ gate sau mỗi item: `npm run check && npm run typecheck && npm run test:run` (+
 
 - Mỗi item: cập nhật dòng status + commit sha ngay khi xong, commit kèm fix (`Fixes #N`).
 - Không bao giờ push khi gate đỏ. Nếu item vượt scope → ghi chú chuyển xuống Deferred.
+
+## Sweep 2 (2026-08-26 tiep) - hang doi con lai
+
+| # | Task | Loai | Status | Commit |
+|---|------|------|--------|--------|
+| S1 | #31 headerTooltip tren ColDef | ui | TODO | |
+| S2 | #29 loadingType skeleton rows | ui | TODO | |
+| S3 | #30 scrollLeft ngang + scroll sau addRow/autoFocus | ui | TODO | |
+| S4 | #49 ResizeHandle Pointer Events + keyboard resize | a11y | TODO | |
+| S5 | #48 ARIA grid semantics (roles, rowcount/colcount, aria-selected/invalid) | a11y | TODO | |
+| S6 | #51 clipboard copy/cut selection (TSV, textarea fallback) | feat | TODO | |
+| S7 | #39 Ctrl+A whole grid | feat | TODO | |
+| S8 | #38 useControllableState: search/columns/widths | feat | TODO | |
+| S9 | Lon lai: #45 col-virtualization, #44 memoize, #50 types, #52 header menu, #53 delete rows, #54 i18n, #16/#17/#18/#27/#14/#19/#4 | feat | DEFER cuoi phien | |
+
+Quy tac: TDD RED truoc, gates day du moi task, commit tung task.

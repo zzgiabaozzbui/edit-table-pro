@@ -40,6 +40,7 @@ import {
 import type { TableContextValue, TableProps } from "../context/TableContext";
 import { useCellCommit } from "./useCellCommit";
 import { useColumnResize } from "./useColumnResize";
+import { useControllableState } from "./useControllableState";
 import { useFill } from "./useFill";
 import { useHistoryOps } from "./useHistoryOps";
 import { usePasteHandler } from "./usePasteHandler";
@@ -57,6 +58,17 @@ export type UseEditableTableOptions<T> = {
   onCellClick?: CellClickHandler;
   onCellCommit?: (info: CellCommitInfo) => void;
   onRowSave?: (row: T) => void | Promise<void>;
+  /** Controlled search query (#38) */
+  searchValue?: string;
+  onSearchChange?: (query: string) => void;
+  /** Controlled column visibility (#38) */
+  hiddenColumnKeys?: ColKey[];
+  onHiddenColumnKeysChange?: (keys: ColKey[]) => void;
+  /** Controlled/persistable column widths (#38) */
+  columnWidths?: Record<ColKey, number>;
+  onColumnWidthsChange?: (widths: Record<ColKey, number>) => void;
+  /** Controlled row selection (#38) */
+  selectedRowIds?: RowId[];
   autoFocus?: boolean;
   value?: T[];
   onChange?: (rows: T[]) => void;
@@ -110,10 +122,23 @@ export function useEditableTable<T extends Record<string, string>>(
     hasSelection,
   };
 
-  // Feature 10b: Column visibility (#24)
-  const [hiddenKeys, setHiddenKeys] = useState<Set<ColKey>>(
+  // Feature 10b: Column visibility (#24) — controllable (#38)
+  const hiddenKeysControlled = options.hiddenColumnKeys
+    ? new Set(options.hiddenColumnKeys)
+    : undefined;
+  const [hiddenKeysInternal, setHiddenKeysInternal] = useState<Set<ColKey>>(
     () => new Set(columns.filter((c) => c.hidden).map((c) => c.key)),
   );
+  const hiddenKeys = hiddenKeysControlled ?? hiddenKeysInternal;
+  const applyHiddenKeys = useCallback(
+    (make: () => Set<ColKey>) => {
+      const next = make();
+      if (!hiddenKeysControlled) setHiddenKeysInternal(next);
+      options.onHiddenColumnKeysChange?.([...next]);
+    },
+    [hiddenKeysControlled, options.onHiddenColumnKeysChange],
+  );
+
   const effectiveColumns = useMemo(
     () => columns.filter((c) => !hiddenKeys.has(c.key)),
     [columns, hiddenKeys],
@@ -125,7 +150,12 @@ export function useEditableTable<T extends Record<string, string>>(
   const editSessionStore = useMemo(() => new EditSessionStore(), []);
 
   // Feature 11: Row search (#23)
-  const [query, setQuery] = useState("");
+  // Controlled props (#38): search / visibility / widths / selection
+  const [query, setQuery] = useControllableState(
+    options.searchValue,
+    "",
+    options.onSearchChange,
+  );
   const deferredQuery = useDeferredValue(query);
   const searchTextCacheRef = useRef<{
     cols: ColDef<T>[];
@@ -223,13 +253,17 @@ export function useEditableTable<T extends Record<string, string>>(
   );
 
   // Feature 6: Column Resize
-  const { columnWidths, setColumnWidth } = useColumnResize(columns);
+  const { columnWidths, setColumnWidth } = useColumnResize(columns, {
+    columnWidths: options.columnWidths,
+    onColumnWidthsChange: options.onColumnWidthsChange,
+  });
 
   // Feature 5: Row Selection
   const { selectedRowIds, toggleRow, toggleAll } = useRowSelection({
     rowsDataRef,
     getRowId,
     onSelectionChange,
+    selectedRowIds: options.selectedRowIds,
   });
 
   // Feature 3: Side Effects
@@ -469,24 +503,30 @@ export function useEditableTable<T extends Record<string, string>>(
     for (const id of rowIds) discardRow(dirtyRowsRef.current, id);
   }, []);
 
-  // Feature 10b: Column visibility (#24)
-  const setColumnVisibility = useCallback((key: ColKey, visible: boolean) => {
-    setHiddenKeys((prev) => {
-      const next = new Set(prev);
-      if (visible) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }, []);
+  // Feature 10b: Column visibility (#24) — controllable (#38)
+  const setColumnVisibility = useCallback(
+    (key: ColKey, visible: boolean) => {
+      applyHiddenKeys(() => {
+        const next = new Set(hiddenKeys);
+        if (visible) next.delete(key);
+        else next.add(key);
+        return next;
+      });
+    },
+    [hiddenKeys, applyHiddenKeys],
+  );
 
-  const toggleColumn = useCallback((key: ColKey) => {
-    setHiddenKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }, []);
+  const toggleColumn = useCallback(
+    (key: ColKey) => {
+      applyHiddenKeys(() => {
+        const next = new Set(hiddenKeys);
+        if (next.has(key)) next.delete(key);
+        else next.add(key);
+        return next;
+      });
+    },
+    [hiddenKeys, applyHiddenKeys],
+  );
 
   return {
     columns: effectiveColumns,

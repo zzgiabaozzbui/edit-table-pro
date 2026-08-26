@@ -20,7 +20,10 @@ const BUDGET = {
   // 66.0 -> 76.0 kB after #4/#14/#19/#26/#27/#28/#29/#30/#31/#39/#48/#49/#51/#54
   // (clipboard/selection keyboard surface, horizontal fill, auto-scroll, footer,
   // skeleton, ARIA grid semantics, labels, dark theme) - see CHANGELOG [Unreleased].
-  "index.js": 76_000,
+  // 66.0 -> 80.0 kB after #4/#14/#16/#19/#26/#27/#28/#29/#30/#31/#38/#39/#48/#49/#51/#53/#54
+  // (sorting, delete rows, controlled props, clipboard/selection keyboard surface,
+  // horizontal fill, auto-scroll, footer, skeleton, ARIA grid, labels, dark theme)
+  "index.js": 80_000,
   "index.cjs": 55_000,
   "style.css": 6_000,
 };

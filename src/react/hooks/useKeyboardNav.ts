@@ -1,3 +1,4 @@
+import { buildSelectionTsv } from "@/core/clipboard";
 import { createRowIndexGetter } from "@/core/row-index";
 import type { EditSessionStore } from "@/core/session";
 import type {
@@ -25,6 +26,7 @@ type UseKeyboardNavOptions<T> = {
   applyFill: (range: CellRange, sourceCell: CellPos) => void;
   focusCell: (cell: CellPos) => void;
   setCellSelection: (sel: CellSelectionRange | null) => void;
+  cellSelection: CellSelectionRange | null;
 };
 
 export function useKeyboardNav<T extends Record<string, string>>({
@@ -41,6 +43,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
   redo,
   applyFill,
   focusCell,
+  cellSelection,
   setCellSelection,
 }: UseKeyboardNavOptions<T>) {
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
@@ -65,18 +68,50 @@ export function useKeyboardNav<T extends Record<string, string>>({
 
     if (!active) return;
 
+    const ae = document.activeElement;
+    const isTypingTarget =
+      ae instanceof HTMLInputElement &&
+      ae.type !== "checkbox" &&
+      ae.type !== "radio";
+
     if (e.ctrlKey && e.key === "a") {
+      if (isTypingTarget) return;
       e.preventDefault();
+      const rows = displayRowsRef.current;
       const visibleCols = columns.filter((c) => !c.hidden);
-      if (visibleCols.length === 0) return;
-      const rowIdx = getRowIndex(displayRowsRef.current, active.rowId);
-      if (rowIdx === -1) return;
+      if (visibleCols.length === 0 || rows.length === 0) return;
       setCellSelection({
-        rowId: active.rowId,
-        rowIndex: rowIdx,
+        rowId: getRowId(rows[0]),
+        rowIndex: 0,
+        rowIdEnd: getRowId(rows[rows.length - 1]),
+        rowIndexEnd: rows.length - 1,
         colKeyStart: visibleCols[0].key,
         colKeyEnd: visibleCols[visibleCols.length - 1].key,
       });
+      return;
+    }
+
+    if (e.ctrlKey && e.key === "c" && !isTypingTarget && cellSelection) {
+      e.preventDefault();
+      const tsv = buildSelectionTsv(
+        displayRowsRef.current,
+        columns,
+        getRowId,
+        cellSelection,
+      );
+      if (!tsv) return;
+      if (navigator.clipboard?.writeText) {
+        void navigator.clipboard.writeText(tsv);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = tsv;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
       return;
     }
 
@@ -140,10 +175,10 @@ export function useKeyboardNav<T extends Record<string, string>>({
         sc.scrollLeft = right - sc.clientWidth;
     };
 
-    const ae = document.activeElement;
     const nativeControl =
-      ae instanceof HTMLSelectElement ||
-      (ae instanceof HTMLInputElement && ae.type === "date");
+      document.activeElement instanceof HTMLSelectElement ||
+      (document.activeElement instanceof HTMLInputElement &&
+        document.activeElement.type === "date");
     const caretAtBoundary = (at: "start" | "end") => {
       const el = ae instanceof HTMLInputElement ? ae : null;
       if (!el || el.type === "date" || el.type === "checkbox") return true;

@@ -7,13 +7,13 @@ type Row = { id: string; a: string; b: string; c: string };
 
 const columns: ColDef<Row>[] = [
   { key: "a", type: "text" },
-  { key: "b", type: "text" },
+  { key: "b", type: "boolean" },
   { key: "c", type: "text", hidden: true },
 ];
 const getRowId = (r: Row) => r.id;
 
-describe("Ctrl+A select all in row (#22)", () => {
-  it("selects all visible cells in active row, excludes hidden + other rows", () => {
+describe("Ctrl+A select whole grid (#39)", () => {
+  it("selects all rows x visible columns, excludes hidden", () => {
     const { container } = render(
       <EditableTable<Row>
         columns={columns}
@@ -24,31 +24,40 @@ describe("Ctrl+A select all in row (#22)", () => {
         ]}
       />,
     );
-    const input = container.querySelector("input") as HTMLInputElement;
-    fireEvent.focus(input);
+    const checkbox = container.querySelector(
+      '[data-rowid="1"][data-colkey="b"] input',
+    ) as HTMLInputElement;
+    checkbox.focus();
     act(() => {
       document.dispatchEvent(
         new KeyboardEvent("keydown", { ctrlKey: true, key: "a" }),
       );
     });
-    const row1Cells = container.querySelectorAll(
-      '[data-rowid="1"][data-colkey]',
+    const selected = container.querySelectorAll(".et-cell-selected");
+    expect(selected.length).toBe(4); // 2 rows x 2 visible cols
+  });
+
+  it("no-op while typing inside an editable input (native select-all wins)", () => {
+    const { container } = render(
+      <EditableTable<Row>
+        columns={columns.filter((c) => !c.hidden)}
+        getRowId={getRowId}
+        initialData={[
+          { id: "1", a: "hello", b: "y", c: "z" },
+          { id: "2", a: "p", b: "q", c: "r" },
+        ]}
+      />,
     );
-    expect(row1Cells.length).toBe(2); // a + b, c excluded (hidden)
-    for (const c of row1Cells) {
-      expect(c.className).toContain("et-cell-selected");
-    }
-    // hidden col "c" must never be selected
-    expect(
-      container.querySelector('[data-rowid="1"][data-colkey="c"]'),
-    ).toBeNull();
-    // row 2 must NOT be selected
-    const row2Cells = container.querySelectorAll(
-      '[data-rowid="2"][data-colkey]',
-    );
-    for (const c of row2Cells) {
-      expect(c.className).not.toContain("et-cell-selected");
-    }
+    const input = container.querySelector(
+      '[data-rowid="1"][data-colkey="a"] input',
+    ) as HTMLInputElement;
+    input.focus();
+    act(() => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { ctrlKey: true, key: "a" }),
+      );
+    });
+    expect(container.querySelectorAll(".et-cell-selected")).toHaveLength(0);
   });
 
   it("no-op when no active cell", () => {

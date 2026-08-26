@@ -6,8 +6,16 @@ const SELECTION_COL_WIDTH = 40;
 type HeaderRowProps = Readonly<{ totalWidth: number }>;
 
 export function HeaderRow({ totalWidth }: HeaderRowProps) {
-  const { columns, tableProps, columnWidths, selectedRowIds, rows, toggleAll } =
-    useTableContext();
+  const {
+    columns,
+    tableProps,
+    columnWidths,
+    selectedRowIds,
+    rows,
+    toggleAll,
+    sortState,
+    toggleSort,
+  } = useTableContext();
   const visibleCols = columns.filter((c) => !c.hidden);
   const isAllSelected = rows.length > 0 && selectedRowIds.size === rows.length;
   const isIndeterminate =
@@ -58,8 +66,20 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
           key={col.key}
           role="columnheader"
           aria-colindex={visibleCols.indexOf(col) + 1}
+          aria-sort={
+            sortState?.colKey === col.key
+              ? sortState.dir === "asc"
+                ? "ascending"
+                : "descending"
+              : col.sortable
+                ? "none"
+                : undefined
+          }
+          onClick={col.sortable ? () => toggleSort(col.key) : undefined}
           title={col.headerTooltip}
           style={{
+            cursor: col.sortable ? "pointer" : undefined,
+            userSelect: "none",
             position: "relative",
             width: columnWidths.get(col.key) ?? col.width ?? 150,
             minWidth: columnWidths.get(col.key) ?? col.width ?? 150,
@@ -73,6 +93,13 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
           }}
         >
           {col.header ?? col.key}
+          {col.sortable
+            ? sortState?.colKey === col.key
+              ? sortState.dir === "asc"
+                ? " ▲"
+                : " ▼"
+              : " ↕"
+            : null}
           <ResizeHandle colKey={col.key} />
         </div>
       ))}

@@ -126,27 +126,51 @@ export function useEditableTable<T extends Record<string, string>>(
     cols: ColDef<T>[];
     map: WeakMap<T, string>;
   } | null>(null);
+  // Feature: column sorting (#16) — view transform, uncontrolled
+  const [sortState, setSortState] = useState<{
+    colKey: ColKey;
+    dir: "asc" | "desc";
+  } | null>(null);
+
   const displayRows = useMemo(() => {
-    if (!deferredQuery) return rows;
-    const q = deferredQuery.toLowerCase();
-    const cols = effectiveColumns.filter((c) => !c.hidden);
-    let cache = searchTextCacheRef.current;
-    if (!cache || cache.cols !== cols) {
-      cache = { cols, map: new WeakMap() };
-      searchTextCacheRef.current = cache;
-    }
-    return rows.filter((r) => {
-      let text = cache.map.get(r);
-      if (text === undefined) {
-        text = cols
-          .map((c) => r[c.key] ?? "")
-          .join("\n")
-          .toLowerCase();
-        cache.map.set(r, text);
+    let out = rows;
+    if (deferredQuery) {
+      const q = deferredQuery.toLowerCase();
+      const cols = effectiveColumns.filter((c) => !c.hidden);
+      let cache = searchTextCacheRef.current;
+      if (!cache || cache.cols !== cols) {
+        cache = { cols, map: new WeakMap() };
+        searchTextCacheRef.current = cache;
       }
-      return text.includes(q);
-    });
-  }, [rows, deferredQuery, effectiveColumns]);
+      out = rows.filter((r) => {
+        let text = cache.map.get(r);
+        if (text === undefined) {
+          text = cols
+            .map((c) => r[c.key] ?? "")
+            .join("\n")
+            .toLowerCase();
+          cache.map.set(r, text);
+        }
+        return text.includes(q);
+      });
+    }
+    if (sortState) {
+      const col = effectiveColumns.find((c) => c.key === sortState.colKey);
+      if (col?.sortable) {
+        const cmp =
+          col.sortComparator ??
+          ((a: string, b: string) =>
+            col.type === "number"
+              ? (Number.parseFloat(a) || 0) - (Number.parseFloat(b) || 0)
+              : a.localeCompare(b));
+        const dir = sortState.dir === "asc" ? 1 : -1;
+        out = [...out].sort(
+          (r1, r2) => cmp(r1[col.key] ?? "", r2[col.key] ?? "") * dir,
+        );
+      }
+    }
+    return out;
+  }, [rows, deferredQuery, effectiveColumns, sortState]);
   const displayRowsRef = useRef<T[]>(displayRows);
   displayRowsRef.current = displayRows;
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
@@ -301,6 +325,15 @@ export function useEditableTable<T extends Record<string, string>>(
       });
     }
   }, [createRow, columns, getRowId, focusCell, appendRows]);
+
+  const toggleSort = useCallback((colKey: ColKey) => {
+    setSortState((prev) => {
+      if (!prev || prev.colKey !== colKey)
+        return { colKey, dir: "asc" as const };
+      if (prev.dir === "asc") return { colKey, dir: "desc" as const };
+      return null;
+    });
+  }, []);
 
   const clearCellSelection = useCallback((): boolean => {
     const sel = cellSelection;
@@ -476,6 +509,8 @@ export function useEditableTable<T extends Record<string, string>>(
     setData,
     scrollToRow,
     clearCellSelection,
+    sortState,
+    toggleSort,
     validate,
     getDirtyRows,
     markSaved,

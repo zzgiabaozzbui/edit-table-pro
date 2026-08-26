@@ -93,7 +93,9 @@ export function VirtualBody<T extends Record<string, string>>({
   const totalHeight = getTotalHeight(rows.length, rowHeight);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    setScrollTop(e.currentTarget.scrollTop);
+    const top = e.currentTarget.scrollTop;
+    // Skip redundant state updates (horizontal scroll / no-op scrolls)
+    setScrollTop((prev) => (prev === top ? prev : top));
   }, []);
 
   return (

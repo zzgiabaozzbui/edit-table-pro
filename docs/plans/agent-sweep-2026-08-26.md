@@ -96,3 +96,18 @@ Tests 166 -> 178 PASS. Gates xanh.
 - #44 memoize, #45 col virtualization: perf refactor cau truc.
 - #50 breaking type change: can major version.
 - #55 docs site, #10 launch demo/GIF/HN: manual, ngoai pham vi code session.
+
+## Sweep 4 - dong not phan con lai
+
+| # | Task | Status |
+|---|------|--------|
+| U1 | #16 column sorting (sortable, comparator, header click cycle) | TODO |
+| U2 | #53 removeRows + structural history + onRowSave | TODO |
+| U3 | #38 useControllableState: search/visibility/widths/selection | TODO |
+| U4 | #15 frozen columns sticky left/right | TODO |
+| U5 | #17 row drag reorder | STRETCH |
+| U6 | #44 memoization ctx/cell/RAF-scroll | STRETCH |
+| U7 | #18 menu, #52 header menu, #45 col-virtualization | DEFER (UI/perf lon) |
+| U8 | #50 breaking types (major), #55 docs site, #10 launch manual | DOC-ONLY ly do |
+
+Quy tac: TDD RED, gates moi task, commit tung task.

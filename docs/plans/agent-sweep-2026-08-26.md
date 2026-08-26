@@ -61,14 +61,15 @@ gate sau mỗi item: `npm run check && npm run typecheck && npm run test:run` (+
 
 | # | Task | Loai | Status | Commit |
 |---|------|------|--------|--------|
-| S1 | #31 headerTooltip tren ColDef | ui | TODO | |
-| S2 | #29 loadingType skeleton rows | ui | TODO | |
-| S3 | #30 scrollLeft ngang + scroll sau addRow/autoFocus | ui | TODO | |
-| S4 | #49 ResizeHandle Pointer Events + keyboard resize | a11y | TODO | |
-| S5 | #48 ARIA grid semantics (roles, rowcount/colcount, aria-selected/invalid) | a11y | TODO | |
-| S6 | #51 clipboard copy/cut selection (TSV, textarea fallback) | feat | TODO | |
-| S7 | #39 Ctrl+A whole grid | feat | TODO | |
-| S8 | #38 useControllableState: search/columns/widths | feat | TODO | |
-| S9 | Lon lai: #45 col-virtualization, #44 memoize, #50 types, #52 header menu, #53 delete rows, #54 i18n, #16/#17/#18/#27/#14/#19/#4 | feat | DEFER cuoi phien | |
+| S1 | #31 headerTooltip tren ColDef | ui | DONE | 26095d2 |
+| S2 | #29 loadingType skeleton rows | ui | DONE | 7790c85 |
+| S3 | #30 scrollLeft ngang + scroll sau addRow/autoFocus | ui | DONE (scrollLeft theo col offsets; addRow/autoFocus da scroll doc tu truoc) | 08035cc |
+| S4 | #49 ResizeHandle Pointer Events + keyboard resize | a11y | DONE | 45eabb3 |
+| S5 | #48 ARIA grid semantics | a11y | PARTIAL (grid/row/header roles + counts + aria-selected/invalid xong; gridcell role + readonly keyboard con lai) | 0b638b5 |
+| S6 | #51 clipboard copy/cut selection | feat | PARTIAL (Ctrl+C TSV multi-row + fallback xong qua mo rong CellSelectionRange; cut/delete/Shift+Arrow con lai) | 0716638 |
+| S7 | #39 Ctrl+A whole grid | feat | DONE (typing-guard native noop) | 0716638 |
+| S8 | #38 useControllableState: search/columns/widths | feat | DEFER (API surface lon, can mini-spec rieng) | |
+| S9 | Con lai: #45 col-virtualization, #44 memoize, #50 types breaking, #52 header menu, #53 delete rows, #54 i18n, #55 docs site, #16/#17/#18/#27/#14/#19/#4, #10 launch | feat/manual | DEFER phien sau | |
 
-Quy tac: TDD RED truoc, gates day du moi task, commit tung task.
+Ket qua sweep 2: dong them 5 issue (#31 #29 #30 #49 #39), 2 issue tien do lon (#48, #51).
+Tests 141 -> 166 PASS. Gates xanh.

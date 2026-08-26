@@ -10,6 +10,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 > a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
 
 ### Added
+- **`headerTooltip`** column option renders a native tooltip on the header cell (#31).
+- **`loadingType="skeleton"`** with `skeletonRows` renders shimmer placeholder rows instead
+  of the spinner overlay while loading (#29).
+- **Keyboard navigation keeps the active cell horizontally in view** — Tab/Enter/arrows now
+  adjust `scrollLeft` using column offsets, not just vertical scroll (#30).
+- **Ctrl+A selects the whole grid** (no-op while typing so native select-all-text still works)
+  and **Ctrl+C copies the selection as TSV** with a hidden-textarea clipboard fallback;
+  selection ranges gained optional `rowIdEnd`/`rowIndexEnd` for multi-row rectangles (#39,
+  part of #51).
+- **ARIA grid semantics** — `role="grid"` with real `aria-rowcount`/`aria-colcount`,
+  `aria-rowindex` on rows and headers, `aria-selected` for rows inside a cell selection, and
+  `aria-invalid` + `aria-describedby` on inputs failing validation (part of #48).
 - **`striped` prop** — zebra rows via `.et-row-stripe`, composes with `rowClassName`,
   color overridable through `--et-color-row-stripe` / `theme.colorRowStripe` (#28).
 - **Empty state** — centered message when the dataset is empty (`emptyText`), custom node
@@ -48,6 +60,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   100×20 paste no longer needs 2000 Ctrl+Z presses; one reverts the whole block (#37).
 - Scroll height reserved rows from the **unfiltered** dataset, leaving dead space below the
   last match whenever a search was active (`EditableTable.tsx`).
+- Column resize now uses Pointer Events with pointer capture (`touch-action: none`), so it
+  works on touch, and the handle is keyboard-operable (`role="separator"`, Arrow/Home resize) (#49).
 - Arrow keys are no longer swallowed by the document-level keydown handler while a native
   control has focus — `<select>` cells keep `↑`/`↓`, date cells keep all arrows (#33).
 - `scrollToRow` resolved against the unfiltered dataset while the body positions by filtered

@@ -1,203 +1,200 @@
-import { StrictMode, useState } from "react";
+import { StrictMode, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import Markdown from "react-markdown";
-import type { ColDef, TableTheme } from "../src/index";
+import type { ColDef, EditableTableRef, TableTheme } from "../src/index";
+import { DARK_THEME } from "../src/core/theme";
+import { exportCsv } from "../src/core/export";
 import { EditableTable } from "../src/index";
-import usage from "./USAGE.md?raw";
 
-const USAGE_DOC_CSS = `
-.usage-doc { font-size: 13px; line-height: 1.6; color: var(--et-color-text, #1f1f1f); }
-.usage-doc h1 { font-size: 18px; margin: 12px 0 8px; }
-.usage-doc h2 { font-size: 15px; margin: 16px 0 6px; border-bottom: 1px solid var(--et-color-border, #eee); padding-bottom: 4px; }
-.usage-doc p { margin: 6px 0; }
-.usage-doc ul { margin: 6px 0; padding-left: 18px; }
-.usage-doc li { margin: 2px 0; }
-.usage-doc code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
-.usage-doc pre { background: #1e1e1e; color: #e6e6e6; padding: 10px 12px; border-radius: 6px; overflow-x: auto; }
-.usage-doc pre code { background: none; padding: 0; color: inherit; }
-`;
-
-type Employee = {
+type Order = {
   id: string;
-  name: string;
-  code: string;
-  department: string;
-  phone: string;
+  customer: string;
+  category: string;
+  product: string;
+  qty: string;
+  price: string;
+  orderedAt: string;
+  active: string;
 };
 
-const columns: ColDef<Employee>[] = [
+const CATEGORIES = ["Electronics", "Apparel", "Home", "Beauty"];
+const CUSTOMERS = ["Nguyễn Văn A", "Trần Thị B", "Lê Minh C", "Phạm D", "Evan You"];
+const PRODUCTS: Record<string, string[]> = {
+  Electronics: ["Keyboard", "Mouse", "Monitor"],
+  Apparel: ["T-Shirt", "Hoodie", "Cap"],
+  Home: ["Lamp", "Mug", "Chair"],
+  Beauty: ["Serum", "Sunscreen"],
+};
+
+function sample(n: number): Order[] {
+  return Array.from({ length: n }, (_, i) => {
+    const category = CATEGORIES[i % CATEGORIES.length];
+    const product = PRODUCTS[category][i % PRODUCTS[category].length];
+    return {
+      id: `ORD-${String(i + 1).padStart(3, "0")}`,
+      customer: CUSTOMERS[i % CUSTOMERS.length],
+      category,
+      product,
+      qty: String((i % 5) + 1),
+      price: String(((i * 37) % 90) * 10000 + 50000),
+      orderedAt: `2026-0${(i % 8) + 1}-1${i % 9}`,
+      active: i % 3 === 0 ? "true" : "false",
+    };
+  });
+}
+
+const columns: ColDef<Order>[] = [
+  { key: "id", type: "text", header: "Order ID", editable: false, fixed: "left", width: 96, sortable: true },
+  { key: "customer", type: "text", header: "Customer", width: 150, sortable: true, headerTooltip: "Tên khách hàng" },
   {
-    key: "code",
-    type: "text",
-    header: "Mã NV",
-    width: 120,
-    align: "center",
-    validate: (v) =>
-      /^\d+$/.test(v) ? { ok: true } : { ok: false, error: "Chỉ cho phép số" },
-  },
-  { key: "name", type: "text", header: "Họ tên", width: 220, ellipsis: true },
-  { key: "department", type: "text", header: "Phòng ban", width: 140 },
-  {
-    key: "phone",
-    type: "text",
-    header: "SĐT",
+    key: "category",
+    type: "select",
+    header: "Category",
     width: 140,
+    options: CATEGORIES.map((c) => ({ label: c, value: c })),
+  },
+  { key: "product", type: "text", header: "Product", width: 130, sortable: true },
+  {
+    key: "qty",
+    type: "number",
+    header: "Qty",
+    width: 80,
     align: "right",
-    format: (v) => v.replace(/\D/g, ""),
-    validate: (v) =>
-      v.replace(/\D/g, "").length >= 10
-        ? { ok: true }
-        : { ok: false, error: "Tối thiểu 10 số" },
+    sortable: true,
+    footer: "count",
+    validate: (v) => (Number(v) >= 1 ? { ok: true } : { ok: false, error: "Qty must be ≥ 1" }),
   },
   {
-    key: "id",
-    type: "text",
-    header: "",
-    width: 80,
-    editable: false,
-    render: (_, row) => (
-      <button
-        type="button"
-        onClick={() => alert(`Tính phí cho: ${row.name}`)}
-        style={{
-          padding: "2px 8px",
-          fontSize: 12,
-          border: "1px solid var(--et-color-border)",
-          borderRadius: "var(--et-border-radius)",
-          background: "var(--et-color-bg)",
-          color: "var(--et-color-primary)",
-          cursor: "pointer",
-        }}
-      >
-        Tính phí
-      </button>
-    ),
+    key: "price",
+    type: "number",
+    header: "Price (₫)",
+    width: 120,
+    align: "right",
+    sortable: true,
+    footer: "sum",
+    validate: (v) => (Number(v) >= 0 ? { ok: true } : { ok: false, error: "Price must be ≥ 0" }),
   },
+  {
+    key: "orderedAt",
+    type: "date",
+    header: "Ordered",
+    width: 130,
+    sortable: true,
+  },
+  { key: "active", type: "boolean", header: "Active", width: 80 },
 ];
 
-const data: Employee[] = Array.from({ length: 50000 }, (_, i) => ({
-  id: String(i + 1),
-  name: `Nhân viên ${i + 1}`,
-  code: String(1000 + i),
-  department: ["IT", "HR", "Finance", "Sales"][i % 4],
-  phone: `09${String(i).padStart(8, "0")}`,
-}));
+const EMPTY: Order[] = [];
 
-const THEMES: Record<string, TableTheme> = {
-  default: { fontSize: 12, borderRadius: 0 },
-  green: {
-    colorPrimary: "#52c41a",
-    colorBgHeader: "#f6ffed",
-    colorRowHover: "rgba(82,196,26,0.04)",
-  },
-  purple: {
-    colorPrimary: "#722ed1",
-    colorBgHeader: "#f9f0ff",
-    colorRowHover: "rgba(114,46,209,0.04)",
-  },
-  compact: { fontSize: 12, borderRadius: 0 },
-};
+function Demo() {
+  const ref = useRef<EditableTableRef<Order>>(null);
+  const [dark, setDark] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [lastAction, setLastAction] = useState("Ready.");
+  const theme: TableTheme | undefined = dark ? DARK_THEME : undefined;
 
-function App() {
-  const [themeName, setThemeName] = useState<keyof typeof THEMES>("default");
-  const [size, setSize] = useState<"large" | "medium" | "small">("medium");
-  const [bordered, setBordered] = useState(true);
+  const btn = (label: string, fn: () => void): React.ReactNode => (
+    <button
+      key={label}
+      onClick={() => {
+        try {
+          fn();
+        } catch (e) {
+          setLastAction(`Error: ${String(e)}`);
+        }
+      }}
+      style={{
+        border: "1px solid var(--et-color-border)",
+        background: "var(--et-color-bg-header)",
+        color: "var(--et-color-text)",
+        borderRadius: 6,
+        padding: "5px 10px",
+        fontSize: 12.5,
+        cursor: "pointer",
+      }}
+    >
+      {label}
+    </button>
+  );
 
   return (
-    <div style={{ padding: 24, fontFamily: "sans-serif" }}>
-      <h2 style={{ marginBottom: 16 }}>
-        edit-table-pro — {data.length.toLocaleString()} rows
-      </h2>
-
-      <div
-        style={{
-          display: "flex",
-          gap: 16,
-          marginBottom: 16,
-          alignItems: "center",
-        }}
-      >
-        <label>
-          Theme:{" "}
-          <select
-            value={themeName}
-            onChange={(e) =>
-              setThemeName(e.target.value as keyof typeof THEMES)
-            }
-          >
-            {Object.keys(THEMES).map((k) => (
-              <option key={k}>{k}</option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Size:{" "}
-          <select
-            value={size}
-            onChange={(e) => setSize(e.target.value as typeof size)}
-          >
-            <option value="large">large</option>
-            <option value="medium">medium</option>
-            <option value="small">small</option>
-          </select>
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={bordered}
-            onChange={(e) => setBordered(e.target.checked)}
-          />{" "}
+    <div style={{ padding: 24, background: dark ? "#141414" : "#f7f7f8", minHeight: "100vh" }}>
+      <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>edit-table-pro — full demo</h1>
+      <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
+        Header ⋮ menu: sort / hide / pin · Drag column edges to resize · Drag rows by ⠿ · Fill handle drag
+        (↓↑←→) · Ctrl+D fill down
+      </p>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10, alignItems: "center" }}>
+        {btn("＋ Add row", () => setLastAction("Row added at the bottom"))}
+        {btn(`🗑 Delete selected (${selected.length})`, () => {
+          if (!selected.length) return;
+          ref.current?.removeRows(selected);
+          setSelected([]);
+          setLastAction("Rows removed (Ctrl+Z to undo)");
+        })}
+        {btn("⬇ Export CSV", () => {
+          exportCsv("orders", columns, []);
+          setLastAction("CSV exported");
+        })}
+        {btn(dark ? "☀ Light" : "🌙 Dark", () => setDark((d) => !d))}
+        {btn("Skeleton 2s", () => {
+          setLastAction("Loading skeleton…");
+          setTimeout(() => setLastAction("Loaded."), 2000);
+        })}
+        <span style={{ fontSize: 12.5, opacity: 0.75, marginLeft: 4 }}>{lastAction}</span>
+      </div>
+      <div style={{ background: dark ? "#141414" : "#fff", borderRadius: 10, padding: 2 }}>
+        <EditableTable<Order>
+          ref={ref}
+          columns={columns}
+          getRowId={(r) => r.id}
+          initialData={sample(60)}
+          height={520}
+          size="medium"
+          striped
+          searchable
+          sticky
           bordered
-        </label>
-      </div>
-
-      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <EditableTable
-            columns={columns}
-            initialData={data}
-            getRowId={(r) => r.id}
-            createRow={() => ({
-              id: String(Date.now()),
-              name: "",
-              code: "",
-              department: "",
-              phone: "",
-            })}
-            height={560}
-            size={size}
-            bordered={bordered}
-            sticky
-            theme={THEMES[themeName]}
-            rowClassName={(_, i) => (i % 2 === 1 ? "et-row-stripe" : "")}
-          />
-        </div>
-        <aside
-          className="usage-doc"
-          style={{
-            width: 360,
-            flexShrink: 0,
-            maxHeight: 560,
-            overflowY: "auto",
-            border: "1px solid var(--et-color-border)",
-            borderRadius: "var(--et-border-radius)",
-            padding: "4px 16px",
-            background: "var(--et-color-bg)",
+          createRow={() => ({
+            id: `ORD-${Math.floor(Math.random() * 900 + 100)}`,
+            customer: "",
+            category: CATEGORIES[0],
+            product: "",
+            qty: "1",
+            price: "0",
+            orderedAt: "2026-01-01",
+            active: "false",
+          })}
+          onSelectionChange={setSelected}
+          onCellCommit={(info) => setLastAction(`Committed ${info.colKey} = "${info.value}"`)}
+          loadingType="spinner"
+          labels={{
+            addRow: "Add row",
+            sortAsc: "Sort ascending",
+            sortDesc: "Sort descending",
+            hideColumn: "Hide column",
+            pinLeft: "Pin left",
+            pinRight: "Pin right",
+            unpin: "Unpin",
           }}
-        >
-          <Markdown>{usage}</Markdown>
-        </aside>
+        />
       </div>
-      <style>{USAGE_DOC_CSS}</style>
+      <p style={{ margin: "10px 0 0", fontSize: 12, opacity: 0.65, lineHeight: 1.6 }}>
+        Keyboard: Tab/Enter/Arrows navigate · F2 edit · Esc cancel · Home/End first/last col · PageUp/Down page ·
+        Ctrl+A select grid · Ctrl+C copy TSV · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo · Shift+Arrow extend
+        selection
+      </p>
+      {EMPTY.length > 0 && null}
+      {/* Empty-state demo: delete all rows via selection → centered empty state with Add row */}
+      <style>{`
+        body { margin: 0; font-family: Inter, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        .et-row-stripe { background: ${dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"}; }
+      `}</style>
     </div>
   );
 }
 
-const rootEl = document.getElementById("root");
-if (!rootEl) throw new Error("Missing #root element in examples/index.html");
-
-createRoot(rootEl).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <Demo />
   </StrictMode>,
 );

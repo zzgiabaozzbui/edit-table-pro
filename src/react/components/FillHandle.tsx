@@ -19,6 +19,7 @@ export function FillHandle({
     getRowId,
     rowHeight,
     scrollContainerRef,
+    columnWidths,
     fillState,
     setFillState,
     applyFill,
@@ -31,7 +32,11 @@ export function FillHandle({
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     // Capture pointer so pointermove/pointerup always fire on this element
     const btn = e.currentTarget;
-    btn.setPointerCapture(e.pointerId);
+    try {
+      btn.setPointerCapture(e.pointerId);
+    } catch {
+      // happy-dom / older browsers — events still land while pressed
+    }
     e.preventDefault();
     e.stopPropagation();
 
@@ -67,7 +72,7 @@ export function FillHandle({
       }
     }
 
-    const computeRange = (clientY: number): CellRange | null => {
+    const computeRange = (clientY: number, clientX = 0): CellRange | null => {
       const container = scrollContainerRef.current;
       if (!container) return null;
       const rect = container.getBoundingClientRect();
@@ -77,6 +82,33 @@ export function FillHandle({
         0,
         Math.min(Math.floor(relY / rowHeight), totalRows - 1),
       );
+
+      // Horizontal target column from pointer X over precomputed offsets
+      const visibleCols = columns.filter((c) => !c.hidden);
+      const srcIdx = visibleCols.findIndex((c) => c.key === colKey);
+      if (srcIdx !== -1) {
+        let acc = 0;
+        let hit: ColKey | null = null;
+        for (const c of visibleCols) {
+          const w = columnWidths?.get(c.key) ?? c.width ?? 150;
+          if (clientX - rect.left + container.scrollLeft < acc + w) {
+            hit = c.key;
+            break;
+          }
+          acc += w;
+        }
+        const anchorKey = sel?.colKeyStart ?? colKey;
+        if (hit && hit !== anchorKey && targetRowIndex === sourceRowIndex) {
+          return {
+            rowIndexStart: sourceRowIndex,
+            rowIndexEnd: sourceRowIndex,
+            colKey: anchorKey,
+            targetColKey: hit,
+            colKeys: undefined,
+          };
+        }
+      }
+
       return {
         rowIndexStart: sourceRowIndex,
         rowIndexEnd: targetRowIndex,
@@ -86,7 +118,7 @@ export function FillHandle({
     };
 
     const onPointerMove = (ev: PointerEvent) => {
-      const range = computeRange(ev.clientY);
+      const range = computeRange(ev.clientY, ev.clientX);
       if (range) previewRangeRef.current = range;
 
       cancelAnimationFrame(rafId);
@@ -154,6 +186,8 @@ export function FillHandle({
       type="button"
       aria-label="Fill handle"
       className="et-cell-fill-handle"
+      data-rowid={rowId}
+      data-colkey={colKey}
       draggable={false}
       onPointerDown={onPointerDown}
     />

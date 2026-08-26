@@ -104,6 +104,8 @@ export type CellRange = {
   rowIndexEnd: number;
   colKey: ColKey;
   colKeys?: ColKey[];
+  /** Horizontal fill: last column of the target span (inclusive) */
+  targetColKey?: ColKey;
 };
 
 export type CellSelectionRange = {

@@ -77,6 +77,9 @@ export function VirtualBody<T extends Record<string, string>>({
     <div
       ref={scrollContainerRef as React.RefObject<HTMLDivElement>}
       className="et-scroll"
+      role="grid"
+      aria-rowcount={rows.length + 1}
+      aria-colcount={visibleColKeys.length + (tableProps.hasSelection ? 1 : 0)}
       style={{ overflow: "auto", flex: 1 }}
       onScroll={handleScroll}
     >
@@ -131,6 +134,14 @@ export function VirtualBody<T extends Record<string, string>>({
           return (
             <div
               key={rowId}
+              role="row"
+              aria-rowindex={rowIndex + 2}
+              aria-selected={
+                cellSelection !== null &&
+                isRowInSelection(rowIndex, cellSelection)
+                  ? "true"
+                  : undefined
+              }
               className={[
                 "et-row",
                 isSelected ? "et-row-selected" : "",

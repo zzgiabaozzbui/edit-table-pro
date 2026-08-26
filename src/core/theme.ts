@@ -33,6 +33,27 @@ export const DEFAULT_THEME: Required<TableTheme> = {
   borderRadius: 6,
 };
 
+/**
+ * Dark preset tuned for WCAG AA: body text ≥ 4.5:1 against its background,
+ * UI boundaries (border/split/error border) ≥ 3:1.
+ */
+export const DARK_THEME: Required<TableTheme> = {
+  colorPrimary: "#4096ff",
+  colorBorder: "#767676",
+  colorBgContainer: "#141414",
+  colorBgHeader: "#1d1d1d",
+  colorText: "#e9e9e9",
+  colorError: "#ff7875",
+  colorErrorBg: "#2c1618",
+  colorErrorBorder: "#7a3a3c",
+  colorRowHover: "rgba(255,255,255,0.06)",
+  colorRowStripe: "rgba(255,255,255,0.04)",
+  colorSplit: "#666666",
+  fontFamily: DEFAULT_THEME.fontFamily,
+  fontSize: DEFAULT_THEME.fontSize,
+  borderRadius: DEFAULT_THEME.borderRadius,
+};
+
 export const SIZE_CONFIG = {
   large: { rowHeight: 54, paddingY: 12, paddingX: 16, fontSize: 14 },
   medium: { rowHeight: 44, paddingY: 8, paddingX: 16, fontSize: 14 },

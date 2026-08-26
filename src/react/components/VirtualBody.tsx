@@ -1,3 +1,4 @@
+import { isRowInSelection } from "@/core/clipboard";
 import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
 import { useCallback, useState } from "react";
@@ -163,7 +164,7 @@ export function VirtualBody<T extends Record<string, string>>({
                     : col.key === pr.colKey);
                 const inCellSelection =
                   cellSelection !== null &&
-                  rowIndex === cellSelection.rowIndex &&
+                  isRowInSelection(rowIndex, cellSelection) &&
                   isColInRange(col.key, cellSelection, visibleColKeys);
                 const isEditable =
                   col.editable === undefined ||

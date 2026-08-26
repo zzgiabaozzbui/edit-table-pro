@@ -107,6 +107,9 @@ export type CellRange = {
 export type CellSelectionRange = {
   rowId: RowId;
   rowIndex: number;
+  /** Inclusive row-range end; omit for a single-row selection */
+  rowIdEnd?: RowId;
+  rowIndexEnd?: number;
   colKeyStart: ColKey;
   colKeyEnd: ColKey;
 };

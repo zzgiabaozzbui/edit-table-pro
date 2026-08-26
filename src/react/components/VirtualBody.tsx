@@ -75,6 +75,7 @@ export function VirtualBody<T extends Record<string, string>>({
   return (
     <div
       ref={scrollContainerRef as React.RefObject<HTMLDivElement>}
+      className="et-scroll"
       style={{ overflow: "auto", flex: 1 }}
       onScroll={handleScroll}
     >

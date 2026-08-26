@@ -13,6 +13,7 @@ import { type MutableRefObject, useEffect, useMemo, useRef } from "react";
 type UseKeyboardNavOptions<T> = {
   activeCellRef: MutableRefObject<CellPos | null>;
   columns: ColDef<T>[];
+  columnWidths?: Map<string, number>;
   displayRowsRef: MutableRefObject<T[]>;
   scrollContainerRef: MutableRefObject<HTMLDivElement | null>;
   rowHeight: number;
@@ -29,6 +30,7 @@ type UseKeyboardNavOptions<T> = {
 export function useKeyboardNav<T extends Record<string, string>>({
   activeCellRef,
   columns,
+  columnWidths,
   displayRowsRef,
   scrollContainerRef,
   rowHeight,
@@ -115,7 +117,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    const scrollToRow = (rowIndex: number) => {
+    const scrollToPos = (rowIndex: number, colKey?: string) => {
       const sc = scrollContainerRef.current;
       if (!sc) return;
       const top = rowIndex * rowHeight;
@@ -123,6 +125,19 @@ export function useKeyboardNav<T extends Record<string, string>>({
       if (top < sc.scrollTop) sc.scrollTop = top;
       else if (bottom > sc.scrollTop + sc.clientHeight)
         sc.scrollTop = bottom - sc.clientHeight;
+      if (!colKey) return;
+      let left = 0;
+      let width = 0;
+      for (const col of columns) {
+        if (col.hidden) continue;
+        width = columnWidths?.get(col.key) ?? col.width ?? 150;
+        if (col.key === colKey) break;
+        left += width;
+      }
+      const right = left + width;
+      if (left < sc.scrollLeft) sc.scrollLeft = left;
+      else if (right > sc.scrollLeft + sc.clientWidth)
+        sc.scrollLeft = right - sc.clientWidth;
     };
 
     const ae = document.activeElement;
@@ -204,7 +219,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
         rowId: getRowId(allRows[nextRowIdx]),
         colKey: navigableCols[nextColIdx].key,
       };
-      scrollToRow(nextRowIdx);
+      scrollToPos(nextRowIdx, nextCell.colKey);
       requestAnimationFrame(() => focusCell(nextCell));
     };
 

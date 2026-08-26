@@ -94,6 +94,7 @@ function EditableTableInner<T extends Record<string, string>>(
     displayRowsRef,
     scrollContainerRef,
     rowHeight,
+    columnWidths,
     editSessionStore,
     cellRefs,
     getRowId,

@@ -419,7 +419,7 @@ export function useEditableTable<T extends Record<string, string>>(
         }, 50);
       }
     });
-  }, [createRow, columns, getRowId, focusCell, appendRows, scrollContainerRef]);
+  }, [createRow, columns, getRowId, focusCell, appendRows]);
 
   const toggleSort = useCallback((colKey: ColKey) => {
     setSortState((prev) => {

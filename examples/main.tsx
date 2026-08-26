@@ -122,7 +122,8 @@ function Demo() {
   const [selected, setSelected] = useState<string[]>([]);
   const [lastAction, setLastAction] = useState("Ready.");
   const [showDocs, setShowDocs] = useState(true);
-  const guideOnly = new URLSearchParams(window.location.search).get("view") === "guide";
+  const guideOnly =
+    new URLSearchParams(window.location.search).get("view") === "guide";
   const theme: TableTheme | undefined = dark ? DARK_THEME : undefined;
 
   const btn = (label: string, fn: () => void): React.ReactNode => (
@@ -166,101 +167,101 @@ function Demo() {
         rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
       </p>
       {!guideOnly && (
-      <>
-      <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
-        edit-table-pro — full demo
-      </h1>
-      <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
-        Header ⋮ menu: sort / hide / pin · Drag column edges to resize · Drag
-        rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
-      </p>
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          flexWrap: "wrap",
-          marginBottom: 10,
-          alignItems: "center",
-        }}
-      >
-        {btn("＋ Add row", () => setLastAction("Row added at the bottom"))}
-        {btn(`🗑 Delete selected (${selected.length})`, () => {
-          if (!selected.length) return;
-          ref.current?.removeRows(selected);
-          setSelected([]);
-          setLastAction("Rows removed (Ctrl+Z to undo)");
-        })}
-        {btn("⬇ Export CSV", () => {
-          exportCsv("orders", columns, []);
-          setLastAction("CSV exported");
-        })}
-        {btn(dark ? "☀ Light" : "🌙 Dark", () => setDark((d) => !d))}
-        {btn("Skeleton 2s", () => {
-          setLastAction("Loading skeleton…");
-          setTimeout(() => setLastAction("Loaded."), 2000);
-        })}
-        <span style={{ fontSize: 12.5, opacity: 0.75, marginLeft: 4 }}>
-          {lastAction}
-        </span>
-      </div>
-      <div
-        style={{
-          background: dark ? "#141414" : "#fff",
-          borderRadius: 10,
-          padding: 2,
-        }}
-      >
-        <EditableTable<Order>
-          ref={ref}
-          columns={columns}
-          getRowId={(r) => r.id}
-          initialData={sample(60)}
-          height={520}
-          size="medium"
-          striped
-          searchable
-          sticky
-          bordered
-          createRow={() => ({
-            id: `ORD-${Math.floor(Math.random() * 900 + 100)}`,
-            customer: "",
-            category: CATEGORIES[0],
-            product: "",
-            qty: "1",
-            price: "0",
-            orderedAt: "2026-01-01",
-            active: "false",
-          })}
-          onSelectionChange={setSelected}
-          onCellCommit={(info) =>
-            setLastAction(`Committed ${info.colKey} = "${info.value}"`)
-          }
-          loadingType="spinner"
-          labels={{
-            addRow: "Add row",
-            sortAsc: "Sort ascending",
-            sortDesc: "Sort descending",
-            hideColumn: "Hide column",
-            pinLeft: "Pin left",
-            pinRight: "Pin right",
-            unpin: "Unpin",
-          }}
-        />
-      </div>
-      <p
-        style={{
-          margin: "10px 0 0",
-          fontSize: 12,
-          opacity: 0.65,
-          lineHeight: 1.6,
-        }}
-      >
-        Keyboard: Tab/Enter/Arrows navigate · F2 edit · Esc cancel · Home/End
-        first/last col · PageUp/Down page · Ctrl+A select grid · Ctrl+C copy TSV
-        · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo · Shift+Arrow extend
-        selection
-      </p>
-      </>
+        <>
+          <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
+            edit-table-pro — full demo
+          </h1>
+          <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
+            Header ⋮ menu: sort / hide / pin · Drag column edges to resize ·
+            Drag rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              flexWrap: "wrap",
+              marginBottom: 10,
+              alignItems: "center",
+            }}
+          >
+            {btn("＋ Add row", () => setLastAction("Row added at the bottom"))}
+            {btn(`🗑 Delete selected (${selected.length})`, () => {
+              if (!selected.length) return;
+              ref.current?.removeRows(selected);
+              setSelected([]);
+              setLastAction("Rows removed (Ctrl+Z to undo)");
+            })}
+            {btn("⬇ Export CSV", () => {
+              exportCsv("orders", columns, []);
+              setLastAction("CSV exported");
+            })}
+            {btn(dark ? "☀ Light" : "🌙 Dark", () => setDark((d) => !d))}
+            {btn("Skeleton 2s", () => {
+              setLastAction("Loading skeleton…");
+              setTimeout(() => setLastAction("Loaded."), 2000);
+            })}
+            <span style={{ fontSize: 12.5, opacity: 0.75, marginLeft: 4 }}>
+              {lastAction}
+            </span>
+          </div>
+          <div
+            style={{
+              background: dark ? "#141414" : "#fff",
+              borderRadius: 10,
+              padding: 2,
+            }}
+          >
+            <EditableTable<Order>
+              ref={ref}
+              columns={columns}
+              getRowId={(r) => r.id}
+              initialData={sample(60)}
+              height={520}
+              size="medium"
+              striped
+              searchable
+              sticky
+              bordered
+              createRow={() => ({
+                id: `ORD-${Math.floor(Math.random() * 900 + 100)}`,
+                customer: "",
+                category: CATEGORIES[0],
+                product: "",
+                qty: "1",
+                price: "0",
+                orderedAt: "2026-01-01",
+                active: "false",
+              })}
+              onSelectionChange={setSelected}
+              onCellCommit={(info) =>
+                setLastAction(`Committed ${info.colKey} = "${info.value}"`)
+              }
+              loadingType="spinner"
+              labels={{
+                addRow: "Add row",
+                sortAsc: "Sort ascending",
+                sortDesc: "Sort descending",
+                hideColumn: "Hide column",
+                pinLeft: "Pin left",
+                pinRight: "Pin right",
+                unpin: "Unpin",
+              }}
+            />
+          </div>
+          <p
+            style={{
+              margin: "10px 0 0",
+              fontSize: 12,
+              opacity: 0.65,
+              lineHeight: 1.6,
+            }}
+          >
+            Keyboard: Tab/Enter/Arrows navigate · F2 edit · Esc cancel ·
+            Home/End first/last col · PageUp/Down page · Ctrl+A select grid ·
+            Ctrl+C copy TSV · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo ·
+            Shift+Arrow extend selection
+          </p>
+        </>
       )}
       {guideOnly && (
         <aside

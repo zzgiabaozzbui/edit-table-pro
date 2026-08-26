@@ -13,6 +13,7 @@ type CellProps = Readonly<{
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   className?: string;
+  pinnedStyle?: React.CSSProperties;
   "data-colkey"?: string;
   "data-rowid"?: string;
 }>;
@@ -25,6 +26,7 @@ export function Cell({
   align,
   ellipsis,
   className,
+  pinnedStyle,
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
 }: CellProps) {
@@ -170,7 +172,13 @@ export function Cell({
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}
-      style={{ position: "relative", width, minWidth: width, height: "100%" }}
+      style={{
+        position: "relative",
+        width,
+        minWidth: width,
+        height: "100%",
+        ...pinnedStyle,
+      }}
     >
       <input
         ref={inputRef}

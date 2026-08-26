@@ -14,6 +14,7 @@ type DropdownCellProps = Readonly<{
   align?: "left" | "center" | "right";
   disabled?: boolean;
   className?: string;
+  pinnedStyle?: React.CSSProperties;
   "data-colkey"?: string;
   "data-rowid"?: string;
 }>;
@@ -26,6 +27,7 @@ export function DropdownCell({
   align,
   disabled,
   className,
+  pinnedStyle,
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
 }: DropdownCellProps) {
@@ -56,7 +58,13 @@ export function DropdownCell({
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}
-      style={{ position: "relative", width, minWidth: width, height: "100%" }}
+      style={{
+        position: "relative",
+        width,
+        minWidth: width,
+        height: "100%",
+        ...pinnedStyle,
+      }}
     >
       <select
         ref={selectRef}

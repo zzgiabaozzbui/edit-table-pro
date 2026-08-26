@@ -1,4 +1,5 @@
 import { isRowInSelection } from "@/core/clipboard";
+import { computePinStyle } from "@/core/pin";
 import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
 import { useCallback, useMemo, useState } from "react";
@@ -69,6 +70,13 @@ export function VirtualBody<T extends Record<string, string>>({
 
   const viewportHeight = scrollContainerRef.current?.clientHeight ?? 600;
   const visibleCols = columns.filter((c) => !c.hidden);
+  const pinStyles: Record<string, React.CSSProperties | undefined> = {};
+  for (const c of visibleCols) {
+    pinStyles[c.key] = computePinStyle(c, visibleCols, (k) => {
+      const target = visibleCols.find((x) => x.key === k);
+      return (target && columnWidths.get(k)) || target?.width || 150;
+    });
+  }
   const visibleColKeys = visibleCols.map((c) => c.key);
   const { start, end } = getVisibleRange(
     scrollTop,
@@ -209,6 +217,7 @@ export function VirtualBody<T extends Record<string, string>>({
                       row={liveRow}
                       rowIndex={rowIndex}
                       width={colWidth}
+                      pinnedStyle={pinStyles[col.key]}
                       align={col.align}
                     />
                   );
@@ -220,6 +229,7 @@ export function VirtualBody<T extends Record<string, string>>({
                       cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       width={colWidth}
+                      pinnedStyle={pinStyles[col.key]}
                       align={col.align}
                       disabled={!isEditable}
                       className={cellClass}
@@ -236,6 +246,7 @@ export function VirtualBody<T extends Record<string, string>>({
                       value={liveRow[col.key] ?? ""}
                       options={col.options ?? []}
                       width={colWidth}
+                      pinnedStyle={pinStyles[col.key]}
                       align={col.align}
                       disabled={!isEditable}
                       className={cellClass}
@@ -251,6 +262,7 @@ export function VirtualBody<T extends Record<string, string>>({
                       cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       width={colWidth}
+                      pinnedStyle={pinStyles[col.key]}
                       disabled={!isEditable}
                       className={cellClass}
                       data-colkey={col.key}
@@ -265,6 +277,7 @@ export function VirtualBody<T extends Record<string, string>>({
                       cell={{ rowId, colKey: col.key }}
                       value={liveRow[col.key] ?? ""}
                       width={colWidth}
+                      pinnedStyle={pinStyles[col.key]}
                       align={col.align}
                       ellipsis={col.ellipsis}
                       className={cellClass}

@@ -9,6 +9,7 @@ type ReadonlyCellProps = Readonly<{
   align?: "left" | "center" | "right";
   ellipsis?: boolean;
   className?: string;
+  pinnedStyle?: React.CSSProperties;
   "data-colkey"?: string;
   "data-rowid"?: string;
 }>;
@@ -20,6 +21,7 @@ export function ReadonlyCell({
   align,
   ellipsis,
   className,
+  pinnedStyle,
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
 }: ReadonlyCellProps) {
@@ -49,6 +51,7 @@ export function ReadonlyCell({
         width,
         minWidth: width,
         height: "100%",
+        ...pinnedStyle,
         display: "flex",
         alignItems: "center",
         padding: "0 var(--et-padding-x)",

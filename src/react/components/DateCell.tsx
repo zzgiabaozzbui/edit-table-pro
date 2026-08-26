@@ -48,6 +48,7 @@ export function DateCell({
 
   return (
     <div
+      role="gridcell"
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}

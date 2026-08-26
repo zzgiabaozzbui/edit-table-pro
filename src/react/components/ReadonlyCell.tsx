@@ -38,6 +38,8 @@ export function ReadonlyCell({
 
   return (
     <div
+      role="gridcell"
+      tabIndex={0}
       className={["et-cell-readonly", className].filter(Boolean).join(" ")}
       data-colkey={dataColKey}
       data-rowid={dataRowId}

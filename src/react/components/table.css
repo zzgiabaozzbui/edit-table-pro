@@ -27,7 +27,11 @@
 }
 
 .et-input:hover:not(:focus):not(.error) {
-  border-color: #4096ff;
+  border-color: color-mix(
+    in srgb,
+    var(--et-color-primary) 55%,
+    var(--et-color-border)
+  );
 }
 
 .et-input:focus:not(.error) {
@@ -87,6 +91,10 @@
 }
 
 /* ── Row ────────────────────────────────────── */
+.et-row {
+  transition: background-color 0.12s ease, opacity 0.15s ease;
+}
+
 .et-row:hover {
   background: var(--et-color-row-hover);
 }
@@ -134,8 +142,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.65);
+  background: color-mix(in srgb, var(--et-color-bg) 65%, transparent);
   backdrop-filter: blur(1px);
+}
+
+/* ── Reduced motion ─────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .et-root *,
+  .et-root *::before,
+  .et-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .et-loading-spinner {
@@ -170,12 +189,80 @@
   width: 7px;
   height: 7px;
   background: var(--et-color-primary);
-  border: 1px solid #fff;
+  border: 1px solid var(--et-color-bg);
   border-radius: 1px;
   cursor: crosshair;
   z-index: 10;
   padding: 0;
   outline: none;
+}
+
+/* ── Focus visibility (keyboard only) ───────── */
+.et-root
+  :is(
+    button,
+    [role="button"],
+    [role="separator"],
+    [tabindex="0"]
+  ):focus-visible,
+.et-empty-add:focus-visible {
+  outline: 2px solid var(--et-color-primary);
+  outline-offset: 2px;
+}
+
+.et-input:focus-visible {
+  outline: none;
+}
+
+/* ── Column header menu (#52) ───────────────── */
+.et-col-menu-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1;
+  color: inherit;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.et-columnheader:hover .et-col-menu-btn,
+.et-col-menu-btn:focus-visible,
+.et-col-menu-btn[aria-expanded="true"] {
+  opacity: 1;
+}
+
+.et-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 31;
+  min-width: 140px;
+  padding: 4px 0;
+  background: var(--et-color-bg);
+  border: 1px solid var(--et-color-border);
+  border-radius: var(--et-border-radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.et-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: var(--et-font-size);
+  font-family: inherit;
+  color: inherit;
+  transition: background-color 0.12s ease;
+}
+
+.et-menu-item:hover {
+  background: var(--et-color-row-hover);
 }
 
 .et-cell-fill-handle:focus-visible {

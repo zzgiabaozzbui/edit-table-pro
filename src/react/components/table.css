@@ -153,6 +153,15 @@
   }
 }
 
+@keyframes et-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 /* ── Fill Handle ────────────────────────────── */
 .et-cell-fill-handle {
   position: absolute;

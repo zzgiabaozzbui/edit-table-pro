@@ -57,6 +57,7 @@ export function VirtualBody<T extends Record<string, string>>({
     fillState,
     cellSelection,
     rowDrag,
+    effectiveFixed,
     addRow,
   } = useTableContext<T>();
   const [scrollTop, setScrollTop] = useState(0);
@@ -76,14 +77,20 @@ export function VirtualBody<T extends Record<string, string>>({
 
   const viewportHeight = scrollContainerRef.current?.clientHeight ?? 600;
   const visibleCols = columns.filter((c) => !c.hidden);
+  const visibleColKeys = visibleCols.map((c) => c.key);
   const pinStyles: Record<string, React.CSSProperties | undefined> = {};
   for (const c of visibleCols) {
-    pinStyles[c.key] = computePinStyle(c, visibleCols, (k) => {
-      const target = visibleCols.find((x) => x.key === k);
-      return (target && columnWidths.get(k)) || target?.width || 150;
-    });
+    pinStyles[c.key] = computePinStyle(
+      effectiveFixed(c.key),
+      c.key,
+      visibleCols.map((c) => c.key),
+      (k) => {
+        const t = visibleCols.find((x) => x.key === k);
+        return (t && columnWidths.get(k)) || t?.width || 150;
+      },
+      effectiveFixed,
+    );
   }
-  const visibleColKeys = visibleCols.map((c) => c.key);
   const { start, end } = getVisibleRange(
     scrollTop,
     viewportHeight,

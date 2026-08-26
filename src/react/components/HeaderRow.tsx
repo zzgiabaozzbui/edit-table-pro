@@ -1,5 +1,6 @@
 import { computePinStyle } from "@/core/pin";
 import { useTableContext } from "../context/TableContext";
+import { HeaderMenu } from "./HeaderMenu";
 import { ResizeHandle } from "./ResizeHandle";
 
 const SELECTION_COL_WIDTH = 40;
@@ -16,6 +17,9 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
     toggleAll,
     sortState,
     toggleSort,
+    sortColumn,
+    setPin,
+    effectiveFixed,
   } = useTableContext();
   const visibleCols = columns.filter((c) => !c.hidden);
   const isAllSelected = rows.length > 0 && selectedRowIds.size === rows.length;
@@ -101,11 +105,17 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             color: "var(--et-color-text)",
-            background: col.fixed && "var(--et-color-bg-header)",
-            ...computePinStyle(col, visibleCols, (k) => {
-              const t = visibleCols.find((x) => x.key === k);
-              return (t && columnWidths.get(k)) || t?.width || 150;
-            }),
+            background: effectiveFixed(col.key) && "var(--et-color-bg-header)",
+            ...computePinStyle(
+              effectiveFixed(col.key),
+              col.key,
+              visibleCols.map((c) => c.key),
+              (k) => {
+                const t = visibleCols.find((x) => x.key === k);
+                return (t && columnWidths.get(k)) || t?.width || 150;
+              },
+              effectiveFixed,
+            ),
           }}
         >
           {col.header ?? col.key}
@@ -116,6 +126,7 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
                 : " ▼"
               : " ↕"
             : null}
+          <HeaderMenu colKey={col.key} />
           <ResizeHandle colKey={col.key} />
         </div>
       ))}

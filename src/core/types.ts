@@ -168,3 +168,5 @@ export type VirtualRange = {
   start: number;
   end: number;
 };
+
+export type PinSide = "left" | "right" | undefined;

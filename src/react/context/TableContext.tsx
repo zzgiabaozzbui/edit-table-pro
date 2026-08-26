@@ -12,6 +12,7 @@ import type {
   DirtyRow,
   FillState,
   HistoryState,
+  PinSide,
   RowId,
   SubmitRow,
   ValidationResult,
@@ -90,6 +91,9 @@ export type TableContextValue<T = Record<string, string>> = {
   clearCellSelection: () => boolean;
   sortState: { colKey: ColKey; dir: "asc" | "desc" } | null;
   toggleSort: (colKey: ColKey) => void;
+  sortColumn: (colKey: ColKey, dir: "asc" | "desc" | null) => void;
+  effectiveFixed: (colKey: string) => PinSide;
+  setPin: (colKey: ColKey, side: PinSide) => void;
   // Feature 10: Imperative ref API (#20)
   setData: (rows: T[]) => void;
   scrollToRow: (rowId: RowId) => void;

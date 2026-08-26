@@ -27,6 +27,8 @@ export type TableProps<T> = {
   bordered?: boolean;
   size?: "large" | "medium" | "small";
   loading?: boolean;
+  loadingType?: "spinner" | "skeleton";
+  skeletonRows?: number;
   showHeader?: boolean;
   sticky?: boolean;
   striped?: boolean;

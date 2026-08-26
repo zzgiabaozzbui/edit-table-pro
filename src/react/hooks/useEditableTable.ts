@@ -75,6 +75,8 @@ export function useEditableTable<T extends Record<string, string>>(
     sticky,
     striped,
     rowClassName,
+    loadingType,
+    skeletonRows,
     searchable = false,
     onSelectionChange,
     onCellClick,
@@ -95,6 +97,8 @@ export function useEditableTable<T extends Record<string, string>>(
     sticky,
     striped,
     rowClassName,
+    loadingType,
+    skeletonRows,
     hasSelection,
   };
 

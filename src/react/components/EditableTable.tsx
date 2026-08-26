@@ -133,10 +133,36 @@ function EditableTableInner<T extends Record<string, string>>(
           overflow: "hidden",
         }}
       >
-        {tableProps.loading && (
-          <div className="et-loading-overlay">
-            <div className="et-loading-spinner" />
+        {tableProps.loading && tableProps.loadingType === "skeleton" ? (
+          <div
+            className="et-skeleton-container"
+            style={{ padding: "var(--et-padding-y) var(--et-padding-x)" }}
+          >
+            {Array.from(
+              { length: tableProps.skeletonRows ?? 8 },
+              (_, i) => i,
+            ).map((i) => (
+              <div
+                key={i}
+                className="et-skeleton-row"
+                style={{
+                  height: "var(--et-row-height)",
+                  marginBottom: "var(--et-gap-y)",
+                  borderRadius: "var(--et-border-radius)",
+                  background:
+                    "linear-gradient(90deg, var(--et-color-bg-header) 25%, var(--et-color-border) 50%, var(--et-color-bg-header) 75%)",
+                  backgroundSize: "200% 100%",
+                  animation: "et-shimmer 1.4s ease infinite",
+                }}
+              />
+            ))}
           </div>
+        ) : (
+          tableProps.loading && (
+            <div className="et-loading-overlay">
+              <div className="et-loading-spinner" />
+            </div>
+          )
         )}
         <div
           style={{
@@ -172,14 +198,16 @@ function EditableTableInner<T extends Record<string, string>>(
             {tableProps.showHeader !== false && (
               <HeaderRow totalWidth={totalWidth} />
             )}
-            <VirtualBody
-              rows={displayRows}
-              getRowId={options.getRowId}
-              totalWidth={totalWidth}
-              emptyText={options.emptyText}
-              emptyRender={options.emptyRender}
-              showAddRow={canAddRow}
-            />
+            {!(tableProps.loading && tableProps.loadingType === "skeleton") && (
+              <VirtualBody
+                rows={displayRows}
+                getRowId={options.getRowId}
+                totalWidth={totalWidth}
+                emptyText={options.emptyText}
+                emptyRender={options.emptyRender}
+                showAddRow={canAddRow}
+              />
+            )}
             {canAddRow && (
               <button
                 type="button"

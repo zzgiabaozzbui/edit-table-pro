@@ -188,7 +188,7 @@ function EditableTableInner<T extends Record<string, string>>(
               <input
                 data-testid="et-search-input"
                 type="text"
-                placeholder="Search…"
+                placeholder={tableProps.labels?.searchPlaceholder}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 style={{
@@ -240,7 +240,7 @@ function EditableTableInner<T extends Record<string, string>>(
                 }}
               >
                 <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
-                <span>Thêm dòng</span>
+                <span>{tableProps.labels?.addRow}</span>
               </button>
             )}
           </div>

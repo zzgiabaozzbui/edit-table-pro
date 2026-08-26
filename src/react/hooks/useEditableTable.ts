@@ -2,6 +2,7 @@ import { collectDirtyRows, discardRow } from "@/core/dirty";
 import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
 import { createHistory } from "@/core/history";
+import { resolveLabels } from "@/core/labels";
 import { createRowIndexGetter } from "@/core/row-index";
 import { EditSessionStore } from "@/core/session";
 import { SIZE_CONFIG } from "@/core/theme";
@@ -78,6 +79,7 @@ export function useEditableTable<T extends Record<string, string>>(
     loadingType,
     skeletonRows,
     searchable = false,
+    labels,
     onSelectionChange,
     onCellClick,
     onCellCommit,
@@ -99,6 +101,7 @@ export function useEditableTable<T extends Record<string, string>>(
     rowClassName,
     loadingType,
     skeletonRows,
+    labels: resolveLabels(labels),
     hasSelection,
   };
 

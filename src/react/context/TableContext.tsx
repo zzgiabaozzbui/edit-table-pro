@@ -35,6 +35,7 @@ export type TableProps<T> = {
   hasSelection?: boolean;
   rowClassName?: (row: T, index: number) => string;
   searchable?: boolean;
+  labels?: Partial<import("@/core/labels").TableLabels>;
 };
 
 export type TableContextValue<T = Record<string, string>> = {

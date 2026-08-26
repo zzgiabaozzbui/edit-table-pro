@@ -151,15 +151,22 @@ function Demo() {
   );
 
   return (
-      {!guideOnly && (
-      <>
-      <div
-        style={{
+    <div
+      style={{
         padding: 24,
         background: dark ? "#141414" : "#f7f7f8",
         minHeight: "100vh",
       }}
     >
+      <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
+        edit-table-pro — full demo
+      </h1>
+      <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
+        Header ⋮ menu: sort / hide / pin · Drag column edges to resize · Drag
+        rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
+      </p>
+      {!guideOnly && (
+      <>
       <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
         edit-table-pro — full demo
       </h1>

@@ -34,6 +34,7 @@ type UseCellCommitOptions<T> = {
     trigger: "change" | "blur",
   ) => void;
   onCellCommit?: (info: CellCommitInfo) => void;
+  onRowSave?: (row: T) => void | Promise<void>;
 };
 
 export function useCellCommit<T extends Record<string, string>>({
@@ -46,6 +47,7 @@ export function useCellCommit<T extends Record<string, string>>({
   setRows,
   runSideEffect,
   onCellCommit,
+  onRowSave,
 }: UseCellCommitOptions<T>) {
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const commitCell = useCallback(
@@ -97,6 +99,11 @@ export function useCellCommit<T extends Record<string, string>>({
       });
 
       runSideEffect(cell, formatted, "blur");
+      if (onRowSave) {
+        const savedRow =
+          rowsDataRef.current[getRowIndex(rowsDataRef.current, cell.rowId)];
+        if (savedRow) void Promise.resolve(onRowSave(savedRow)).catch(() => {});
+      }
       onCellCommit?.({
         rowId: cell.rowId,
         colKey: cell.colKey,

@@ -106,6 +106,7 @@ export type TableContextValue<T = Record<string, string>> = {
   // Feature 10b: Column visibility (#24)
   setColumnVisibility: (key: ColKey, visible: boolean) => void;
   toggleColumn: (key: ColKey) => void;
+  removeRows: (rowIds: RowId[]) => void;
 };
 
 export type EditableTableRef<T = Record<string, string>> = Pick<
@@ -117,6 +118,7 @@ export type EditableTableRef<T = Record<string, string>> = Pick<
   | "markSaved"
   | "setColumnVisibility"
   | "toggleColumn"
+  | "removeRows"
 >;
 
 // biome-ignore lint/suspicious/noExplicitAny: generic context default

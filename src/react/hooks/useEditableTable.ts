@@ -1,7 +1,11 @@
 import { collectDirtyRows, discardRow, markDirty } from "@/core/dirty";
 import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
-import { createHistory, pushBatchHistory } from "@/core/history";
+import {
+  createHistory,
+  pushBatchHistory,
+  pushStructuralHistory,
+} from "@/core/history";
 import { resolveLabels } from "@/core/labels";
 import { createRowIndexGetter } from "@/core/row-index";
 import { EditSessionStore } from "@/core/session";
@@ -52,6 +56,7 @@ export type UseEditableTableOptions<T> = {
   onSelectionChange?: (ids: RowId[]) => void;
   onCellClick?: CellClickHandler;
   onCellCommit?: (info: CellCommitInfo) => void;
+  onRowSave?: (row: T) => void | Promise<void>;
   autoFocus?: boolean;
   value?: T[];
   onChange?: (rows: T[]) => void;
@@ -246,6 +251,7 @@ export function useEditableTable<T extends Record<string, string>>(
     setRows: updateRows,
     runSideEffect,
     onCellCommit,
+    onRowSave: options.onRowSave,
   });
 
   // Feature 7: Undo/Redo
@@ -312,6 +318,26 @@ export function useEditableTable<T extends Record<string, string>>(
       updateRows(next);
     },
     [updateRows],
+  );
+
+  // Row delete (#53): structural, undoable
+  const removeRows = useCallback(
+    (rowIds: RowId[]) => {
+      const ids = new Set(rowIds);
+      const removed: Array<{ rowId: RowId; index: number; row: T }> = [];
+      rowsDataRef.current.forEach((r, i) => {
+        const id = getRowId(r);
+        if (ids.has(id)) removed.push({ rowId: id, index: i, row: r });
+      });
+      if (removed.length === 0) return;
+      rowsDataRef.current = rowsDataRef.current.filter(
+        (r) => !ids.has(getRowId(r)),
+      );
+      pushStructuralHistory(historyRef.current, "remove", removed);
+      for (const { rowId } of removed) dirtyRowsRef.current.delete(rowId);
+      updateRows([...rowsDataRef.current]);
+    },
+    [getRowId, historyRef, dirtyRowsRef, updateRows],
   );
 
   const addRow = useCallback(() => {
@@ -511,6 +537,7 @@ export function useEditableTable<T extends Record<string, string>>(
     clearCellSelection,
     sortState,
     toggleSort,
+    removeRows,
     validate,
     getDirtyRows,
     markSaved,

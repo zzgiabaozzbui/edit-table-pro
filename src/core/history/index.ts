@@ -40,6 +40,21 @@ export function pushBatchHistory(
   state.pointer = state.stack.length - 1;
 }
 
+export function pushStructuralHistory<T extends Record<string, string>>(
+  state: HistoryState,
+  op: "remove" | "insert",
+  rows: Array<{ rowId: RowId; index: number; row: T }>,
+): void {
+  state.stack = state.stack.slice(0, state.pointer + 1);
+  state.stack.push({
+    type: "structural",
+    op,
+    rows,
+    timestamp: Date.now(),
+  });
+  state.pointer = state.stack.length - 1;
+}
+
 export function undoHistory(state: HistoryState): HistoryStackEntry | null {
   if (state.pointer < 0) return null;
   const entry = state.stack[state.pointer];

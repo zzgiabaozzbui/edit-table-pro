@@ -11,6 +11,7 @@ type RenderCellProps = Readonly<{
   row: Record<string, string>;
   rowIndex: number;
   width: number;
+  pinnedStyle?: React.CSSProperties;
   align?: "left" | "center" | "right";
 }>;
 
@@ -22,6 +23,7 @@ export function RenderCell({
   rowIndex,
   width,
   align,
+  pinnedStyle,
 }: RenderCellProps) {
   const { cellRefs, onCellClick } = useTableContext();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -54,6 +56,7 @@ export function RenderCell({
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       style={{
+        ...pinnedStyle,
         width,
         minWidth: width,
         height: "100%",

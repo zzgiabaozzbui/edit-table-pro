@@ -10,6 +10,7 @@ type BooleanCellProps = Readonly<{
   width: number;
   disabled?: boolean;
   className?: string;
+  pinnedStyle?: React.CSSProperties;
   "data-colkey"?: string;
   "data-rowid"?: string;
 }>;
@@ -22,6 +23,7 @@ export function BooleanCell({
   width,
   disabled,
   className,
+  pinnedStyle,
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
 }: BooleanCellProps) {
@@ -53,7 +55,13 @@ export function BooleanCell({
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}
-      style={{ position: "relative", width, minWidth: width, height: "100%" }}
+      style={{
+        position: "relative",
+        width,
+        minWidth: width,
+        height: "100%",
+        ...pinnedStyle,
+      }}
     >
       <input
         ref={inputRef}

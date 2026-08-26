@@ -61,6 +61,8 @@ export type ColDef<T = Record<string, string>> = {
   hidden?: boolean;
   sortable?: boolean;
   sortComparator?: (a: string, b: string) => number;
+  /** Freeze this column to the left/right edge of the horizontal scroll (#15) */
+  fixed?: "left" | "right";
   editable?: boolean | ((row: T) => boolean);
   options?: { label: string; value: string }[];
   validate?: (value: string, row: T) => ValidationResult;

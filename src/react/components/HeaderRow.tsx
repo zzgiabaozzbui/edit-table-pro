@@ -1,3 +1,4 @@
+import { computePinStyle } from "@/core/pin";
 import { useTableContext } from "../context/TableContext";
 import { ResizeHandle } from "./ResizeHandle";
 
@@ -90,6 +91,11 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             color: "var(--et-color-text)",
+            background: col.fixed && "var(--et-color-bg-header)",
+            ...computePinStyle(col, visibleCols, (k) => {
+              const t = visibleCols.find((x) => x.key === k);
+              return (t && columnWidths.get(k)) || t?.width || 150;
+            }),
           }}
         >
           {col.header ?? col.key}

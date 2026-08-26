@@ -1,6 +1,7 @@
 import { StrictMode, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { exportCsv } from "../src/core/export";
 import { DARK_THEME } from "../src/core/theme";
 import type { ColDef, EditableTableRef, TableTheme } from "../src/index";
@@ -277,7 +278,7 @@ function Demo() {
           }}
         >
           <div className="usage-doc">
-            <Markdown>{usage}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>{usage}</Markdown>
           </div>
         </aside>
       )}

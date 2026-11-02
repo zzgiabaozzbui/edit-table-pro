@@ -1,0 +1,27 @@
+name: edit-table-pro
+version: 0.1.0
+targets:
+  - claude
+  - codex
+includes: auto
+
+dependencies:
+  apm:
+    - git: https://gitlab.com/nguyenquangbao2409/athena-agent-kit.git
+      path: packages/core
+      ref: v0.19.0
+    - git: https://gitlab.com/nguyenquangbao2409/athena-agent-kit.git
+      path: packages/agents-private/claude
+      ref: v0.19.0
+      targets: [claude]
+    - git: https://gitlab.com/nguyenquangbao2409/athena-agent-kit.git
+      path: packages/agents-private/codex
+      ref: v0.19.0
+      targets: [codex]
+
+compilation:
+  # Luật gói claude không vào AGENTS.md (Codex đọc file này); Claude đọc .claude/rules.
+  exclude:
+    - "apm_modules/**/agents-private/claude/**"
+  agents_md:
+    mode: managed_section

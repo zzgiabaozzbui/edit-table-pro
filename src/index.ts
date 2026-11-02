@@ -3,6 +3,7 @@ export { useEditableTable } from "./react/hooks/useEditableTable";
 export { useTableContext } from "./react/context/TableContext";
 export { EditSessionStore } from "./core/session";
 export { exportCsv } from "./core/export";
+export { DARK_THEME } from "./core/theme";
 
 export type { TableTheme } from "./core/theme";
 export type { TableContextValue } from "./react/context/TableContext";

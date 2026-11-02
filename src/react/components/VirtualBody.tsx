@@ -4,14 +4,14 @@ import type { CellSelectionRange } from "@/core/types";
 import { getRowOffset, getTotalHeight, getVisibleRange } from "@/core/virtual";
 import { useCallback, useMemo, useState } from "react";
 import { useTableContext } from "../context/TableContext";
-import { BooleanCell } from "./BooleanCell";
-import { Cell } from "./Cell";
-import { DateCell } from "./DateCell";
-import { DropdownCell } from "./DropdownCell";
-import { ReadonlyCell } from "./ReadonlyCell";
-import { RenderCell } from "./RenderCell";
 import { RowDragHandle } from "./RowDragHandle";
-import { SelectCell } from "./SelectCell";
+import { BooleanCell } from "./cells/BooleanCell";
+import { Cell } from "./cells/Cell";
+import { DateCell } from "./cells/DateCell";
+import { DropdownCell } from "./cells/DropdownCell";
+import { ReadonlyCell } from "./cells/ReadonlyCell";
+import { RenderCell } from "./cells/RenderCell";
+import { SelectCell } from "./cells/SelectCell";
 
 function isColInRange(
   colKey: string,

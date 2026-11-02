@@ -1,6 +1,6 @@
 ---
 chay_tu:
-plan_duyet:
+plan_duyet: f448bfe
 ---
 
 # Progress — sửa index dòng

@@ -5,13 +5,20 @@ export function createRowIndexGetter<T>(
   const indexById = new Map<string, number>();
 
   return (rows: T[], rowId: string): number => {
-    if (cachedRows !== rows) {
+    const idx = indexById.get(rowId);
+    if (
+      cachedRows !== rows ||
+      idx === undefined ||
+      idx >= rows.length ||
+      getRowId(rows[idx]) !== rowId
+    ) {
       indexById.clear();
       for (let i = 0; i < rows.length; i++) {
         indexById.set(getRowId(rows[i]), i);
       }
       cachedRows = rows;
+      return indexById.get(rowId) ?? -1;
     }
-    return indexById.get(rowId) ?? -1;
+    return idx;
   };
 }

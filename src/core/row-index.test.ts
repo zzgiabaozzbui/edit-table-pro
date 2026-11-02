@@ -32,4 +32,22 @@ describe("createRowIndexGetter (#43)", () => {
     expect(get(rows, "0")).toBe(0);
     expect(get(rows, "2")).toBe(2);
   });
+
+  it("returns fresh index after in-place splice insert", () => {
+    const get = createRowIndexGetter<Row>((r) => r.id);
+    const rows = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    expect(get(rows, "c")).toBe(2);
+    rows.splice(0, 0, { id: "x" });
+    expect(get(rows, "c")).toBe(3);
+    expect(get(rows, "x")).toBe(0);
+  });
+
+  it("returns fresh index after in-place splice remove", () => {
+    const get = createRowIndexGetter<Row>((r) => r.id);
+    const rows = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    expect(get(rows, "c")).toBe(2);
+    rows.splice(0, 1);
+    expect(get(rows, "c")).toBe(1);
+    expect(get(rows, "a")).toBe(-1);
+  });
 });

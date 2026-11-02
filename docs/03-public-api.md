@@ -58,6 +58,13 @@ exportCsv('data.csv', columns, rowsDataRef.current)
 // Filter hidden columns và render columns tự động
 ```
 
+### `DARK_THEME`
+
+```ts
+import { DARK_THEME } from 'edit-table-pro'
+// Required<TableTheme> — preset dark đã audit WCAG AA; dùng: theme={DARK_THEME}
+```
+
 ---
 
 ## Classes

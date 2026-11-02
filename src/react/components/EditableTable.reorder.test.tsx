@@ -28,6 +28,53 @@ const orderOf = (container: HTMLElement) =>
   );
 
 describe("row drag to reorder (#17)", () => {
+  it("hides drag handle while sorted", () => {
+    const { container } = render(
+      <EditableTable<Row>
+        columns={[{ key: "a", type: "text", sortable: true }]}
+        getRowId={getRowId}
+        initialData={data}
+        rowDraggable
+      />,
+    );
+    const header = container.querySelector(
+      '[role="columnheader"]',
+    ) as HTMLElement;
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeTruthy();
+    fireEvent.click(header);
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeNull();
+    fireEvent.click(header);
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeNull();
+    fireEvent.click(header);
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeTruthy();
+  });
+
+  it("hides drag handle while searching", async () => {
+    const { container } = render(
+      <EditableTable<Row>
+        columns={columns}
+        getRowId={getRowId}
+        initialData={data}
+        rowDraggable
+        searchable
+      />,
+    );
+    const search = container.querySelector(
+      '[data-testid="et-search-input"]',
+    ) as HTMLInputElement;
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeTruthy();
+    fireEvent.change(search, { target: { value: "one" } });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeNull();
+    fireEvent.change(search, { target: { value: "" } });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 20));
+    });
+    expect(container.querySelector('[aria-label="Drag row"]')).toBeTruthy();
+  });
+
   it("drag handle moves a row up and reports onRowReorder", async () => {
     const onRowReorder = vi.fn();
     const { container } = render(

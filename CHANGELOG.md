@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+- **Wrong row written after undo/redo** — the rowId→index cache re-validates after in-place
+  row insert/remove, so edits after undoing a row delete hit the right row.
+- **Sort/search index mix-up** — drag selection, Delete, paste and fill act on the rows shown
+  while sorted or searching; the row drag handle is hidden during sort/search.
+
 ## [0.3.0] — 2026-11-02
 
 First npm release since `0.1.1`; includes everything tagged in `0.2.0`.

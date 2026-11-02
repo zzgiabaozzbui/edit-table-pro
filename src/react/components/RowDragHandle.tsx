@@ -8,8 +8,16 @@ export function RowDragHandle({
   rowId: string;
   rowIndex: number;
 }) {
-  const { scrollContainerRef, rowHeight, setRowDrag, moveRow } =
-    useTableContext();
+  const {
+    scrollContainerRef,
+    rowHeight,
+    setRowDrag,
+    moveRow,
+    sortState,
+    query,
+    displayRows,
+    rowsDataRef,
+  } = useTableContext();
   const targetRef = useRef(rowIndex);
 
   const computeTarget = (clientY: number): number => {
@@ -20,6 +28,9 @@ export function RowDragHandle({
     const total = container.scrollHeight / rowHeight;
     return Math.max(0, Math.min(Math.floor(relY / rowHeight), total - 1));
   };
+
+  if (sortState || query || displayRows.length !== rowsDataRef.current.length)
+    return null;
 
   return (
     <div

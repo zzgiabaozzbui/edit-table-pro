@@ -16,7 +16,7 @@ export function FillHandle({
   colKey,
 }: Readonly<{ rowId: RowId; colKey: ColKey }>) {
   const {
-    rowsDataRef,
+    displayRowsRef,
     getRowId,
     rowHeight,
     scrollContainerRef,
@@ -41,7 +41,7 @@ export function FillHandle({
     e.preventDefault();
     e.stopPropagation();
 
-    const sourceRowIndex = (rowsDataRef.current ?? []).findIndex(
+    const sourceRowIndex = displayRowsRef.current.findIndex(
       (r) => getRowId(r) === rowId,
     );
     if (sourceRowIndex === -1) return;
@@ -94,7 +94,7 @@ export function FillHandle({
       if (!container) return null;
       const rect = container.getBoundingClientRect();
       const relY = clientY - rect.top + container.scrollTop;
-      const totalRows = rowsDataRef.current?.length ?? 1;
+      const totalRows = displayRowsRef.current.length;
       const targetRowIndex = Math.max(
         0,
         Math.min(Math.floor(relY / rowHeight), totalRows - 1),

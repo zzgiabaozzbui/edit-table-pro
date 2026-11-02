@@ -5,6 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-11-02
+
+First npm release since `0.1.1`; includes everything tagged in `0.2.0`.
+
 ### Added (sweep 5)
 - **Column header menu** — per-column dropdown with Sort ascending/descending/clear, Hide
   column and Pin left/right/Unpin; runtime pin overrides take precedence over static
@@ -14,9 +18,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - **Perf** — VirtualBody skips redundant scroll state updates and resolves cell values through
   a rowId-keyed live map so view transforms stay correct (#44, partial).
 
-> **Note**: `0.2.0` was tagged in git but never published to npm — `npm view edit-table-pro`
-> still shows `0.1.1` as latest. The next release is therefore free to change the API without
-> a deprecation cycle, and it will: see [`docs/06-roadmap.md`](./docs/06-roadmap.md).
+> **Note**: `0.2.0` was tagged in git but never published to npm, so `0.3.0` follows `0.1.1`
+> on npm. See [`docs/06-roadmap.md`](./docs/06-roadmap.md) for what comes next.
 
 ### Added
 - **Column sorting** — `sortable` + optional `sortComparator` on `ColDef`; header click cycles
@@ -146,7 +149,8 @@ Virtual scroll, inline validation, side effects, undo/redo, fill handle,
 multi-cell selection, Excel/Sheets paste, row selection, column resize, CSV
 export, theming.
 
-[Unreleased]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/zzgiabaozzbui/edit-table-pro/releases/tag/v0.1.0

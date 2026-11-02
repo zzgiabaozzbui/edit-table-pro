@@ -1,15 +1,12 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
 import { useEffect, useRef } from "react";
-import { useTableContext } from "../context/TableContext";
-import { FillHandle } from "./FillHandle";
+import { useTableContext } from "../../context/TableContext";
+import { FillHandle } from "../FillHandle";
 
-type Option = { label: string; value: string };
-
-type DropdownCellProps = Readonly<{
+type DateCellProps = Readonly<{
   cell: CellPos;
   value: string;
-  options: Option[];
   width: number;
   align?: "left" | "center" | "right";
   disabled?: boolean;
@@ -19,10 +16,9 @@ type DropdownCellProps = Readonly<{
   "data-rowid"?: string;
 }>;
 
-export function DropdownCell({
+export function DateCell({
   cell,
   value,
-  options,
   width,
   align,
   disabled,
@@ -30,7 +26,7 @@ export function DropdownCell({
   pinnedStyle,
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
-}: DropdownCellProps) {
+}: DateCellProps) {
   const {
     commitCell,
     cellRefs,
@@ -43,10 +39,10 @@ export function DropdownCell({
     activeCellState?.rowId === cell.rowId &&
     activeCellState?.colKey === cell.colKey;
   const cellKey = makeCellKey(cell.rowId, cell.colKey);
-  const selectRef = useRef<HTMLSelectElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (selectRef.current) cellRefs.current?.set(cellKey, selectRef.current);
+    if (inputRef.current) cellRefs.current?.set(cellKey, inputRef.current);
     return () => {
       cellRefs.current?.delete(cellKey);
     };
@@ -66,20 +62,15 @@ export function DropdownCell({
         ...pinnedStyle,
       }}
     >
-      <select
-        ref={selectRef}
+      <input
+        ref={inputRef}
+        type="date"
         value={value}
         disabled={disabled}
         onChange={(e) => commitCell(cell, e.target.value)}
         onFocus={() => setActiveCell(cell)}
         style={{ width: "100%", textAlign: align ?? "left" }}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      />
       {(isActiveCell ||
         (cellSelection?.rowId === cell.rowId &&
           cellSelection?.colKeyEnd === cell.colKey)) && (

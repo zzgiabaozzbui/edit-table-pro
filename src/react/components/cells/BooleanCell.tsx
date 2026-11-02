@@ -1,14 +1,13 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
 import { useEffect, useRef } from "react";
-import { useTableContext } from "../context/TableContext";
-import { FillHandle } from "./FillHandle";
+import { useTableContext } from "../../context/TableContext";
+import { FillHandle } from "../FillHandle";
 
-type DateCellProps = Readonly<{
+type BooleanCellProps = Readonly<{
   cell: CellPos;
   value: string;
   width: number;
-  align?: "left" | "center" | "right";
   disabled?: boolean;
   className?: string;
   pinnedStyle?: React.CSSProperties;
@@ -16,23 +15,25 @@ type DateCellProps = Readonly<{
   "data-rowid"?: string;
 }>;
 
-export function DateCell({
+const TRUTHY_VALUES = new Set(["true", "1", "yes"]);
+
+export function BooleanCell({
   cell,
   value,
   width,
-  align,
   disabled,
   className,
   pinnedStyle,
   "data-colkey": dataColKey,
   "data-rowid": dataRowId,
-}: DateCellProps) {
+}: BooleanCellProps) {
   const {
     commitCell,
     cellRefs,
     setActiveCell,
     activeCellState,
     cellSelection,
+    onCellClick,
   } = useTableContext();
 
   const isActiveCell =
@@ -64,12 +65,13 @@ export function DateCell({
     >
       <input
         ref={inputRef}
-        type="date"
-        value={value}
+        type="checkbox"
+        aria-label={cell.colKey}
+        checked={TRUTHY_VALUES.has(value.trim().toLowerCase())}
         disabled={disabled}
-        onChange={(e) => commitCell(cell, e.target.value)}
+        onClick={() => onCellClick?.(cell.rowId, cell.colKey, value)}
+        onChange={(e) => commitCell(cell, e.target.checked ? "true" : "false")}
         onFocus={() => setActiveCell(cell)}
-        style={{ width: "100%", textAlign: align ?? "left" }}
       />
       {(isActiveCell ||
         (cellSelection?.rowId === cell.rowId &&

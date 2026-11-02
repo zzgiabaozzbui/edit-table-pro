@@ -195,7 +195,7 @@ foundation, vì `#14`/`#19` chỉ cần mảng column offset chứ không cần 
 | NEW-09 | Scope keydown listener vào table root; undo/redo xuống dưới active-cell guard; `activeElement` guard. **Thêm ArrowLeft/ArrowRight** (gate `selectionStart===0` / `===value.length` để edit trong cell còn sống), **Home/End, PageUp/PageDown, F2** — cùng handler, cùng diff, và README đang quảng cáo sẵn (sửa `#33`) | — |
 | NEW-38 | Search perf: debounce query sang state riêng + `useDeferredValue`; sau đó `searchIndexRef` chứa text row đã lowercase, dựng một lần và patch **một** row index mỗi commit | NEW-04 |
 | NEW-39 | (S) `colOffsets` prefix-sum `useMemo` trên `columnWidths` (Map đã có sẵn ở `useColumnResize.ts:5`). **Đây là toàn bộ thứ mà `#14` hit-test, `#15` pinned offset, `#27` summary alignment, `#30` horizontal scroll cần** — không phải column virtualization | — |
-| **`#14`** | Horizontal fill: merge `computeHorizontalFillEntries` **verbatim** từ salvage (+4 unit test); viết lại trục X của `FillHandle` trên `colOffsets` — bỏ `SELECTION_COL_WIDTH=40` và fallback magic `?? 150`; thêm discriminator `CellRange.axis` tường minh theo `docs/superpowers/specs/2026-07-13-horizontal-fill-design.md`. Đóng luôn `#5` | NEW-39 |
+| **`#14`** | Horizontal fill: merge `computeHorizontalFillEntries` **verbatim** từ salvage (+4 unit test); viết lại trục X của `FillHandle` trên `colOffsets` — bỏ `SELECTION_COL_WIDTH=40` và fallback magic `?? 150`; thêm discriminator `CellRange.axis` tường minh theo `docs/artifact/2026-07-13-horizontal-fill/spec.md`. Đóng luôn `#5` | NEW-39 |
 | **`#19`** | `useEdgeAutoScroll(containerRef)` — hook dùng chung, **gate theo pointer movement thật**, cache rect ở `pointerdown`. Bản salvage khởi động rAF vô điều kiện ở `pointerdown` → row gần đáy container tự scroll ~720px/s chỉ vì mousedown. `useCellSelectionDrag` cũng consume hook này ở P4 | `#14` |
 | NEW-10 | Backfill test: `commitCell`, batch apply của `useHistoryOps`, sideEffect debounce/abort, `core/virtual`, `core/session`, `core/export`, vòng paste, 8 phím chưa test. **Viết assertion qua seam `readCell`/`writeCell` (P1 để identity)** để P2 nới generic không phải viết lại 8 file test | NEW-03,04,05 |
 
@@ -481,4 +481,4 @@ formula engine · multi-range (Ctrl+Click) selection · autocomplete/textarea ed
 | 29 | NEW-06 `markSaved` trên `DirtyRow` cũ | Đổi type `DirtyRow`/`SubmitRow` ngay trong NEW-06 | Cùng file, tránh churn một phase sau |
 | 30 | — | **+ size budget, SSR render test, axe mọi phase, docs-sync exit criteria, perf assertion P1, browserslist, SECURITY/COC/PR template/dependabot, `user-event`** | Gate không ai nhận |
 | 31 | "22 issues" | **24 issues** (`#4` `#5` `#10`–`#31`) | Đếm sót `#4` `#5` |
-| 32 | spec ở `docs/specs/` | `docs/superpowers/specs/2026-07-13-horizontal-fill-design.md` | Đường dẫn sai; `docs/specs/` không tồn tại |
+| 32 | spec ở `docs/specs/` | `docs/artifact/2026-07-13-horizontal-fill/spec.md` | Đường dẫn sai; `docs/specs/` không tồn tại |

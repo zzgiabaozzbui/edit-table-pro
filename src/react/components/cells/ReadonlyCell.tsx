@@ -1,6 +1,6 @@
 import type { CellPos } from "@/core/types";
 import { useCallback } from "react";
-import { useTableContext } from "../context/TableContext";
+import { useTableContext } from "../../context/TableContext";
 
 type ReadonlyCellProps = Readonly<{
   cell: CellPos;

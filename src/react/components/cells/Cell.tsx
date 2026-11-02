@@ -1,9 +1,9 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTableContext } from "../context/TableContext";
-import { useEditSession } from "../hooks/useEditSession";
-import { FillHandle } from "./FillHandle";
+import { useTableContext } from "../../context/TableContext";
+import { useEditSession } from "../../hooks/useEditSession";
+import { FillHandle } from "../FillHandle";
 
 type CellProps = Readonly<{
   cell: CellPos;

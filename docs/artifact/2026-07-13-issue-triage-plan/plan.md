@@ -4,7 +4,7 @@
 
 **Goal:** Sequence và reconcile 30 GitHub issues thành roadmap sửa theo foundation-first milestones (M0–M7) cho edit-table-pro.
 
-**Architecture:** Spec (`docs/superpowers/specs/2026-07-13-issue-triage-plan-design.md`) là triage/sequencing roadmap, KHÔNG phải 1 feature đơn. M0 là reconcile (verify + đóng issues đã code, không code mới). M1–M7 mỗi issue là subsystem độc lập → khi được pick up sẽ chạy `/superpowers:brainstorming` → spec → plan riêng. Plan này lock thứ tự + entry point.
+**Architecture:** Spec (`docs/artifact/2026-07-13-issue-triage-plan/spec.md`) là triage/sequencing roadmap, KHÔNG phải 1 feature đơn. M0 là reconcile (verify + đóng issues đã code, không code mới). M1–M7 mỗi issue là subsystem độc lập → khi được pick up sẽ chạy `/superpowers:brainstorming` → spec → plan riêng. Plan này lock thứ tự + entry point.
 
 **Tech Stack:** React 18 + TypeScript (strict) + Vite, CSS Modules, Biome, Vitest. Repo: `zzgiabaozzbui/edit-table-pro`.
 
@@ -161,7 +161,7 @@ Handoff: task thủ công (marketing), không cần spec/plan code.
 
 ## Execution Handoff
 
-Plan complete and saved to `docs/superpowers/plans/2026-07-13-issue-triage-plan.md`.
+Plan complete and saved to `docs/artifact/2026-07-13-issue-triage-plan/plan.md`.
 
 **M0** có thể thực thi ngay (reconcile). **M1–M7** mỗi issue perlu plan riêng khi pick up.
 

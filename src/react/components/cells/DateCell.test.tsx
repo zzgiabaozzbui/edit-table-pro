@@ -2,8 +2,8 @@ import type { ColDef } from "@/core/types";
 import { render, screen } from "@testing-library/react";
 import { act, fireEvent, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { TableProvider } from "../context/TableContext";
-import { useEditableTable } from "../hooks/useEditableTable";
+import { TableProvider } from "../../context/TableContext";
+import { useEditableTable } from "../../hooks/useEditableTable";
 import { DateCell } from "./DateCell";
 
 type Row = { id: string; due: string };

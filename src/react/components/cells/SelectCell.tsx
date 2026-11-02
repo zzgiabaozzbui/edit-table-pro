@@ -1,5 +1,5 @@
 import type { RowId } from "@/core/types";
-import { useTableContext } from "../context/TableContext";
+import { useTableContext } from "../../context/TableContext";
 
 type SelectCellProps = Readonly<{
   rowId: RowId;

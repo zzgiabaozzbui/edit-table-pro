@@ -34,6 +34,7 @@ type UseFillOptions<T> = {
   columns: ColDef<T>[];
   getRowId: (row: T) => string;
   rowsDataRef: MutableRefObject<T[]>;
+  displayRowsRef: MutableRefObject<T[]>;
   dirtyRowsRef: MutableRefObject<Map<RowId, DirtyRow>>;
   historyRef: MutableRefObject<HistoryState>;
   setRows: Dispatch<SetStateAction<T[]>>;
@@ -44,6 +45,7 @@ export function useFill<T extends Record<string, string>>({
   columns,
   getRowId,
   rowsDataRef,
+  displayRowsRef,
   dirtyRowsRef,
   historyRef,
   setRows,
@@ -55,7 +57,7 @@ export function useFill<T extends Record<string, string>>({
   const applyFill = useCallback(
     (range: CellRange, sourceCell: CellPos) => {
       const { rowIndexStart, rowIndexEnd } = range;
-      const allRows0 = rowsDataRef.current;
+      const displayRows = displayRowsRef.current;
 
       // ── Horizontal fill: same row(s), column span from source col ──
       if (range.targetColKey && range.targetColKey !== range.colKey) {
@@ -77,8 +79,10 @@ export function useFill<T extends Record<string, string>>({
             nextValue: string;
           }> = [];
           for (let r = rLo; r <= rHi; r++) {
-            const row = allRows0[r];
+            const row = displayRows[r];
             if (!row) continue;
+            const dataIndex = getRowIndex(rowsDataRef.current, getRowId(row));
+            if (dataIndex === -1) continue;
             const srcVal = row[range.colKey] ?? "";
             const seriesType = detectSeriesType([srcVal]);
             const filled = generateFillValues(
@@ -93,8 +97,8 @@ export function useFill<T extends Record<string, string>>({
               const prevValue = row[ck] ?? "";
               const nextValue = filled[i++] ?? "";
               if (prevValue === nextValue) continue;
-              rowsDataRef.current[r] = {
-                ...rowsDataRef.current[r],
+              rowsDataRef.current[dataIndex] = {
+                ...rowsDataRef.current[dataIndex],
                 [ck]: nextValue,
               };
               markDirty(
@@ -124,8 +128,7 @@ export function useFill<T extends Record<string, string>>({
 
       const colsToFill: ColKey[] = range.colKeys ?? [range.colKey];
 
-      const allRows = rowsDataRef.current;
-      const sourceRowIndex = getRowIndex(allRows, sourceCell.rowId);
+      const sourceRowIndex = getRowIndex(displayRows, sourceCell.rowId);
       if (sourceRowIndex === -1) return;
 
       const minIdx = Math.min(rowIndexStart, rowIndexEnd);
@@ -142,14 +145,14 @@ export function useFill<T extends Record<string, string>>({
         const col = columns.find((c) => c.key === ck);
         if (!col) continue;
 
-        const sourceValue = allRows[sourceRowIndex]?.[ck] ?? "";
+        const sourceValue = displayRows[sourceRowIndex]?.[ck] ?? "";
         const sourceValues = [sourceValue];
         const seriesType = detectSeriesType(sourceValues);
 
         const targetIndices: number[] = [];
         for (let i = minIdx; i <= maxIdx; i++) {
           if (i === sourceRowIndex) continue;
-          const r = allRows[i];
+          const r = displayRows[i];
           if (!r) continue;
           const isEditable = resolveEditable(col.editable, r);
           if (isEditable) targetIndices.push(i);
@@ -165,11 +168,17 @@ export function useFill<T extends Record<string, string>>({
 
         for (let i = 0; i < targetIndices.length; i++) {
           const idx = targetIndices[i];
-          const row = rowsDataRef.current[idx];
+          const visibleRow = displayRows[idx];
+          const dataIndex = getRowIndex(
+            rowsDataRef.current,
+            getRowId(visibleRow),
+          );
+          if (dataIndex === -1) continue;
+          const row = rowsDataRef.current[dataIndex];
           const prevValue = row[ck] ?? "";
           const nextValue = filled[i] ?? "";
           if (prevValue === nextValue) continue;
-          rowsDataRef.current[idx] = { ...row, [ck]: nextValue };
+          rowsDataRef.current[dataIndex] = { ...row, [ck]: nextValue };
           markDirty(
             dirtyRowsRef.current,
             getRowId(row),
@@ -198,6 +207,7 @@ export function useFill<T extends Record<string, string>>({
       columns,
       getRowId,
       rowsDataRef,
+      displayRowsRef,
       dirtyRowsRef,
       historyRef,
       setRows,

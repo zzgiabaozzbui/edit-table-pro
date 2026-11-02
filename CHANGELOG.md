@@ -34,7 +34,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   proportional to edge proximity (#19).
 - **`labels` prop** (`TableLabels` + `defaultLabels`) so consumers can localize the add-row
   action and search placeholder — English defaults ship out of the box (#54).
-- **`darkTheme` preset** audited against WCAG AA (text ≥ 4.5:1, UI boundaries ≥ 3:1), with a
+- **`DARK_THEME` preset** audited against WCAG AA (text ≥ 4.5:1, UI boundaries ≥ 3:1), with a
   pure `contrastRatio` helper exported from `core/contrast` (#4).
 - **Footer summary row** via `col.footer: "sum" | "count" | "avg" | ((rows) => string)` (#27).
 - **`headerTooltip`** column option renders a native tooltip on the header cell (#31).
@@ -99,6 +99,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   index, so an active search scrolled to the wrong row (#35).
 - `biome ci` now passes: `dist/` and `docs/ai-handbook/` excluded (400 of 431 diagnostics came
   from unignored build output), plus four real lint violations in `src/` and `examples/`.
+- `DARK_THEME` is now exported from the package entry (USAGE documented the import but it was
+  missing).
 
 ### Removed
 - `src/core/fill/index.test.ts` — a strict subset of `fill.test.ts` covering the same 66-line

@@ -1,7 +1,7 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
 import { useCallback, useEffect, useRef } from "react";
-import { useTableContext } from "../context/TableContext";
+import { useTableContext } from "../../context/TableContext";
 
 type RenderCellProps = Readonly<{
   cell: CellPos;

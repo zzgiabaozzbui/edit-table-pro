@@ -7,11 +7,11 @@ plan_duyet: f448bfe
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Đợt | Trạng thái |
 |---|---|---|---|---|---|---|
-| T1 | Getter index tự kiểm lại sau mutate tại chỗ | — | codex | `src/core/row-index.ts`, `src/core/row-index.test.ts`, `src/react/components/EditableTable.undo-index.test.tsx` | 1 | DOING — base 794549f |
-| T2 | Selection kéo chuột + xoá vùng chọn theo index hiển thị | T1 | codex | `src/react/hooks/useCellSelectionDrag.ts`, `src/react/hooks/useEditableTable.ts`, `src/react/components/EditableTable.tsx`, `src/react/components/EditableTable.sort-index.test.tsx` | 2 | TODO |
-| T3 | Paste theo dòng hiển thị | T2 | codex | `src/react/hooks/usePasteHandler.ts`, `src/react/hooks/useEditableTable.ts`, `src/react/components/EditableTable.sort-index.test.tsx` | 2 | TODO |
-| T4 | Fill theo dòng hiển thị | T2 | codex | `src/react/components/FillHandle.tsx`, `src/react/hooks/useFill.ts`, `src/react/components/EditableTable.sort-index.test.tsx` | 2 | TODO |
-| T5 | Ẩn row drag handle khi sort / search | — | codex | `src/react/components/RowDragHandle.tsx`, `src/react/components/EditableTable.reorder.test.tsx` | 2 | TODO |
+| T1 | Getter index tự kiểm lại sau mutate tại chỗ | — | codex | `src/core/row-index.ts`, `src/core/row-index.test.ts`, `src/react/components/EditableTable.undo-index.test.tsx` | 1 | DONE — `caafff3` · R0 · F0 |
+| T2 | Selection kéo chuột + xoá vùng chọn theo index hiển thị | T1 | codex | `src/react/hooks/useCellSelectionDrag.ts`, `src/react/hooks/useEditableTable.ts`, `src/react/components/EditableTable.tsx`, `src/react/components/EditableTable.sort-index.test.tsx` | 2 | DOING — base caafff3 |
+| T3 | Paste theo dòng hiển thị | T2 | codex | `src/react/hooks/usePasteHandler.ts`, `src/react/hooks/useEditableTable.ts`, `src/react/components/EditableTable.sort-index.test.tsx` | 2 | DOING — base caafff3 |
+| T4 | Fill theo dòng hiển thị | T2 | codex | `src/react/components/FillHandle.tsx`, `src/react/hooks/useFill.ts`, `src/react/components/EditableTable.sort-index.test.tsx` | 2 | DOING — base caafff3 |
+| T5 | Ẩn row drag handle khi sort / search | — | codex | `src/react/components/RowDragHandle.tsx`, `src/react/components/EditableTable.reorder.test.tsx` | 2 | DOING — base caafff3 |
 
 ## Kiểm trước khi chạy
 
@@ -29,3 +29,6 @@ plan_duyet: f448bfe
 - 2026-11-02 · Nhánh: tạo nhánh mới `fix/row-index-display-order` · USER
 
 ## Đã thử, không được
+
+- 2026-11-02 · `codex-companion task --write` chạy foreground · turn dừng sau tin nhắn đầu của Codex, không sửa file (job kẹt `starting`) → dùng `codex exec -m gpt-6-sol -s workspace-write` (T1 thread `01a19af3-4962-7fd1-9dfd-053746973979`)
+- 2026-11-02 · Codex tự chạy vitest trong sandbox · `spawn EPERM` (esbuild) → main chạy vitest ngoài sandbox

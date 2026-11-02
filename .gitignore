@@ -10,12 +10,22 @@ docs/human-context/
 docs/*.md
 # ...but the roadmap is public: README, CHANGELOG and open issues all link it.
 !docs/06-roadmap.md
+# ...and the public API doc: CHANGELOG and the PR template link it.
+!docs/03-public-api.md
+# raw chat captured by agent hooks (R-172)
+docs/agent/inbox/
 .playwright-mcp/
 
 # AI tools
 .claude/
+.agents/
+.codex/
 CLAUDE.md
 .cursor/
 .copilot/
 .aider*
 .continue/
+
+
+# APM dependencies
+apm_modules/

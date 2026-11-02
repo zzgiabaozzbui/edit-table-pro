@@ -23,6 +23,7 @@ type UsePasteHandlerOptions<T> = {
   columns: ColDef<T>[];
   activeCellRef: MutableRefObject<CellPos | null>;
   rowsDataRef: MutableRefObject<T[]>;
+  displayRowsRef: MutableRefObject<T[]>;
   dirtyRowsRef: MutableRefObject<Map<RowId, DirtyRow>>;
   historyRef: MutableRefObject<HistoryState>;
   editSessionStore: EditSessionStore;
@@ -41,6 +42,7 @@ export function usePasteHandler<T extends Record<string, string>>({
   columns,
   activeCellRef,
   rowsDataRef,
+  displayRowsRef,
   dirtyRowsRef,
   historyRef,
   editSessionStore,
@@ -67,9 +69,8 @@ export function usePasteHandler<T extends Record<string, string>>({
         (c) => c.editable !== false && !c.render,
       );
       const active = activeCellRef.current;
-      const currentRows = rowsDataRef.current;
       const activeRowIndex = active
-        ? getRowIndex(currentRows, active.rowId)
+        ? getRowIndex(displayRowsRef.current, active.rowId)
         : -1;
       const activeColIndex = active
         ? editableCols.findIndex((c) => c.key === active.colKey)
@@ -78,8 +79,9 @@ export function usePasteHandler<T extends Record<string, string>>({
       if (activeRowIndex !== -1 && activeColIndex !== -1) {
         const allRows = rowsDataRef.current;
         const needed = activeRowIndex + lines.length;
-        if (needed > allRows.length && createRow) {
-          const extra = needed - allRows.length;
+        const visibleCount = displayRowsRef.current.length;
+        if (needed > visibleCount && createRow) {
+          const extra = needed - visibleCount;
           appendRows(Array.from({ length: extra }, () => createRow()));
         }
         const batchEntries: Array<{
@@ -90,8 +92,12 @@ export function usePasteHandler<T extends Record<string, string>>({
         }> = [];
         const sideEffectCells: Array<{ cell: CellPos; value: string }> = [];
         for (let li = 0; li < lines.length; li++) {
-          const rowIndex = activeRowIndex + li;
-          if (rowIndex >= rowsDataRef.current.length) break;
+          const displayIndex = activeRowIndex + li;
+          const displayRow = displayRowsRef.current[displayIndex];
+          const rowIndex = displayRow
+            ? getRowIndex(rowsDataRef.current, getRowId(displayRow))
+            : allRows.length + displayIndex - visibleCount;
+          if (rowIndex < 0 || rowIndex >= rowsDataRef.current.length) break;
           const rowId = getRowId(rowsDataRef.current[rowIndex]);
           const values = lines[li].split("\t");
           for (let ci = 0; ci < values.length; ci++) {
@@ -166,6 +172,7 @@ export function usePasteHandler<T extends Record<string, string>>({
       columns,
       activeCellRef,
       rowsDataRef,
+      displayRowsRef,
       dirtyRowsRef,
       historyRef,
       editSessionStore,

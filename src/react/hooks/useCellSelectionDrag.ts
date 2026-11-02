@@ -4,7 +4,7 @@ import { type MutableRefObject, useCallback, useMemo, useRef } from "react";
 
 type UseCellSelectionDragOptions<T> = {
   activeCellState: CellPos | null;
-  rowsDataRef: MutableRefObject<T[]>;
+  displayRowsRef: MutableRefObject<T[]>;
   columns: ColDef<T>[];
   columnWidths: Map<string, number>;
   setCellSelection: (sel: CellSelectionRange | null) => void;
@@ -15,7 +15,7 @@ type ColumnSegment = { key: string; start: number; end: number };
 
 export function useCellSelectionDrag<T>({
   activeCellState,
-  rowsDataRef,
+  displayRowsRef,
   columns,
   columnWidths,
   setCellSelection,
@@ -60,7 +60,7 @@ export function useCellSelectionDrag<T>({
       const rowId = cellEl.getAttribute("data-rowid");
       if (!colKey || !rowId) return;
 
-      const rowIndex = getRowIndex(rowsDataRef.current, rowId);
+      const rowIndex = getRowIndex(displayRowsRef.current, rowId);
       if (rowIndex === -1) return;
 
       if (e.shiftKey) {
@@ -138,7 +138,7 @@ export function useCellSelectionDrag<T>({
     },
     [
       activeCellState,
-      rowsDataRef,
+      displayRowsRef,
       columns,
       columnWidths,
       setCellSelection,

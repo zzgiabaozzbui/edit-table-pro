@@ -113,7 +113,7 @@ function EditableTableInner<T extends Record<string, string>>(
 
   const { handleContainerPointerDown } = useCellSelectionDrag({
     activeCellState,
-    rowsDataRef,
+    displayRowsRef,
     columns,
     columnWidths,
     setCellSelection,

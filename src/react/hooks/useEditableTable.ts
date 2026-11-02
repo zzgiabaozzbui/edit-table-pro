@@ -308,6 +308,7 @@ export function useEditableTable<T extends Record<string, string>>(
     columns,
     getRowId,
     rowsDataRef,
+    displayRowsRef,
     dirtyRowsRef,
     historyRef,
     setRows: updateRows,
@@ -455,7 +456,7 @@ export function useEditableTable<T extends Record<string, string>>(
   const clearCellSelection = useCallback((): boolean => {
     const sel = cellSelection;
     if (!sel) return false;
-    const rows = rowsDataRef.current;
+    const rows = displayRowsRef.current;
     const visibleCols = columns.filter(
       (c) => !c.hidden && c.editable !== false && !c.render,
     );
@@ -491,7 +492,10 @@ export function useEditableTable<T extends Record<string, string>>(
           nextValue: "",
         });
       }
-      if (mutated) rowsDataRef.current[r] = mutated as T;
+      if (mutated) {
+        const dataIndex = getRowIndex(rowsDataRef.current, rowId);
+        if (dataIndex !== -1) rowsDataRef.current[dataIndex] = mutated as T;
+      }
     }
     if (batchEntries.length === 0) return false;
     pushBatchHistory(historyRef.current, batchEntries);
@@ -500,12 +504,20 @@ export function useEditableTable<T extends Record<string, string>>(
       runSideEffect({ rowId: entry.rowId, colKey: entry.colKey }, "", "blur");
     }
     return true;
-  }, [cellSelection, columns, getRowId, updateRows, runSideEffect]);
+  }, [
+    cellSelection,
+    columns,
+    getRowId,
+    getRowIndex,
+    updateRows,
+    runSideEffect,
+  ]);
 
   const { handlePaste } = usePasteHandler({
     columns: effectiveColumns,
     activeCellRef,
     rowsDataRef,
+    displayRowsRef,
     dirtyRowsRef,
     historyRef,
     editSessionStore,

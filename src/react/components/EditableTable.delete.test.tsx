@@ -27,6 +27,7 @@ describe("row deletion + structural history (#53)", () => {
       ref.current?.removeRows(["2"]);
     });
     expect(container.querySelector('[data-rowid="2"]')).toBeNull();
+    fireEvent.pointerDown(container.querySelector("input") as HTMLInputElement);
     await act(async () => {
       document.dispatchEvent(
         new KeyboardEvent("keydown", { ctrlKey: true, key: "z" }),
@@ -86,5 +87,47 @@ describe("row deletion + structural history (#53)", () => {
       await new Promise((r) => setTimeout(r, 20));
     });
     expect(onRowSave).toHaveBeenCalledWith({ id: "1", a: "hello" });
+  });
+
+  it("delete skips cells locked by editable function", () => {
+    const cols: ColDef<Row>[] = [
+      { key: "name", type: "text", editable: (r) => r.locked !== "1" },
+      { key: "ok", type: "boolean" },
+    ];
+    const { container } = render(
+      <EditableTable<Row>
+        columns={cols}
+        getRowId={getRowId}
+        initialData={[
+          { id: "1", name: "a" },
+          { id: "2", name: "b", locked: "1" },
+          { id: "3", name: "c" },
+        ]}
+      />,
+    );
+    const textOf = (el: HTMLElement) =>
+      el.querySelector("input")?.value ?? el.textContent;
+    const cell = (id: string) =>
+      container.querySelector(
+        `[data-rowid="${id}"][data-colkey="name"]`,
+      ) as HTMLElement;
+    (
+      container.querySelector(
+        '[data-rowid="1"][data-colkey="ok"] input',
+      ) as HTMLInputElement
+    ).focus();
+    act(() => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { ctrlKey: true, key: "a" }),
+      );
+    });
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete" }));
+    });
+    expect([cell("1"), cell("2"), cell("3")].map(textOf)).toEqual([
+      "",
+      "b",
+      "",
+    ]);
   });
 });

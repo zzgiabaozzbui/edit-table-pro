@@ -1,6 +1,6 @@
 import "./table.css";
 import { themeToVars } from "@/core/theme";
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { type EditableTableRef, TableProvider } from "../context/TableContext";
 import { useCellSelectionDrag } from "../hooks/useCellSelectionDrag";
 import {
@@ -92,8 +92,11 @@ function EditableTableInner<T extends Record<string, string>>(
     displayRows.length * rowHeight + headerHeight + footerHeight;
   const actualHeight = Math.min(height, contentHeight);
 
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
   useKeyboardNav({
     activeCellRef,
+    rootRef,
     columns,
     displayRowsRef,
     scrollContainerRef,
@@ -123,6 +126,7 @@ function EditableTableInner<T extends Record<string, string>>(
   return (
     <TableProvider value={ctx}>
       <div
+        ref={rootRef}
         className="et-root"
         onPaste={handlePaste}
         onPointerDown={handleContainerPointerDown}

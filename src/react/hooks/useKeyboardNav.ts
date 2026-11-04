@@ -17,6 +17,7 @@ type UseKeyboardNavOptions<T> = {
   columnWidths?: Map<string, number>;
   displayRowsRef: MutableRefObject<T[]>;
   scrollContainerRef: MutableRefObject<HTMLDivElement | null>;
+  rootRef: MutableRefObject<HTMLDivElement | null>;
   rowHeight: number;
   editSessionStore: EditSessionStore;
   cellRefs: MutableRefObject<Map<CellKey, HTMLElement>>;
@@ -36,6 +37,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
   columnWidths,
   displayRowsRef,
   scrollContainerRef,
+  rootRef,
   rowHeight,
   editSessionStore,
   cellRefs,
@@ -51,7 +53,18 @@ export function useKeyboardNav<T extends Record<string, string>>({
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const keyHandlerRef = useRef<(e: KeyboardEvent) => void>();
 
+  const lastPointerInsideRef = useRef(false);
+
   keyHandlerRef.current = (e: KeyboardEvent) => {
+    const focused = document.activeElement;
+    const root = rootRef.current;
+    const inScope =
+      !!root &&
+      (root.contains(focused) ||
+        ((focused === null || focused === document.body) &&
+          lastPointerInsideRef.current));
+    if (!inScope) return;
+
     const active = activeCellRef.current;
     const navigableCols = columns.filter(
       (c) => !c.hidden && c.editable !== false && !c.render,
@@ -140,6 +153,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     ) {
       e.preventDefault();
       const rows = displayRowsRef.current;
+      if (rows.length === 0) return;
       const visibleCols = columns.filter((c) => !c.hidden);
       const endRow = cellSelection.rowIndexEnd ?? cellSelection.rowIndex;
       const endColIdx = visibleCols.findIndex(
@@ -258,6 +272,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       const allRows = displayRowsRef.current;
       const colIdx = navigableCols.findIndex((c) => c.key === from.colKey);
       const rowIdx = getRowIndex(allRows, from.rowId);
+      if (rowIdx === -1 || navigableCols.length === 0) return;
 
       let nextColIdx = colIdx;
       let nextRowIdx = rowIdx;
@@ -391,7 +406,15 @@ export function useKeyboardNav<T extends Record<string, string>>({
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => keyHandlerRef.current?.(e);
+    const onPointerDown = (e: PointerEvent) => {
+      lastPointerInsideRef.current =
+        rootRef.current?.contains(e.target as Node) ?? false;
+    };
     document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => {
+      document.removeEventListener("keydown", handler);
+      document.removeEventListener("pointerdown", onPointerDown, true);
+    };
+  }, [rootRef]);
 }

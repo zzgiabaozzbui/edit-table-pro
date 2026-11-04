@@ -18,6 +18,7 @@ import {
   useCallback,
   useMemo,
 } from "react";
+import { resolveEditable } from "./useFill";
 
 type UsePasteHandlerOptions<T> = {
   columns: ColDef<T>[];
@@ -103,6 +104,8 @@ export function usePasteHandler<T extends Record<string, string>>({
           for (let ci = 0; ci < values.length; ci++) {
             const col = editableCols[activeColIndex + ci];
             if (!col) break;
+            if (!resolveEditable(col.editable, rowsDataRef.current[rowIndex]))
+              continue;
             const trimmed = values[ci].trim();
             const validation = validateCell(
               col,
@@ -156,7 +159,8 @@ export function usePasteHandler<T extends Record<string, string>>({
           const values = line.split("\t");
           const row = createRow();
           editableCols.forEach((col, i) => {
-            if (values[i] === undefined) return;
+            if (values[i] === undefined || !resolveEditable(col.editable, row))
+              return;
             const trimmed = values[i].trim();
             const validation = validateCell(col, trimmed, row as T);
             (row as Record<string, string>)[col.key] = validation.ok

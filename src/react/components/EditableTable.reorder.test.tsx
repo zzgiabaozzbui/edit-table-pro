@@ -109,6 +109,54 @@ describe("row drag to reorder (#17)", () => {
     expect(orderOf(container)).toEqual(["one", "two", "three"]);
   });
 
+  it("row drag ends after handle unmounts", async () => {
+    const many = Array.from({ length: 300 }, (_, i) => ({
+      id: String(i + 1),
+      a: `r${i + 1}`,
+    }));
+    const { container } = render(
+      <EditableTable<Row>
+        columns={columns}
+        getRowId={getRowId}
+        initialData={many}
+        rowHeight={36}
+        rowDraggable
+      />,
+    );
+    const handleOf = (id: string) =>
+      container.querySelector(`[data-rowid="${id}"][aria-label="Drag row"]`);
+    const scroll = container.querySelector(".et-scroll") as HTMLElement;
+    Object.defineProperty(scroll, "scrollHeight", { value: 300 * 36 });
+    await act(async () => {
+      fireEvent.pointerDown(handleOf("1") as HTMLElement, {
+        pointerId: 1,
+        clientY: 10,
+      });
+      fireEvent.pointerMove(handleOf("1") as HTMLElement, {
+        pointerId: 1,
+        clientY: 100,
+      });
+    });
+    // rows 1-2 leave the render window (overscan 5); drop-target row 3 stays
+    await act(async () => {
+      scroll.scrollTop = 36 * 7;
+      fireEvent.scroll(scroll);
+    });
+    expect(handleOf("1")).toBeNull();
+    const rowOf = (id: string) =>
+      container.querySelector(
+        `.et-row[aria-rowindex="${Number(id) + 1}"]`,
+      ) as HTMLElement;
+    expect(rowOf("3").style.boxShadow).not.toBe("");
+    await act(async () => {
+      fireEvent.pointerUp(document, { pointerId: 1 });
+    });
+    for (const row of container.querySelectorAll<HTMLElement>(".et-row")) {
+      expect(row.style.opacity).toBe("");
+      expect(row.style.boxShadow).toBe("");
+    }
+  });
+
   it("no drag handle without rowDraggable", () => {
     const { container } = render(
       <EditableTable<Row>

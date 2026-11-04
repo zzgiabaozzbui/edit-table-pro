@@ -31,7 +31,7 @@ export function FillHandle({
   const previewRangeRef = useRef<CellRange | null>(null);
 
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
-    // Capture pointer so pointermove/pointerup always fire on this element
+    // Capture pointer; move/up listen on document so they survive this button unmounting
     const btn = e.currentTarget;
     try {
       btn.setPointerCapture(e.pointerId);
@@ -166,15 +166,16 @@ export function FillHandle({
       if (container) {
         const rect = container.getBoundingClientRect();
         const speed = computeEdgeScrollSpeed(ev.clientY, rect.top, rect.bottom);
-        if (speed !== 0) startAutoScroll(container, speed);
+        if (speed === 0) stopAutoScroll();
+        else startAutoScroll(container, speed);
       }
     };
 
     const onPointerUp = () => {
       cancelAnimationFrame(rafId);
-      btn.removeEventListener("pointermove", onPointerMove);
-      btn.removeEventListener("pointerup", onPointerUp);
-      btn.removeEventListener("pointercancel", onPointerUp);
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointercancel", onPointerUp);
       stopAutoScroll();
       const range = previewRangeRef.current;
       if (range) {
@@ -206,9 +207,9 @@ export function FillHandle({
       previewRangeRef.current = null;
     };
 
-    btn.addEventListener("pointermove", onPointerMove);
-    btn.addEventListener("pointerup", onPointerUp);
-    btn.addEventListener("pointercancel", onPointerUp);
+    document.addEventListener("pointermove", onPointerMove);
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerUp);
   };
 
   // Hide handle when another cell is being dragged

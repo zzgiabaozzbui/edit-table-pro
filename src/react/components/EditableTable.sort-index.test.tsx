@@ -113,6 +113,7 @@ describe("display row indices", () => {
       "input",
     ) as HTMLInputElement;
     fireEvent.focus(input);
+    fireEvent.pointerDown(input);
     fireEvent.paste(input, { clipboardData: { getData: () => "X\nY" } });
     expect(value(container, "3")).toBe("X");
     expect(value(container, "1")).toBe("Y");
@@ -145,6 +146,7 @@ describe("display row indices", () => {
       "input",
     ) as HTMLInputElement;
     fireEvent.focus(input);
+    fireEvent.pointerDown(input);
     fireEvent.paste(input, { clipboardData: { getData: () => "X\nY" } });
     expect(value(container, "1")).toBe("X");
     expect(value(container, "3")).toBe("Y");

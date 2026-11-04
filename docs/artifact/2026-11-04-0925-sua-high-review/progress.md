@@ -12,8 +12,8 @@ plan_duyet: e4d708f
 | T3 | H3 · undo/redo cập nhật dirty | — | edit-table-pro-lib-dev | `useHistoryOps.ts`, `useEditableTable.ts`, `useEditableTable.dirty.test.tsx` | CHỜ-USER — duyệt 2 Tự chọn của test: batch undo kiểm qua clearCellSelection thay vì paste 2×2; test mới dùng bản sao initialData |
 | T4 | H4a · paste tôn trọng `editable` hàm | — | edit-table-pro-lib-dev | `useFill.ts`, `usePasteHandler.ts`, `EditableTable.paste-batch.test.tsx` | DONE — `013bf74` · R0 · F0 |
 | T5 | H4b · Delete vùng chọn tôn trọng `editable` hàm | T3, T4 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete.test.tsx` | TODO |
-| T6 | H5 · cột text pin sticky | — | edit-table-pro-lib-dev | `VirtualBody.tsx`, `EditableTable.frozen.test.tsx` | DOING — base 013bf74 |
-| T7 | H6 · fill handle không kẹt | — | edit-table-pro-lib-dev | `FillHandle.tsx`, `EditableTable.fill-drag.test.tsx` | TODO |
+| T6 | H5 · cột text pin sticky | — | edit-table-pro-lib-dev | `VirtualBody.tsx`, `EditableTable.frozen.test.tsx` | DONE — `5c36022` · R0 · F0 |
+| T7 | H6 · fill handle không kẹt | — | edit-table-pro-lib-dev | `FillHandle.tsx`, `EditableTable.fill-drag.test.tsx` | DOING — base 5c36022 |
 | T8 | H7 · row drag không kẹt | — | edit-table-pro-lib-dev | `RowDragHandle.tsx`, `EditableTable.reorder.test.tsx` | TODO |
 | T9 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8 | main | `CHANGELOG.md` | TODO |
 

@@ -219,7 +219,10 @@ export function useFill<T extends Record<string, string>>({
   return { fillState, setFillState, applyFill };
 }
 
-function resolveEditable<T>(editable: ColDef<T>["editable"], row: T): boolean {
+export function resolveEditable<T>(
+  editable: ColDef<T>["editable"],
+  row: T,
+): boolean {
   if (editable === undefined || editable === true) return true;
   if (editable === false) return false;
   return editable(row);

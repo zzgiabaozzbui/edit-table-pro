@@ -15,7 +15,7 @@ plan_duyet: e4d708f
 | T6 | H5 · cột text pin sticky | — | edit-table-pro-lib-dev | `VirtualBody.tsx`, `EditableTable.frozen.test.tsx` | DONE — `5c36022` · R0 · F0 |
 | T7 | H6 · fill handle không kẹt | — | edit-table-pro-lib-dev | `FillHandle.tsx`, `EditableTable.fill-drag.test.tsx` | DONE — `f0c4759` · R0 · F0 |
 | T8 | H7 · row drag không kẹt | — | edit-table-pro-lib-dev | `RowDragHandle.tsx`, `EditableTable.reorder.test.tsx` | DONE — `84593f1` · R0 · F0 |
-| T9 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8 | main | `CHANGELOG.md` | CHỜ-USER — build vượt budget: index.cjs 55,053 B / 55,000 B (base 54,409 B, +644 B do 7 fix); nâng budget hay cắt code |
+| T9 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8 | main | `CHANGELOG.md` | DONE — `d2247e3` · R0 · F1 |
 
 ## Kiểm trước khi chạy
 - T1, T2 · chung `useKeyboardNav.ts` · tuần tự (T2 phụ thuộc T1), không xung đột.
@@ -31,6 +31,7 @@ plan_duyet: e4d708f
 - 2026-11-04 · T2 được sửa thêm 4 file test cũ (`EditableTable.{keyboard-nav,delete,paste-batch,sort-index}.test.tsx`): chỉ thêm focus / pointerDown trong bảng trước khi gửi phím, không đổi assertion · USER
 - 2026-11-04 · T3 chấp nhận 2 Tự chọn của test: undo batch kiểm qua clearCellSelection; test mới dùng bản sao initialData · USER
 - 2026-11-04 · T5 chấp nhận Tự chọn của test: chọn vùng bằng Ctrl+A từ cột boolean phụ thay vì kéo chọn · USER
+- 2026-11-04 · Nâng budget `index.cjs` 55 kB → 56 kB (`scripts/post-build.mjs`, commit riêng `c689e99`) · USER
 
 ## Đã thử, không được
 - 2026-11-04 · đo size bản base bằng git worktree tạm có junction `node_modules` rồi `git worktree remove --force` · lệnh xoá đi theo junction, làm rỗng `node_modules` của repo; đã khôi phục bằng `npm ci`. Lần sau đo base bằng `npm ci` riêng trong worktree, không junction

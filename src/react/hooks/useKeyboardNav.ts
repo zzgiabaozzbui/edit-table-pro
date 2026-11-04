@@ -140,6 +140,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     ) {
       e.preventDefault();
       const rows = displayRowsRef.current;
+      if (rows.length === 0) return;
       const visibleCols = columns.filter((c) => !c.hidden);
       const endRow = cellSelection.rowIndexEnd ?? cellSelection.rowIndex;
       const endColIdx = visibleCols.findIndex(
@@ -258,6 +259,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       const allRows = displayRowsRef.current;
       const colIdx = navigableCols.findIndex((c) => c.key === from.colKey);
       const rowIdx = getRowIndex(allRows, from.rowId);
+      if (rowIdx === -1 || navigableCols.length === 0) return;
 
       let nextColIdx = colIdx;
       let nextRowIdx = rowIdx;

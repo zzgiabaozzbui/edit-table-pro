@@ -1,5 +1,5 @@
 ---
-chay_tu:
+chay_tu: 3a0ef29
 plan_duyet: e4d708f
 ---
 
@@ -7,7 +7,7 @@ plan_duyet: e4d708f
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
-| T1 | H2 · `navigate` không ném lỗi | — | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.keyboard-nav.test.tsx` | TODO |
+| T1 | H2 · `navigate` không ném lỗi | — | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.keyboard-nav.test.tsx` | DOING — base 3a0ef29 |
 | T2 | H1 · phím tắt chỉ cho bảng đang dùng | T1 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.tsx`, `EditableTable.keyboard-scope.test.tsx` | TODO |
 | T3 | H3 · undo/redo cập nhật dirty | — | edit-table-pro-lib-dev | `useHistoryOps.ts`, `useEditableTable.ts`, `useEditableTable.dirty.test.tsx` | TODO |
 | T4 | H4a · paste tôn trọng `editable` hàm | — | edit-table-pro-lib-dev | `useFill.ts`, `usePasteHandler.ts`, `EditableTable.paste-batch.test.tsx` | TODO |
@@ -18,6 +18,10 @@ plan_duyet: e4d708f
 | T9 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8 | main | `CHANGELOG.md` | TODO |
 
 ## Kiểm trước khi chạy
+- T1, T2 · chung `useKeyboardNav.ts` · tuần tự (T2 phụ thuộc T1), không xung đột.
+- T3, T5 · chung `useEditableTable.ts` (T3 chỉ truyền `dirtyRowsRef`, T5 sửa `clearCellSelection`) · tuần tự, không xung đột.
+- T4, T5 · interface `resolveEditable` (T4 export, T5 dùng) · T5 phụ thuộc T4, khớp.
+- Không task nào có chỗ plan không nói đủ.
 
 ## Đã chốt
 - 2026-11-04 · Duyệt plan (kèm sửa intent H6/H7: kéo tiếp tục khi row nguồn unmount) · USER

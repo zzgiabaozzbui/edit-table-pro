@@ -9,8 +9,8 @@ plan_duyet: e4d708f
 |---|---|---|---|---|---|
 | T1 | H2 · `navigate` không ném lỗi | — | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.keyboard-nav.test.tsx` | DONE — `28004b9` · R0 · F0 |
 | T2 | H1 · phím tắt chỉ cho bảng đang dùng | T1 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.tsx`, `EditableTable.keyboard-scope.test.tsx` | DONE — `ad1b3cb` · R0 · F1 |
-| T3 | H3 · undo/redo cập nhật dirty | — | edit-table-pro-lib-dev | `useHistoryOps.ts`, `useEditableTable.ts`, `useEditableTable.dirty.test.tsx` | DOING — base ad1b3cb |
-| T4 | H4a · paste tôn trọng `editable` hàm | — | edit-table-pro-lib-dev | `useFill.ts`, `usePasteHandler.ts`, `EditableTable.paste-batch.test.tsx` | TODO |
+| T3 | H3 · undo/redo cập nhật dirty | — | edit-table-pro-lib-dev | `useHistoryOps.ts`, `useEditableTable.ts`, `useEditableTable.dirty.test.tsx` | CHỜ-USER — duyệt 2 Tự chọn của test: batch undo kiểm qua clearCellSelection thay vì paste 2×2; test mới dùng bản sao initialData |
+| T4 | H4a · paste tôn trọng `editable` hàm | — | edit-table-pro-lib-dev | `useFill.ts`, `usePasteHandler.ts`, `EditableTable.paste-batch.test.tsx` | DOING — base 088932d |
 | T5 | H4b · Delete vùng chọn tôn trọng `editable` hàm | T3, T4 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete.test.tsx` | TODO |
 | T6 | H5 · cột text pin sticky | — | edit-table-pro-lib-dev | `VirtualBody.tsx`, `EditableTable.frozen.test.tsx` | TODO |
 | T7 | H6 · fill handle không kẹt | — | edit-table-pro-lib-dev | `FillHandle.tsx`, `EditableTable.fill-drag.test.tsx` | TODO |

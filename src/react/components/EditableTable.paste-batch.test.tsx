@@ -37,6 +37,7 @@ describe("paste creates a single undo entry (#37)", () => {
     );
     const input = container.querySelector("input") as HTMLInputElement;
     fireEvent.focus(input);
+    fireEvent.pointerDown(input);
     paste(input, "m\tn\no\tp");
 
     expect(inputValue(container, "1", "a")).toBe("m");

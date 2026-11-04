@@ -27,6 +27,7 @@ describe("row deletion + structural history (#53)", () => {
       ref.current?.removeRows(["2"]);
     });
     expect(container.querySelector('[data-rowid="2"]')).toBeNull();
+    fireEvent.pointerDown(container.querySelector("input") as HTMLInputElement);
     await act(async () => {
       document.dispatchEvent(
         new KeyboardEvent("keydown", { ctrlKey: true, key: "z" }),

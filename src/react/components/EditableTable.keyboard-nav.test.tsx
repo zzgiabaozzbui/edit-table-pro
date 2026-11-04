@@ -111,6 +111,7 @@ describe("Keyboard navigation — horizontal + paging (#42)", () => {
     const container = renderTable();
     const b = inputAt(container, "2", "b");
     b.focus();
+    fireEvent.pointerDown(b);
     b.blur();
     expect(document.activeElement).not.toBe(b);
     await pressKey("F2");

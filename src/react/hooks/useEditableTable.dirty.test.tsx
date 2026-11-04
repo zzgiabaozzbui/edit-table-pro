@@ -105,3 +105,50 @@ describe("onCellCommit callback (#36)", () => {
     expect(onCellCommit).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("undo/redo keep the dirty tracker in sync", () => {
+  it("undo reverts dirty", async () => {
+    const { result } = setup({
+      initialData: initialData.map((r) => ({ ...r })),
+    });
+    await commit(result, "1", "name", "B");
+    act(() => result.current.undo());
+    expect(result.current.getDirtyRows()).toEqual([]);
+    act(() => result.current.redo());
+    expect(result.current.getDirtyRows()).toEqual([
+      { rowId: "1", changes: { name: "B" } },
+    ]);
+  });
+
+  it("undo batch reverts dirty", () => {
+    const { result } = setup({
+      initialData: initialData.map((r) => ({ ...r })),
+    });
+    act(() =>
+      result.current.setCellSelection({
+        rowIndex: 0,
+        rowIndexEnd: 1,
+        colKeyStart: "name",
+        colKeyEnd: "qty",
+      } as never),
+    );
+    act(() => {
+      result.current.clearCellSelection();
+    });
+    expect(result.current.getDirtyRows().length).toBe(2);
+    act(() => result.current.undo());
+    expect(result.current.getDirtyRows()).toEqual([]);
+  });
+
+  it("undo after markSaved marks dirty", async () => {
+    const { result } = setup({
+      initialData: initialData.map((r) => ({ ...r })),
+    });
+    await commit(result, "1", "name", "B");
+    act(() => result.current.markSaved());
+    act(() => result.current.undo());
+    expect(result.current.getDirtyRows()).toEqual([
+      { rowId: "1", changes: { name: "a" } },
+    ]);
+  });
+});

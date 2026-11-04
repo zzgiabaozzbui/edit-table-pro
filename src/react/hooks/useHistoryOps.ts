@@ -1,6 +1,7 @@
+import { markDirty } from "@/core/dirty";
 import { redoHistory, undoHistory } from "@/core/history";
 import type { EditSessionStore } from "@/core/session";
-import type { HistoryState, RowId } from "@/core/types";
+import type { DirtyRow, HistoryState, RowId } from "@/core/types";
 import { makeCellKey } from "@/core/types";
 import {
   type Dispatch,
@@ -13,6 +14,7 @@ type UseHistoryOpsOptions<T> = {
   getRowId: (row: T) => string;
   rowsDataRef: MutableRefObject<T[]>;
   historyRef: MutableRefObject<HistoryState>;
+  dirtyRowsRef: MutableRefObject<Map<RowId, DirtyRow>>;
   editSessionStore: EditSessionStore;
   setRows: Dispatch<SetStateAction<T[]>>;
 };
@@ -21,9 +23,19 @@ export function useHistoryOps<T extends Record<string, string>>({
   getRowId,
   rowsDataRef,
   historyRef,
+  dirtyRowsRef,
   editSessionStore,
   setRows,
 }: UseHistoryOpsOptions<T>) {
+  const writeCell = useCallback(
+    (idx: number, rowId: RowId, colKey: string, value: string) => {
+      const row = rowsDataRef.current[idx];
+      markDirty(dirtyRowsRef.current, rowId, colKey, row[colKey], value);
+      rowsDataRef.current[idx] = { ...row, [colKey]: value };
+    },
+    [rowsDataRef, dirtyRowsRef],
+  );
+
   const undo = useCallback(() => {
     const entry = undoHistory(historyRef.current);
     if (!entry) return;
@@ -63,10 +75,7 @@ export function useHistoryOps<T extends Record<string, string>>({
           (r) => getRowId(r) === e.rowId,
         );
         if (idx !== -1) {
-          rowsDataRef.current[idx] = {
-            ...rowsDataRef.current[idx],
-            [e.colKey]: e.prevValue,
-          };
+          writeCell(idx, e.rowId, e.colKey, e.prevValue);
           editSessionStore.delete(makeCellKey(e.rowId, e.colKey));
         }
       }
@@ -76,15 +85,12 @@ export function useHistoryOps<T extends Record<string, string>>({
         (r) => getRowId(r) === entry.rowId,
       );
       if (rowIndex !== -1) {
-        rowsDataRef.current[rowIndex] = {
-          ...rowsDataRef.current[rowIndex],
-          [entry.colKey]: entry.prevValue,
-        };
+        writeCell(rowIndex, entry.rowId, entry.colKey, entry.prevValue);
         editSessionStore.delete(makeCellKey(entry.rowId, entry.colKey));
         setRows([...rowsDataRef.current]);
       }
     }
-  }, [getRowId, editSessionStore, rowsDataRef, historyRef, setRows]);
+  }, [getRowId, editSessionStore, rowsDataRef, historyRef, writeCell, setRows]);
 
   const redo = useCallback(() => {
     const entry = redoHistory(historyRef.current);
@@ -124,10 +130,7 @@ export function useHistoryOps<T extends Record<string, string>>({
           (r) => getRowId(r) === e.rowId,
         );
         if (idx !== -1) {
-          rowsDataRef.current[idx] = {
-            ...rowsDataRef.current[idx],
-            [e.colKey]: e.nextValue,
-          };
+          writeCell(idx, e.rowId, e.colKey, e.nextValue);
           editSessionStore.delete(makeCellKey(e.rowId, e.colKey));
         }
       }
@@ -137,15 +140,12 @@ export function useHistoryOps<T extends Record<string, string>>({
         (r) => getRowId(r) === entry.rowId,
       );
       if (rowIndex !== -1) {
-        rowsDataRef.current[rowIndex] = {
-          ...rowsDataRef.current[rowIndex],
-          [entry.colKey]: entry.nextValue,
-        };
+        writeCell(rowIndex, entry.rowId, entry.colKey, entry.nextValue);
         editSessionStore.delete(makeCellKey(entry.rowId, entry.colKey));
         setRows([...rowsDataRef.current]);
       }
     }
-  }, [getRowId, editSessionStore, rowsDataRef, historyRef, setRows]);
+  }, [getRowId, editSessionStore, rowsDataRef, historyRef, writeCell, setRows]);
 
   return { undo, redo };
 }

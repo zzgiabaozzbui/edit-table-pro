@@ -299,6 +299,7 @@ export function useEditableTable<T extends Record<string, string>>(
     getRowId,
     rowsDataRef,
     historyRef,
+    dirtyRowsRef,
     editSessionStore,
     setRows: updateRows,
   });

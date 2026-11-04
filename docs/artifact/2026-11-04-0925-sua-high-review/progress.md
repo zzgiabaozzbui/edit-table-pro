@@ -1,6 +1,6 @@
 ---
 chay_tu:
-plan_duyet:
+plan_duyet: e4d708f
 ---
 
 # Progress — sửa 7 lỗi HIGH

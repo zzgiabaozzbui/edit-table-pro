@@ -8,8 +8,8 @@ plan_duyet: e4d708f
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
 | T1 | H2 · `navigate` không ném lỗi | — | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.keyboard-nav.test.tsx` | DONE — `28004b9` · R0 · F0 |
-| T2 | H1 · phím tắt chỉ cho bảng đang dùng | T1 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.tsx`, `EditableTable.keyboard-scope.test.tsx` | DOING — base 28004b9 |
-| T3 | H3 · undo/redo cập nhật dirty | — | edit-table-pro-lib-dev | `useHistoryOps.ts`, `useEditableTable.ts`, `useEditableTable.dirty.test.tsx` | TODO |
+| T2 | H1 · phím tắt chỉ cho bảng đang dùng | T1 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `EditableTable.tsx`, `EditableTable.keyboard-scope.test.tsx` | DONE — `ad1b3cb` · R0 · F1 |
+| T3 | H3 · undo/redo cập nhật dirty | — | edit-table-pro-lib-dev | `useHistoryOps.ts`, `useEditableTable.ts`, `useEditableTable.dirty.test.tsx` | DOING — base ad1b3cb |
 | T4 | H4a · paste tôn trọng `editable` hàm | — | edit-table-pro-lib-dev | `useFill.ts`, `usePasteHandler.ts`, `EditableTable.paste-batch.test.tsx` | TODO |
 | T5 | H4b · Delete vùng chọn tôn trọng `editable` hàm | T3, T4 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete.test.tsx` | TODO |
 | T6 | H5 · cột text pin sticky | — | edit-table-pro-lib-dev | `VirtualBody.tsx`, `EditableTable.frozen.test.tsx` | TODO |
@@ -28,5 +28,6 @@ plan_duyet: e4d708f
 - 2026-11-04 · Cách chạy: chạy ngay, giao agent (`subagent-driven-development`) · USER
 - 2026-11-04 · Chế độ hỏi: gom cuối · USER
 - 2026-11-04 · Nhánh `fix/high-review` · USER
+- 2026-11-04 · T2 được sửa thêm 4 file test cũ (`EditableTable.{keyboard-nav,delete,paste-batch,sort-index}.test.tsx`): chỉ thêm focus / pointerDown trong bảng trước khi gửi phím, không đổi assertion · USER
 
 ## Đã thử, không được

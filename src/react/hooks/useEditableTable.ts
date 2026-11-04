@@ -42,7 +42,7 @@ import type { TableContextValue, TableProps } from "../context/TableContext";
 import { useCellCommit } from "./useCellCommit";
 import { useColumnResize } from "./useColumnResize";
 import { useControllableState } from "./useControllableState";
-import { useFill } from "./useFill";
+import { resolveEditable, useFill } from "./useFill";
 import { useHistoryOps } from "./useHistoryOps";
 import { usePasteHandler } from "./usePasteHandler";
 import { useRowSelection } from "./useRowSelection";
@@ -481,9 +481,10 @@ export function useEditableTable<T extends Record<string, string>>(
       const rowId = getRowId(row);
       let mutated: Record<string, string> | null = null;
       for (let c = lo; c <= hi; c++) {
-        const colKey = visibleCols[c].key;
+        const col = visibleCols[c];
+        const colKey = col.key;
         const prevValue = row[colKey] ?? "";
-        if (prevValue === "") continue;
+        if (prevValue === "" || !resolveEditable(col.editable, row)) continue;
         mutated = { ...(mutated ?? row), [colKey]: "" };
         markDirty(dirtyRowsRef.current, rowId, colKey, prevValue, "");
         batchEntries.push({

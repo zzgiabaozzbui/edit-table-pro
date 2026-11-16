@@ -319,6 +319,7 @@ export function VirtualBody<T extends Record<string, string>>({
                     cell={{ rowId, colKey: col.key }}
                     initialValue={liveRow[col.key] ?? ""}
                     width={colWidth}
+                    pinnedStyle={pinStyles[col.key]}
                     placeholder={col.placeholder}
                     ellipsis={col.ellipsis}
                     align={col.align}

@@ -111,6 +111,7 @@ describe("Keyboard navigation — horizontal + paging (#42)", () => {
     const container = renderTable();
     const b = inputAt(container, "2", "b");
     b.focus();
+    fireEvent.pointerDown(b);
     b.blur();
     expect(document.activeElement).not.toBe(b);
     await pressKey("F2");
@@ -169,5 +170,61 @@ describe("Native controls keep their arrow keys (#33)", () => {
       expect(e.defaultPrevented).toBe(false);
     });
     expect(document.activeElement).toBe(date);
+  });
+});
+
+describe("navigate: unreachable active cell", () => {
+  async function pressKeysCollectErrors(keys: string[]) {
+    const errors: unknown[] = [];
+    const onError = (ev: ErrorEvent) => {
+      ev.preventDefault();
+      errors.push(ev.error);
+    };
+    window.addEventListener("error", onError);
+    for (const key of keys) await pressKey(key);
+    window.removeEventListener("error", onError);
+    return errors;
+  }
+
+  it("navigate: active row filtered out by search", async () => {
+    const { container } = render(
+      <EditableTable<Row>
+        columns={columns}
+        getRowId={getRowId}
+        initialData={data}
+        rowHeight={36}
+        searchable
+      />,
+    );
+    inputAt(container, "1", "b").focus();
+    fireEvent.change(
+      container.querySelector('[data-testid="et-search-input"]') as Element,
+      { target: { value: "a5" } },
+    );
+    expect(inputAt(container, "1", "b")).toBeNull();
+    const errors = await pressKeysCollectErrors([
+      "Tab",
+      "Home",
+      "End",
+      "ArrowLeft",
+      "ArrowRight",
+    ]);
+    expect(errors).toEqual([]);
+  });
+
+  it("navigate: all columns readonly", async () => {
+    const props = { getRowId, initialData: data, rowHeight: 36 };
+    const { container, rerender } = render(
+      <EditableTable<Row> columns={columns} {...props} />,
+    );
+    inputAt(container, "1", "a").focus();
+    rerender(
+      <EditableTable<Row>
+        columns={columns.map((c) => ({ ...c, editable: false }))}
+        {...props}
+      />,
+    );
+    const errors = await pressKeysCollectErrors(["ArrowDown", "Tab"]);
+    expect(errors).toEqual([]);
   });
 });

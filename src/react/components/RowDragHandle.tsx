@@ -65,7 +65,6 @@ export function RowDragHandle({
         });
         targetRef.current = rowIndex;
 
-        const btn = e.currentTarget;
         let finished = false;
         const onMove = (ev: PointerEvent) => {
           const t = computeTarget(ev.clientY);
@@ -77,15 +76,15 @@ export function RowDragHandle({
         const onUp = () => {
           if (finished) return;
           finished = true;
-          btn.removeEventListener("pointermove", onMove);
-          btn.removeEventListener("pointerup", onUp);
-          btn.removeEventListener("pointercancel", onUp);
+          document.removeEventListener("pointermove", onMove);
+          document.removeEventListener("pointerup", onUp);
+          document.removeEventListener("pointercancel", onUp);
           setRowDrag((prev) => ({ ...prev, active: false }));
           moveRow(rowIndex, targetRef.current);
         };
-        btn.addEventListener("pointermove", onMove);
-        btn.addEventListener("pointerup", onUp);
-        btn.addEventListener("pointercancel", onUp);
+        document.addEventListener("pointermove", onMove);
+        document.addEventListener("pointerup", onUp);
+        document.addEventListener("pointercancel", onUp);
       }}
     >
       ⠿

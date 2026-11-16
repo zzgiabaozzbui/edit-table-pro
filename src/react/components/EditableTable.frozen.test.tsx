@@ -49,4 +49,23 @@ describe("frozen columns (#15)", () => {
     // c is pinned right after a(150 default)+b(120)
     expect(headers[2].style.right).toBe("0px");
   });
+
+  it("editable text column pinned left is sticky in body", () => {
+    const cols: ColDef<Row>[] = [{ key: "name", type: "text", fixed: "left" }];
+    const { container } = render(
+      <EditableTable<Row>
+        columns={cols}
+        getRowId={(r) => r.id}
+        initialData={[{ id: "1", name: "a" }]}
+      />,
+    );
+    const cell = container.querySelector(
+      '[data-rowid="1"][data-colkey="name"]',
+    ) as HTMLElement;
+    const header = container.querySelector(
+      '[role="columnheader"]',
+    ) as HTMLElement;
+    expect(cell.style.position).toBe("sticky");
+    expect(cell.style.left).toBe(header.style.left);
+  });
 });

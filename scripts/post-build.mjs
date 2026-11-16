@@ -24,7 +24,7 @@ const BUDGET = {
   // (sorting, delete rows, controlled props, clipboard/selection keyboard surface,
   // horizontal fill, auto-scroll, footer, skeleton, ARIA grid, labels, dark theme)
   "index.js": 92_000,
-  "index.cjs": 55_000,
+  "index.cjs": 56_000,
   "style.css": 6_000,
 };
 

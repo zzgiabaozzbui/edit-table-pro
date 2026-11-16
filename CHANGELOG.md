@@ -5,6 +5,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+- **Shortcuts leaking outside the table** — keys (including Ctrl+Z/Y) are handled only when
+  focus is inside the table, or on the page body after a click inside it; two tables on one
+  page no longer undo together.
+- **Keyboard crash** — navigation no longer throws when the active row is filtered out by
+  search or every column is readonly.
+- **Dirty state after undo/redo** — `getDirtyRows()` follows undo/redo instead of reporting
+  the undone value.
+- **Per-row `editable` ignored by paste and Delete** — cells locked by an
+  `editable: (row) => boolean` function are skipped, including rows created by `createRow`.
+- **Pinned text column not sticky** — editable text columns with `fixed` stay pinned in the
+  body, aligned with the header.
+- **Stuck fill drag** — the fill drag keeps working when its source row scrolls out of the
+  virtual window, and edge auto-scroll stops when the pointer leaves the edge.
+- **Stuck row drag** — releasing the pointer ends a row drag even after the dragged row
+  scrolled out of the virtual window.
+
 ## [0.3.1] — 2026-11-02
 
 ### Fixed

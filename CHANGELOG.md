@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-11-17
+
 ### Added
 - **Theme presets** — `GREEN_THEME`, `PURPLE_THEME`, `ORANGE_THEME` (light, primary ≥ 3:1 on white)
   exported next to `DARK_THEME`; the demo has a theme picker.
@@ -206,7 +208,8 @@ Virtual scroll, inline validation, side effects, undo/redo, fill handle,
 multi-cell selection, Excel/Sheets paste, row selection, column resize, CSV
 export, theming.
 
-[Unreleased]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.1.1...v0.2.0

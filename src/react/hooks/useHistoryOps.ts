@@ -55,10 +55,11 @@ export function useHistoryOps<T extends Record<string, string>>({
       } else if (entry.op === "remove") {
         // Undo a delete: re-insert rows at original positions (stable, desc order)
         const ordered = [...entry.rows].sort((a, b) => b.index - a.index);
-        for (const { rowId, index, row } of ordered) {
+        for (const { rowId, index, row, dirty } of ordered) {
           if (rowsDataRef.current.some((r) => getRowId(r) === rowId)) continue;
           const at = Math.min(index, rowsDataRef.current.length);
           rowsDataRef.current.splice(at, 0, row as T);
+          if (dirty) dirtyRowsRef.current.set(rowId, dirty);
         }
       } else {
         const ids = new Set(entry.rows.map((r) => r.rowId));
@@ -90,7 +91,15 @@ export function useHistoryOps<T extends Record<string, string>>({
         setRows([...rowsDataRef.current]);
       }
     }
-  }, [getRowId, editSessionStore, rowsDataRef, historyRef, writeCell, setRows]);
+  }, [
+    getRowId,
+    editSessionStore,
+    rowsDataRef,
+    historyRef,
+    dirtyRowsRef,
+    writeCell,
+    setRows,
+  ]);
 
   const redo = useCallback(() => {
     const entry = redoHistory(historyRef.current);
@@ -113,6 +122,7 @@ export function useHistoryOps<T extends Record<string, string>>({
         rowsDataRef.current = rowsDataRef.current.filter(
           (r) => !ids.has(getRowId(r)),
         );
+        for (const id of ids) dirtyRowsRef.current.delete(id);
       } else {
         // insert
         const ordered = [...entry.rows].sort((a, b) => a.index - b.index);
@@ -145,7 +155,15 @@ export function useHistoryOps<T extends Record<string, string>>({
         setRows([...rowsDataRef.current]);
       }
     }
-  }, [getRowId, editSessionStore, rowsDataRef, historyRef, writeCell, setRows]);
+  }, [
+    getRowId,
+    editSessionStore,
+    rowsDataRef,
+    historyRef,
+    dirtyRowsRef,
+    writeCell,
+    setRows,
+  ]);
 
   return { undo, redo };
 }

@@ -21,6 +21,24 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   virtual window, and edge auto-scroll stops when the pointer leaves the edge.
 - **Stuck row drag** — releasing the pointer ends a row drag even after the dragged row
   scrolled out of the virtual window.
+- **Header menu changing the sort** — clicking a menu item or the backdrop that closes the
+  menu, or pressing Enter / Space on the menu button or an item, no longer also toggles the
+  sort of a `sortable` column.
+- **Delete clearing hidden columns** — Delete and Ctrl+X on a selection skip columns hidden
+  at runtime.
+- **Ctrl+R did nothing** — it now copies the active cell into the next editable column of
+  the same row, as one undo step.
+- **Horizontal fill writing hidden columns** — Ctrl+R and the horizontal fill drag skip
+  columns hidden at runtime and `render` columns between the source and the target.
+- **Ctrl+Shift+Z and Cmd shortcuts** — shortcut keys are matched case-insensitively (Shift,
+  CapsLock), and Cmd works like Ctrl on macOS.
+- **Dirty state lost after undoing a row delete** — undoing `removeRows` restores the row's
+  unsaved changes in `getDirtyRows()`, and no longer brings back a half-typed, uncommitted
+  value.
+- **`initialData` mutated** — the table works on its own copy; the array passed as
+  `initialData` / `value` is no longer written to.
+- **Edit lost on scroll** — a cell still being edited when it leaves the virtual window is
+  committed instead of being left in a pending session.
 
 ## [0.3.1] — 2026-11-02
 

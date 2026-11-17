@@ -130,4 +130,34 @@ describe("row deletion + structural history (#53)", () => {
       "",
     ]);
   });
+
+  it("Delete skips a runtime-hidden column", () => {
+    const ref = createRef<EditableTableRef<Row>>();
+    const cols: ColDef<Row>[] = [
+      { key: "a", type: "text", width: 100 },
+      { key: "b", type: "text", width: 100 },
+      { key: "c", type: "text", width: 100 },
+    ];
+    const { container } = render(
+      <EditableTable<Row>
+        ref={ref}
+        columns={cols}
+        getRowId={getRowId}
+        initialData={[{ id: "1", a: "x", b: "y", c: "z" }]}
+      />,
+    );
+    act(() => {
+      ref.current?.setColumnVisibility("b", false);
+    });
+    const cellC = container.querySelector(
+      '[data-rowid="1"][data-colkey="c"]',
+    ) as HTMLElement;
+    fireEvent.focus(container.querySelector("input") as HTMLInputElement);
+    fireEvent.pointerDown(cellC, { clientX: 150, clientY: 10, shiftKey: true });
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete" }));
+    });
+    const changes = ref.current?.getDirtyRows()[0]?.changes ?? {};
+    expect(Object.keys(changes).sort()).toEqual(["a", "c"]);
+  });
 });

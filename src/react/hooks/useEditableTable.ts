@@ -151,8 +151,10 @@ export function useEditableTable<T extends Record<string, string>>(
   );
 
   // Shared state
-  const [rows, setRows] = useState<T[]>(() => value ?? initialData);
-  const rowsDataRef = useRef<T[]>(initialData);
+  // Controlled: state holds `value` itself (no extra render); the sync effect gives rowsDataRef its
+  // own copy. Uncontrolled: one shallow copy shared with rowsDataRef. In-place writes never touch the caller's array.
+  const [rows, setRows] = useState<T[]>(() => value ?? [...initialData]);
+  const rowsDataRef = useRef<T[]>(rows);
   const editSessionStore = useMemo(() => new EditSessionStore(), []);
 
   // Feature 11: Row search (#23)
@@ -306,7 +308,7 @@ export function useEditableTable<T extends Record<string, string>>(
 
   // Feature 8 + 9: Fill
   const { fillState, setFillState, applyFill } = useFill({
-    columns,
+    columns: effectiveColumns,
     getRowId,
     rowsDataRef,
     displayRowsRef,
@@ -390,20 +392,35 @@ export function useEditableTable<T extends Record<string, string>>(
   const removeRows = useCallback(
     (rowIds: RowId[]) => {
       const ids = new Set(rowIds);
-      const removed: Array<{ rowId: RowId; index: number; row: T }> = [];
+      const removed: Array<{
+        rowId: RowId;
+        index: number;
+        row: T;
+        dirty?: DirtyRow;
+      }> = [];
       rowsDataRef.current.forEach((r, i) => {
         const id = getRowId(r);
-        if (ids.has(id)) removed.push({ rowId: id, index: i, row: r });
+        if (ids.has(id))
+          removed.push({
+            rowId: id,
+            index: i,
+            row: r,
+            dirty: dirtyRowsRef.current.get(id),
+          });
       });
       if (removed.length === 0) return;
       rowsDataRef.current = rowsDataRef.current.filter(
         (r) => !ids.has(getRowId(r)),
       );
       pushStructuralHistory(historyRef.current, "remove", removed);
-      for (const { rowId } of removed) dirtyRowsRef.current.delete(rowId);
+      for (const { rowId } of removed) {
+        dirtyRowsRef.current.delete(rowId);
+        for (const c of columns)
+          editSessionStore.delete(makeCellKey(rowId, c.key));
+      }
       updateRows([...rowsDataRef.current]);
     },
-    [getRowId, updateRows],
+    [getRowId, updateRows, columns, editSessionStore],
   );
 
   const addRow = useCallback(() => {
@@ -458,7 +475,7 @@ export function useEditableTable<T extends Record<string, string>>(
     const sel = cellSelection;
     if (!sel) return false;
     const rows = displayRowsRef.current;
-    const visibleCols = columns.filter(
+    const visibleCols = effectiveColumns.filter(
       (c) => !c.hidden && c.editable !== false && !c.render,
     );
     const startIdx = visibleCols.findIndex((c) => c.key === sel.colKeyStart);
@@ -508,7 +525,7 @@ export function useEditableTable<T extends Record<string, string>>(
     return true;
   }, [
     cellSelection,
-    columns,
+    effectiveColumns,
     getRowId,
     getRowIndex,
     updateRows,

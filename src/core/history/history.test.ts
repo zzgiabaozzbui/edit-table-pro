@@ -5,6 +5,7 @@ import {
   createHistory,
   pushBatchHistory,
   pushHistory,
+  pushStructuralHistory,
   redoHistory,
   undoHistory,
 } from "./index";
@@ -154,6 +155,18 @@ describe("redoHistory", () => {
       nextValue: "9",
     });
     expect(redoHistory(h)).toBeNull();
+  });
+});
+
+describe("pushStructuralHistory", () => {
+  it("structural remove entry keeps the dirty snapshot", () => {
+    const h = createHistory();
+    const dirty = { original: { a: "1" }, current: { a: "2" } };
+    pushStructuralHistory(h, "remove", [
+      { rowId: "r1", index: 0, row: { a: "2" }, dirty },
+    ]);
+    const entry = undoHistory(h);
+    expect(entry?.type === "structural" && entry.rows[0].dirty).toEqual(dirty);
   });
 });
 

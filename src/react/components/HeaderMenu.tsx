@@ -30,17 +30,18 @@ export function HeaderMenu({ colKey }: { colKey: string }) {
   );
 
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    <span
+      style={{ position: "relative", display: "inline-block" }}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       <button
         type="button"
         aria-label={`Column menu ${colKey}`}
         aria-haspopup="menu"
         aria-expanded={open}
         className="et-col-menu-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen((o) => !o);
-        }}
+        onClick={() => setOpen((o) => !o)}
       >
         ⋮
       </button>

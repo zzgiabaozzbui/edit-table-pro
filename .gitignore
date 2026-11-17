@@ -14,6 +14,10 @@ docs/*.md
 !docs/03-public-api.md
 # raw chat captured by agent hooks (R-172)
 docs/agent/inbox/
+# repo is public: agent logs and drafts stay local (project exception to R-172, 2026-11-17)
+docs/agent/skill-log/
+docs/agent/route-log/
+docs/drafts/
 .playwright-mcp/
 
 # AI tools
@@ -21,11 +25,19 @@ docs/agent/inbox/
 .agents/
 .codex/
 CLAUDE.md
+AGENTS.md
+.opencode/
+.mcp.json
+.codegraph/
 .cursor/
 .copilot/
 .aider*
 .continue/
 
 
-# APM dependencies
+# APM (agent config: manifest, lockfile, local sources, dependencies)
+apm.yml
+apm.lock.yaml
+.apm/
+.apm-local/
 apm_modules/

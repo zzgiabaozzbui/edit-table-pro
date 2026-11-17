@@ -1,4 +1,4 @@
-import { StrictMode, useRef, useState } from "react";
+import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -6,6 +6,7 @@ import { exportCsv } from "../src/core/export";
 import { DARK_THEME } from "../src/core/theme";
 import type { ColDef, EditableTableRef, TableTheme } from "../src/index";
 import { EditableTable } from "../src/index";
+import "./demo.css";
 import usage from "./USAGE.md?raw";
 
 type Order = {
@@ -115,22 +116,61 @@ const columns: ColDef<Order>[] = [
   { key: "active", type: "boolean", header: "Active", width: 80 },
 ];
 
-const EMPTY: Order[] = [];
+const GITHUB = "https://github.com/zzgiabaozzbui/edit-table-pro";
+const INSTALL = "npm i edit-table-pro";
+
+const FEATURES = [
+  [
+    "⚡",
+    "Virtual scroll",
+    "Renders only visible rows, so 50k+ rows stay smooth.",
+  ],
+  [
+    "✎",
+    "Spreadsheet editing",
+    "Fill handle, Ctrl+D, copy/paste TSV from Excel.",
+  ],
+  [
+    "✓",
+    "Validation & undo/redo",
+    "Per-cell validation and batch undo history.",
+  ],
+  ["◇", "Zero dependencies", "React ≥ 18 is the only peer dependency."],
+];
+
+const SHORTCUTS = [
+  ["Tab / Enter / Arrows", "Navigate"],
+  ["F2", "Edit cell"],
+  ["Esc", "Cancel edit"],
+  ["Home / End", "First / last column"],
+  ["PageUp / PageDown", "Move by page"],
+  ["Ctrl+A", "Select grid"],
+  ["Ctrl+C", "Copy TSV"],
+  ["Ctrl+X", "Cut"],
+  ["Delete", "Clear cells"],
+  ["Ctrl+Z / Ctrl+Y", "Undo / redo"],
+  ["Shift+Arrow", "Extend selection"],
+];
 
 function Demo() {
   const ref = useRef<EditableTableRef<Order>>(null);
   const [dark, setDark] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [lastAction, setLastAction] = useState("Ready.");
-  const [showDocs, setShowDocs] = useState(true);
   const guideOnly =
     new URLSearchParams(window.location.search).get("view") === "guide";
   const theme: TableTheme | undefined = dark ? DARK_THEME : undefined;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+  }, [dark]);
 
   const btn = (label: string, fn: () => void): React.ReactNode => (
     <button
       key={label}
       type="button"
+      className="btn"
       onClick={() => {
         try {
           fn();
@@ -138,175 +178,177 @@ function Demo() {
           setLastAction(`Error: ${String(e)}`);
         }
       }}
-      style={{
-        border: "1px solid var(--et-color-border)",
-        background: "var(--et-color-bg-header)",
-        color: "var(--et-color-text)",
-        borderRadius: 6,
-        padding: "5px 10px",
-        fontSize: 12.5,
-        cursor: "pointer",
-      }}
     >
       {label}
     </button>
   );
 
+  const copyInstall = async () => {
+    try {
+      await navigator.clipboard.writeText(INSTALL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard unavailable (insecure context / permission denied): text stays selectable
+    }
+  };
+
   return (
-    <div
-      style={{
-        padding: 24,
-        background: dark ? "#141414" : "#f7f7f8",
-        minHeight: "100vh",
-      }}
-    >
-      <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
-        edit-table-pro — full demo
-      </h1>
-      <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
-        Header ⋮ menu: sort / hide / pin · Drag column edges to resize · Drag
-        rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
-      </p>
-      {!guideOnly && (
-        <>
-          <h1 style={{ margin: "0 0 4px", fontSize: 18 }}>
-            edit-table-pro — full demo
-          </h1>
-          <p style={{ margin: "0 0 12px", fontSize: 12.5, opacity: 0.7 }}>
-            Header ⋮ menu: sort / hide / pin · Drag column edges to resize ·
-            Drag rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
-          </p>
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              flexWrap: "wrap",
-              marginBottom: 10,
-              alignItems: "center",
-            }}
-          >
-            {btn("＋ Add row", () => setLastAction("Row added at the bottom"))}
-            {btn(`🗑 Delete selected (${selected.length})`, () => {
-              if (!selected.length) return;
-              ref.current?.removeRows(selected);
-              setSelected([]);
-              setLastAction("Rows removed (Ctrl+Z to undo)");
-            })}
-            {btn("⬇ Export CSV", () => {
-              exportCsv("orders", columns, []);
-              setLastAction("CSV exported");
-            })}
-            {btn(dark ? "☀ Light" : "🌙 Dark", () => setDark((d) => !d))}
-            {btn("Skeleton 2s", () => {
-              setLastAction("Loading skeleton…");
-              setTimeout(() => setLastAction("Loaded."), 2000);
-            })}
-            <span style={{ fontSize: 12.5, opacity: 0.75, marginLeft: 4 }}>
-              {lastAction}
-            </span>
-          </div>
-          <div
-            style={{
-              background: dark ? "#141414" : "#fff",
-              borderRadius: 10,
-              padding: 2,
-            }}
-          >
-            <EditableTable<Order>
-              ref={ref}
-              columns={columns}
-              getRowId={(r) => r.id}
-              initialData={sample(60)}
-              height={520}
-              size="medium"
-              striped
-              searchable
-              sticky
-              bordered
-              createRow={() => ({
-                id: `ORD-${Math.floor(Math.random() * 900 + 100)}`,
-                customer: "",
-                category: CATEGORIES[0],
-                product: "",
-                qty: "1",
-                price: "0",
-                orderedAt: "2026-01-01",
-                active: "false",
-              })}
-              onSelectionChange={setSelected}
-              onCellCommit={(info) =>
-                setLastAction(`Committed ${info.colKey} = "${info.value}"`)
-              }
-              loadingType="spinner"
-              labels={{
-                addRow: "Add row",
-                sortAsc: "Sort ascending",
-                sortDesc: "Sort descending",
-                hideColumn: "Hide column",
-                pinLeft: "Pin left",
-                pinRight: "Pin right",
-                unpin: "Unpin",
-              }}
-            />
-          </div>
-          <p
-            style={{
-              margin: "10px 0 0",
-              fontSize: 12,
-              opacity: 0.65,
-              lineHeight: 1.6,
-            }}
-          >
-            Keyboard: Tab/Enter/Arrows navigate · F2 edit · Esc cancel ·
-            Home/End first/last col · PageUp/Down page · Ctrl+A select grid ·
-            Ctrl+C copy TSV · Ctrl+X cut · Delete clear · Ctrl+Z/Y undo/redo ·
-            Shift+Arrow extend selection
-          </p>
-        </>
-      )}
-      {guideOnly && (
-        <aside
-          className="guide-root"
-          style={{
-            maxWidth: 860,
-            margin: "0 auto",
-            border: "1px solid var(--et-color-border)",
-            borderRadius: 10,
-            padding: "16px 22px",
-            background: dark ? "#1b1b1b" : "#fff",
-            color: "var(--et-color-text)",
-          }}
-        >
-          <div className="usage-doc">
-            <Markdown remarkPlugins={[remarkGfm]}>{usage}</Markdown>
-          </div>
-        </aside>
-      )}
-      {EMPTY.length > 0 && null}
-      {/* Empty-state demo: delete all rows via selection → centered empty state with Add row */}
-      <style>{`
-        body { margin: 0; font-family: Inter, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-        .et-row-stripe { background: ${dark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)"}; }
-        .guide-root {
-          --et-color-text: ${dark ? "#e9e9e9" : "#1f1f1f"};
-          --et-color-border: ${dark ? "#454545" : "#e2e2e2"};
-          --et-color-split: ${dark ? "#333" : "#eee"};
-          --et-font-size: 14px;
-        }
-        .usage-doc { font-size: 13px; line-height: 1.65; color: var(--et-color-text); }
-        .usage-doc h1 { font-size: 17px; margin: 8px 0; }
-        .usage-doc h2 { font-size: 14px; margin: 20px 0 6px; padding-bottom: 3px; border-bottom: 1px solid var(--et-color-border); }
-        .usage-doc p { margin: 6px 0; }
-        .usage-doc ul { margin: 6px 0; padding-left: 18px; }
-        .usage-doc li { margin: 3px 0; }
-        .usage-doc code { background: ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)"}; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
-        .usage-doc pre { background: #16181d; color: #e6e6e6; padding: 10px 12px; border-radius: 6px; overflow-x: auto; }
-        .usage-doc pre code { background: none; padding: 0; color: inherit; }
-        .usage-doc table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 8px 0; }
-        .usage-doc th, .usage-doc td { border: 1px solid var(--et-color-border); padding: 4px 8px; text-align: left; }
-        .usage-doc th { background: ${dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"}; }
-      `}</style>
-    </div>
+    <>
+      <header className="nav">
+        <div className="container nav-inner">
+          <a className="wordmark" href="./">
+            edit-table-pro
+          </a>
+          <nav className="nav-links">
+            <a href="?view=guide">Guide</a>
+            <a href={GITHUB}>GitHub</a>
+            <a href="https://www.npmjs.com/package/edit-table-pro">npm</a>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setDark((d) => !d)}
+            >
+              {dark ? "☀ Light" : "🌙 Dark"}
+            </button>
+          </nav>
+        </div>
+      </header>
+      <main className="container">
+        {guideOnly ? (
+          <section className="section">
+            <a className="back" href="./">
+              ← Back to demo
+            </a>
+            <div className="card usage-doc">
+              <Markdown remarkPlugins={[remarkGfm]}>{usage}</Markdown>
+            </div>
+          </section>
+        ) : (
+          <>
+            <section className="hero">
+              <h1>Editable React table for 50k+ rows</h1>
+              <p className="subtitle">
+                Virtual scroll, validation, undo/redo, fill handle, paste from
+                Excel — zero runtime dependencies. MIT.
+              </p>
+              <div className="install">
+                <code>{INSTALL}</code>
+                <button type="button" className="btn" onClick={copyInstall}>
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <div className="cta">
+                <a className="btn btn-primary" href="#demo">
+                  Try the demo
+                </a>
+                <a className="btn" href="?view=guide">
+                  Read the guide
+                </a>
+              </div>
+            </section>
+            <section className="features">
+              {FEATURES.map(([icon, title, text]) => (
+                <div className="card feature" key={title}>
+                  <span className="feature-icon" aria-hidden="true">
+                    {icon}
+                  </span>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+              ))}
+            </section>
+            <section className="section" id="demo">
+              <h2>Live demo</h2>
+              <p className="hint">
+                Header ⋮ menu: sort / hide / pin · Drag column edges to resize ·
+                Drag rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
+              </p>
+              <div className="card demo-card">
+                <div className="toolbar">
+                  {btn("＋ Add row", () =>
+                    setLastAction("Row added at the bottom"),
+                  )}
+                  {btn(`🗑 Delete selected (${selected.length})`, () => {
+                    if (!selected.length) return;
+                    ref.current?.removeRows(selected);
+                    setSelected([]);
+                    setLastAction("Rows removed (Ctrl+Z to undo)");
+                  })}
+                  {btn("⬇ Export CSV", () => {
+                    exportCsv("orders", columns, []);
+                    setLastAction("CSV exported");
+                  })}
+                  {btn("Skeleton 2s", () => {
+                    setLastAction("Loading skeleton…");
+                    setTimeout(() => setLastAction("Loaded."), 2000);
+                  })}
+                  <output className="status">{lastAction}</output>
+                </div>
+                <div className="table-wrap">
+                  <EditableTable<Order>
+                    ref={ref}
+                    columns={columns}
+                    getRowId={(r) => r.id}
+                    initialData={sample(60)}
+                    height={520}
+                    size="medium"
+                    striped
+                    searchable
+                    sticky
+                    bordered
+                    theme={theme}
+                    createRow={() => ({
+                      id: `ORD-${Math.floor(Math.random() * 900 + 100)}`,
+                      customer: "",
+                      category: CATEGORIES[0],
+                      product: "",
+                      qty: "1",
+                      price: "0",
+                      orderedAt: "2026-01-01",
+                      active: "false",
+                    })}
+                    onSelectionChange={setSelected}
+                    onCellCommit={(info) =>
+                      setLastAction(
+                        `Committed ${info.colKey} = "${info.value}"`,
+                      )
+                    }
+                    loadingType="spinner"
+                    labels={{
+                      addRow: "Add row",
+                      sortAsc: "Sort ascending",
+                      sortDesc: "Sort descending",
+                      hideColumn: "Hide column",
+                      pinLeft: "Pin left",
+                      pinRight: "Pin right",
+                      unpin: "Unpin",
+                    }}
+                  />
+                </div>
+              </div>
+            </section>
+            <section className="section">
+              <h2>Keyboard shortcuts</h2>
+              <div className="shortcuts">
+                {SHORTCUTS.map(([keys, desc]) => (
+                  <div className="shortcut" key={keys}>
+                    <kbd>{keys}</kbd>
+                    <span>{desc}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+      </main>
+      <footer className="footer">
+        <div className="container footer-inner">
+          <span>MIT License</span>
+          <a href={GITHUB}>GitHub</a>
+        </div>
+      </footer>
+    </>
   );
 }
 

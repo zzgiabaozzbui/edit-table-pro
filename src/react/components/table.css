@@ -29,17 +29,6 @@
 }
 
 .et-input:hover:not(:focus):not(.error) {
-  border-color: var(--et-color-border);
-}
-
-.et-input:focus:not(.error) {
-  background: var(--et-color-bg);
-  border-color: var(--et-color-primary);
-  box-shadow: 0 0 0 2px
-    color-mix(in srgb, var(--et-color-primary) 12%, transparent);
-}
-
-.et-input:hover:not(:focus):not(.error) {
   border-color: color-mix(
     in srgb,
     var(--et-color-primary) 55%,
@@ -48,9 +37,94 @@
 }
 
 .et-input:focus:not(.error) {
+  background: var(--et-color-bg);
   border-color: var(--et-color-primary);
   box-shadow: 0 0 0 2px
     color-mix(in srgb, var(--et-color-primary) 10%, transparent);
+}
+
+select.et-input {
+  appearance: none;
+  padding-right: 26px;
+  cursor: pointer;
+}
+
+input[type="date"].et-input::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+input[type="date"].et-input:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+.et-select-chevron {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── Checkbox ───────────────────────────────── */
+.et-checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--et-color-primary);
+  cursor: pointer;
+}
+
+/* ── Search ─────────────────────────────────── */
+.et-search {
+  width: 100%;
+  padding: var(--et-padding-y) var(--et-padding-x) var(--et-padding-y) 32px;
+  border: 1px solid var(--et-color-border);
+  border-radius: var(--et-border-radius);
+  background: var(--et-color-bg);
+  color: var(--et-color-text);
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* :focus beats a host page's global :focus-visible outline */
+.et-search:focus {
+  outline: none;
+  border-color: var(--et-color-primary);
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--et-color-primary) 20%, transparent);
+}
+
+/* ── Sort icon ──────────────────────────────── */
+.et-header-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.et-sort-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  opacity: 0.35;
+}
+
+.et-sort-icon.active {
+  color: var(--et-color-primary);
+  opacity: 1;
+}
+
+/* ── Row drag handle ────────────────────────── */
+.et-drag-handle {
+  opacity: 0.45;
+}
+
+.et-drag-handle:hover {
+  opacity: 1;
 }
 
 .et-input.error {
@@ -108,17 +182,32 @@
   transition: background-color 0.12s ease, opacity 0.15s ease;
 }
 
+.et-scroll {
+  background: var(--et-color-bg);
+}
+
+/* --et-row-tint / --et-cell-tint mirror the row / cell state background so
+   pinned (opaque) cells can layer the same tint (see core/pin.ts). */
 .et-row:hover {
-  background: var(--et-color-row-hover);
+  --et-row-tint: var(--et-color-row-hover);
+  background: var(--et-row-tint);
+}
+
+/* ── Stripe row (before selected so selection wins on striped rows) ── */
+.et-row-stripe {
+  --et-row-tint: var(--et-color-row-stripe);
+  background: var(--et-row-tint);
 }
 
 /* ── Selected row ───────────────────────────── */
 .et-row-selected {
-  background: color-mix(in srgb, var(--et-color-primary) 8%, transparent);
+  --et-row-tint: color-mix(in srgb, var(--et-color-primary) 8%, transparent);
+  background: var(--et-row-tint);
 }
 
 .et-row-selected:hover {
-  background: color-mix(in srgb, var(--et-color-primary) 12%, transparent);
+  --et-row-tint: color-mix(in srgb, var(--et-color-primary) 12%, transparent);
+  background: var(--et-row-tint);
 }
 
 /* ── Readonly cell ──────────────────────────── */
@@ -126,11 +215,6 @@
   opacity: 0.65;
   user-select: text;
   cursor: default;
-}
-
-/* ── Stripe row ─────────────────────────────── */
-.et-row-stripe {
-  background: var(--et-color-row-stripe);
 }
 
 /* ── Empty state ────────────────────────────── */
@@ -233,16 +317,28 @@
   background: transparent;
   cursor: pointer;
   padding: 0 2px;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
   line-height: 1;
   color: inherit;
+  flex-shrink: 0;
+  /* hidden button takes no width so short columns keep their label */
+  width: 0;
+  overflow: hidden;
   opacity: 0;
   transition: opacity 0.15s ease;
+}
+
+.et-col-menu-btn:focus-visible {
+  outline-offset: 0;
 }
 
 .et-columnheader:hover .et-col-menu-btn,
 .et-col-menu-btn:focus-visible,
 .et-col-menu-btn[aria-expanded="true"] {
+  width: auto;
   opacity: 1;
 }
 
@@ -284,15 +380,19 @@
 }
 
 /* ── Cell Selection Highlight ───────────────── */
+/* active cell keeps its frame after the input loses focus (fill handle marks it) */
+[role="gridcell"]:has(> .et-cell-fill-handle),
 .et-cell-selected {
   outline: 1px solid var(--et-color-primary);
   outline-offset: -1px;
-  background-color: color-mix(in srgb, var(--et-color-primary) 6%, transparent);
+  --et-cell-tint: color-mix(in srgb, var(--et-color-primary) 6%, transparent);
+  background-color: var(--et-cell-tint);
 }
 
 /* ── Fill Preview Highlight ─────────────────── */
 .et-fill-preview {
   outline: 2px dashed var(--et-color-primary) !important;
   outline-offset: -1px;
-  background-color: color-mix(in srgb, var(--et-color-primary) 8%, transparent) !important;
+  --et-cell-tint: color-mix(in srgb, var(--et-color-primary) 8%, transparent);
+  background-color: var(--et-cell-tint) !important;
 }

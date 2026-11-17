@@ -111,6 +111,7 @@ export type TableContextValue<T = Record<string, string>> = {
   // Feature 10b: Column visibility (#24)
   setColumnVisibility: (key: ColKey, visible: boolean) => void;
   toggleColumn: (key: ColKey) => void;
+  hiddenColumns: ColDef<T>[];
   removeRows: (rowIds: RowId[]) => void;
   rowDrag: { active: boolean; fromIndex: number; targetIndex: number };
   setRowDrag: React.Dispatch<

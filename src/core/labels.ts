@@ -9,6 +9,8 @@ export type TableLabels = {
   pinLeft: string;
   pinRight: string;
   unpin: string;
+  /** Prefix of the "show hidden column" menu items; falls back to "Show" */
+  showColumn?: string;
 };
 
 export const defaultLabels: TableLabels = {

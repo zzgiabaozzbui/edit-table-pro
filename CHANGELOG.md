@@ -5,7 +5,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- **Theme presets** — `GREEN_THEME`, `PURPLE_THEME`, `ORANGE_THEME` (light, primary ≥ 3:1 on white)
+  exported next to `DARK_THEME`; the demo has a theme picker.
+- **Show hidden columns from the header menu** — each hidden column gets a `Show <header>` item in the
+  column menu (new optional label `showColumn`); "Hide column" is not offered for the last visible
+  column. The demo has a "Columns" popover with a checkbox per column.
+
 ### Fixed
+- **Pin had no visible effect** — pinned columns are now displayed first (pin left) or last (pin
+  right), so pinning works without horizontal overflow and a middle column no longer sticks at its
+  old position. Unpin restores the original position; CSV export keeps the original column order.
+  A column with a static `hidden: true` can now be shown again at runtime.
+- **Header menu button never shown on hover** — header cells now carry `et-columnheader`; the
+  label, sort icon and menu button sit in a flex row with a gap, and the menu focus ring no
+  longer covers the sort icon.
 - **Shortcuts leaking outside the table** — keys (including Ctrl+Z/Y) are handled only when
   focus is inside the table, or on the page body after a click inside it; two tables on one
   page no longer undo together.

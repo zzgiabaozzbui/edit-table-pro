@@ -65,6 +65,13 @@ import { DARK_THEME } from 'edit-table-pro'
 // Required<TableTheme> — preset dark đã audit WCAG AA; dùng: theme={DARK_THEME}
 ```
 
+### `GREEN_THEME` · `PURPLE_THEME` · `ORANGE_THEME`
+
+```ts
+import { GREEN_THEME, PURPLE_THEME, ORANGE_THEME } from 'edit-table-pro'
+// Required<TableTheme> — preset light (DEFAULT_THEME + màu primary/tint riêng); dùng: theme={PURPLE_THEME}
+```
+
 ---
 
 ## Classes
@@ -108,6 +115,19 @@ SideEffectContext<T> = {
   rowId: RowId
   patchRow: (patch: Partial<T>) => void  // update các cột khác
 }
+```
+
+### Menu cột (`labels`)
+
+Menu header có sort / pin / ẩn cột. Cột đã ẩn hiện thành mục `"<showColumn> <header ?? key>"` ở menu của
+mọi cột còn hiện; không hiện mục "Hide column" khi chỉ còn một cột hiện. Pin đổi thứ tự hiển thị: cột pin trái
+đứng đầu, cột pin phải đứng cuối (CSV export giữ thứ tự gốc của `columns`).
+
+```ts
+labels?: Partial<{
+  addRow; searchPlaceholder; sortAsc; sortDesc; hideColumn; pinLeft; pinRight; unpin
+  showColumn: string   // tiền tố mục mở lại cột ẩn, mặc định "Show"
+}>
 ```
 
 ---

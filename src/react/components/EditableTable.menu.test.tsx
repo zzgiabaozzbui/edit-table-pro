@@ -25,6 +25,14 @@ const menuItem = (container: HTMLElement, label: string) =>
     (el) => el.textContent === label,
   ) as HTMLElement | undefined;
 
+const headerKeys = (container: HTMLElement) =>
+  [...container.querySelectorAll('[role="columnheader"]')].map((h) =>
+    h
+      .querySelector('[aria-label^="Column menu "]')
+      ?.getAttribute("aria-label")
+      ?.replace("Column menu ", ""),
+  );
+
 describe("column header menu (#52)", () => {
   it("hides a column from the menu and reports via aria", async () => {
     const { container } = render(
@@ -58,8 +66,59 @@ describe("column header menu (#52)", () => {
     const header = [
       ...container.querySelectorAll('[role="columnheader"]'),
     ] as HTMLElement[];
-    expect(header[0].style.position).toBe("sticky");
-    expect(header[0].style.right).toBe("0px");
+    // pinned right → displayed last
+    expect(
+      header[1].querySelector('[aria-label="Column menu a"]'),
+    ).toBeTruthy();
+    expect(header[1].style.position).toBe("sticky");
+    expect(header[1].style.right).toBe("0px");
+  });
+
+  it("pin left moves a middle column to the first position", async () => {
+    const container = renderSorted();
+    await openMenu(container, "c");
+    await click(menuItem(container, "Pin left") as HTMLElement);
+    expect(headerKeys(container)).toEqual(["c", "a", "b"]);
+    await openMenu(container, "c");
+    await click(menuItem(container, "Unpin") as HTMLElement);
+    expect(headerKeys(container)).toEqual(["a", "b", "c"]);
+  });
+
+  it("hidden columns get a Show item that restores them", async () => {
+    const container = renderSorted();
+    await openMenu(container, "b");
+    await click(menuItem(container, "Hide column") as HTMLElement);
+    await openMenu(container, "a");
+    await click(menuItem(container, "Show b") as HTMLElement);
+    expect(headerKeys(container)).toEqual(["a", "b", "c"]);
+  });
+
+  it("uses the header text and the showColumn label", async () => {
+    const { container } = render(
+      <EditableTable<Row>
+        columns={[
+          { key: "a", type: "text", hidden: true, header: "Alpha" },
+          { key: "b", type: "text" },
+        ]}
+        labels={{ showColumn: "Mở" }}
+        getRowId={getRowId}
+        initialData={[{ id: "1", a: "", b: "" }]}
+      />,
+    );
+    await openMenu(container, "b");
+    expect(menuItem(container, "Mở Alpha")).toBeTruthy();
+  });
+
+  it("does not offer Hide when only one column is visible", async () => {
+    const { container } = render(
+      <EditableTable<Row>
+        columns={[{ key: "a", type: "text" }]}
+        getRowId={getRowId}
+        initialData={[{ id: "1", a: "" }]}
+      />,
+    );
+    await openMenu(container, "a");
+    expect(menuItem(container, "Hide column")).toBeUndefined();
   });
 
   const sortData = [

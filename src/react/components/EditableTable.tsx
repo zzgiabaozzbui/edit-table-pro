@@ -193,18 +193,37 @@ function EditableTableInner<T extends Record<string, string>>(
             }}
           >
             {searchable && (
-              <input
-                data-testid="et-search-input"
-                type="text"
-                placeholder={tableProps.labels?.searchPlaceholder}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                style={{
-                  flexShrink: 0,
-                  width: totalWidth,
-                  boxSizing: "border-box",
-                }}
-              />
+              <div style={{ position: "relative", margin: 8, flexShrink: 0 }}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: 11,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    opacity: 0.5,
+                    pointerEvents: "none",
+                  }}
+                >
+                  <circle cx="7" cy="7" r="5" />
+                  <path d="m11 11 3.5 3.5" />
+                </svg>
+                <input
+                  data-testid="et-search-input"
+                  className="et-search"
+                  type="text"
+                  placeholder={tableProps.labels?.searchPlaceholder}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
             )}
             {tableProps.showHeader !== false && (
               <HeaderRow totalWidth={totalWidth} />
@@ -225,7 +244,7 @@ function EditableTableInner<T extends Record<string, string>>(
                 style={{
                   flexShrink: 0,
                   display: "flex",
-                  width: totalWidth,
+                  minWidth: totalWidth,
                   borderTop: "1px solid var(--et-color-border)",
                   background: "var(--et-color-bg-header)",
                   fontWeight: 600,
@@ -280,7 +299,7 @@ function EditableTableInner<T extends Record<string, string>>(
                 style={{
                   flexShrink: 0,
                   height: ADD_ROW_HEIGHT,
-                  width: totalWidth,
+                  minWidth: totalWidth,
                   border: "none",
                   borderTop: "1px solid var(--et-color-split)",
                   background: "var(--et-color-bg)",

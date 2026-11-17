@@ -36,6 +36,7 @@ export function RowDragHandle({
     <div
       role="button"
       aria-label="Drag row"
+      className="et-drag-handle"
       data-rowid={rowId}
       tabIndex={-1}
       style={{
@@ -46,7 +47,6 @@ export function RowDragHandle({
         alignItems: "center",
         justifyContent: "center",
         color: "var(--et-color-text)",
-        opacity: 0.5,
         touchAction: "none",
         userSelect: "none",
       }}
@@ -87,7 +87,17 @@ export function RowDragHandle({
         document.addEventListener("pointercancel", onUp);
       }}
     >
-      ⠿
+      <svg
+        width="10"
+        height="14"
+        viewBox="0 0 10 14"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        aria-hidden="true"
+      >
+        <path d="M2.5 2.5h0M7.5 2.5h0M2.5 7h0M7.5 7h0M2.5 11.5h0M7.5 11.5h0" />
+      </svg>
     </div>
   );
 }

@@ -1,5 +1,10 @@
 import { contrastRatio } from "@/core/contrast";
-import { DARK_THEME } from "@/core/theme";
+import {
+  DARK_THEME,
+  GREEN_THEME,
+  ORANGE_THEME,
+  PURPLE_THEME,
+} from "@/core/theme";
 import { describe, expect, it } from "vitest";
 
 describe("dark theme WCAG AA (#4)", () => {
@@ -40,5 +45,23 @@ describe("dark theme WCAG AA (#4)", () => {
       true,
     );
     expect(contrastRatio("#212121", "#ffffff")).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe.each([
+  ["green", GREEN_THEME],
+  ["purple", PURPLE_THEME],
+  ["orange", ORANGE_THEME],
+])("%s preset WCAG AA", (_name, t) => {
+  it("text >= 4.5:1 on container, header and error backgrounds", () => {
+    for (const bg of [t.colorBgContainer, t.colorBgHeader, t.colorErrorBg]) {
+      expect(contrastRatio("#212121", bg)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("primary >= 3:1 on container", () => {
+    expect(
+      contrastRatio(t.colorPrimary, t.colorBgContainer),
+    ).toBeGreaterThanOrEqual(3);
   });
 });

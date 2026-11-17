@@ -5,6 +5,22 @@ import { ResizeHandle } from "./ResizeHandle";
 
 const SELECTION_COL_WIDTH = 40;
 
+function SortIcon({ dir }: { dir?: "asc" | "desc" }) {
+  return (
+    <svg
+      className={dir ? "et-sort-icon active" : "et-sort-icon"}
+      width="10"
+      height="12"
+      viewBox="0 0 10 12"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      {dir !== "desc" && <path d="M5 0 9 5H1z" />}
+      {dir !== "asc" && <path d="M5 12 1 7h8z" />}
+    </svg>
+  );
+}
+
 type HeaderRowProps = Readonly<{ totalWidth: number }>;
 
 export function HeaderRow({ totalWidth }: HeaderRowProps) {
@@ -33,7 +49,7 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
       style={{
         display: "flex",
         flexShrink: 0,
-        width: totalWidth,
+        minWidth: totalWidth,
         borderBottom: "1px solid var(--et-color-border)",
         background: "var(--et-color-bg-header)",
         fontWeight: 500,
@@ -59,12 +75,12 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
         >
           <input
             type="checkbox"
+            className="et-checkbox"
             checked={isAllSelected}
             ref={(el) => {
               if (el) el.indeterminate = isIndeterminate;
             }}
             onChange={toggleAll}
-            style={{ cursor: "pointer", width: 16, height: 16 }}
           />
         </div>
       )}
@@ -72,6 +88,7 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
         <div
           key={col.key}
           role="columnheader"
+          className="et-columnheader"
           aria-colindex={visibleCols.indexOf(col) + 1}
           aria-sort={
             sortState?.colKey === col.key
@@ -102,12 +119,10 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
             minWidth: columnWidths.get(col.key) ?? col.width ?? 150,
             padding: "var(--et-padding-y) var(--et-padding-x)",
             borderRight: "1px solid var(--et-color-border)",
-            textAlign: col.align ?? "left",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
             color: "var(--et-color-text)",
-            background: effectiveFixed(col.key) && "var(--et-color-bg-header)",
             ...computePinStyle(
               effectiveFixed(col.key),
               col.key,
@@ -118,16 +133,23 @@ export function HeaderRow({ totalWidth }: HeaderRowProps) {
               },
               effectiveFixed,
             ),
+            ...(effectiveFixed(col.key) && {
+              backgroundColor: "var(--et-color-bg-header)",
+              backgroundImage: "none",
+            }),
           }}
         >
-          {col.header ?? col.key}
-          {col.sortable
-            ? sortState?.colKey === col.key
-              ? sortState.dir === "asc"
-                ? " ▲"
-                : " ▼"
-              : " ↕"
-            : null}
+          <span
+            className="et-header-label"
+            style={{ textAlign: col.align ?? "left" }}
+          >
+            {col.header ?? col.key}
+          </span>
+          {col.sortable && (
+            <SortIcon
+              dir={sortState?.colKey === col.key ? sortState.dir : undefined}
+            />
+          )}
           <HeaderMenu colKey={col.key} />
           <ResizeHandle colKey={col.key} />
         </div>

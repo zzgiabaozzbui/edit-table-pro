@@ -22,9 +22,9 @@ export function SelectCell({ rowId, width = 40 }: SelectCellProps) {
     >
       <input
         type="checkbox"
+        className="et-checkbox"
         checked={selectedRowIds.has(rowId)}
         onChange={() => toggleRow(rowId)}
-        style={{ cursor: "pointer", width: 16, height: 16 }}
       />
     </div>
   );

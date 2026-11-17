@@ -100,7 +100,7 @@ export default function App() {
 | `loading` | `boolean` | `undefined` | Show loading overlay |
 | `showHeader` | `boolean` | `true` | Show column header row |
 | `autoFocus` | `boolean` | `false` | Focus the first editable cell on mount |
-| `theme` | `TableTheme` | `{}` | CSS token overrides |
+| `theme` | `TableTheme` | `{}` | CSS token overrides; presets `DARK_THEME`, `GREEN_THEME`, `PURPLE_THEME`, `ORANGE_THEME` |
 | `rowClassName` | `(row: T, index: number) => string` | `undefined` | Dynamic row CSS class |
 | `createRow` | `() => T` | `undefined` | Enables "+ Add row" button |
 | `onSelectionChange` | `(ids: RowId[]) => void` | `undefined` | Enables checkbox selection |

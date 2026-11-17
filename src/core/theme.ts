@@ -54,6 +54,34 @@ export const DARK_THEME: Required<TableTheme> = {
   borderRadius: DEFAULT_THEME.borderRadius,
 };
 
+/** Light presets: DEFAULT_THEME with a tinted primary; primary >= 3:1 on white. */
+export const GREEN_THEME: Required<TableTheme> = {
+  ...DEFAULT_THEME,
+  colorPrimary: "#237804",
+  colorBgHeader: "#f6ffed",
+  colorRowHover: "rgba(35,120,4,0.05)",
+  colorRowStripe: "rgba(35,120,4,0.05)",
+  colorSplit: "#d9f7be",
+};
+
+export const PURPLE_THEME: Required<TableTheme> = {
+  ...DEFAULT_THEME,
+  colorPrimary: "#722ed1",
+  colorBgHeader: "#f9f0ff",
+  colorRowHover: "rgba(114,46,209,0.05)",
+  colorRowStripe: "rgba(114,46,209,0.05)",
+  colorSplit: "#efdbff",
+};
+
+export const ORANGE_THEME: Required<TableTheme> = {
+  ...DEFAULT_THEME,
+  colorPrimary: "#ad4e00",
+  colorBgHeader: "#fff7e6",
+  colorRowHover: "rgba(173,78,0,0.05)",
+  colorRowStripe: "rgba(173,78,0,0.05)",
+  colorSplit: "#ffe7ba",
+};
+
 export const SIZE_CONFIG = {
   large: { rowHeight: 54, paddingY: 12, paddingX: 16, fontSize: 14 },
   medium: { rowHeight: 44, paddingY: 8, paddingX: 16, fontSize: 14 },

@@ -1,5 +1,5 @@
 import type { RowId } from "@/core/types";
-import { type MutableRefObject, useCallback, useState } from "react";
+import { type MutableRefObject, useCallback, useRef, useState } from "react";
 
 type UseRowSelectionOptions<T> = {
   rowsDataRef: MutableRefObject<T[]>;
@@ -27,6 +27,19 @@ export function useRowSelection<T>({
     [isControlled, onSelectionChange],
   );
 
+  // Latest selection for callers memoised across renders (removeRows).
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+
+  const deselect = useCallback(
+    (ids: Iterable<RowId>) => {
+      const next = new Set(selectedRef.current);
+      for (const id of ids) next.delete(id);
+      if (next.size !== selectedRef.current.size) apply(next);
+    },
+    [apply],
+  );
+
   const toggleRow = useCallback(
     (rowId: RowId) => {
       const next = new Set(selected);
@@ -43,5 +56,5 @@ export function useRowSelection<T>({
     apply(next);
   }, [getRowId, rowsDataRef, selected, apply]);
 
-  return { selectedRowIds: selected, toggleRow, toggleAll };
+  return { selectedRowIds: selected, toggleRow, toggleAll, deselect };
 }

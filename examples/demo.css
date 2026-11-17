@@ -97,7 +97,9 @@ a {
 
 /* buttons */
 .btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -225,6 +227,39 @@ a {
   margin-bottom: 12px;
 }
 
+.col-pop {
+  position: relative;
+}
+
+.col-pop-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 40;
+  display: grid;
+  gap: 2px;
+  min-width: 170px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+}
+
+.col-pop-menu label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.col-pop-menu label:hover {
+  background: var(--tint);
+}
+
 .status {
   margin-left: auto;
   padding: 3px 12px;
@@ -236,10 +271,6 @@ a {
 
 .table-wrap {
   overflow-x: auto;
-}
-
-.et-row-stripe {
-  background: var(--tint);
 }
 
 .shortcuts {

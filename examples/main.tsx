@@ -3,7 +3,12 @@ import { createRoot } from "react-dom/client";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { exportCsv } from "../src/core/export";
-import { DARK_THEME } from "../src/core/theme";
+import {
+  DARK_THEME,
+  GREEN_THEME,
+  ORANGE_THEME,
+  PURPLE_THEME,
+} from "../src/core/theme";
 import type { ColDef, EditableTableRef, TableTheme } from "../src/index";
 import { EditableTable } from "../src/index";
 import "./demo.css";
@@ -52,6 +57,27 @@ function sample(n: number): Order[] {
   });
 }
 
+const icon = (d: string): React.ReactNode => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d={d} />
+  </svg>
+);
+const ICON_PLUS = icon("M8 3v10M3 8h10");
+const ICON_TRASH = icon("M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5");
+const ICON_DOWNLOAD = icon("M8 2.5v8M4.8 7.5 8 10.7l3.2-3.2M3 13h10");
+const ICON_COLUMNS = icon("M2.5 3h11v10h-11zM6.2 3v10M9.8 3v10");
+
 const columns: ColDef<Order>[] = [
   {
     key: "id",
@@ -59,7 +85,7 @@ const columns: ColDef<Order>[] = [
     header: "Order ID",
     editable: false,
     fixed: "left",
-    width: 96,
+    width: 120,
     sortable: true,
   },
   {
@@ -88,7 +114,7 @@ const columns: ColDef<Order>[] = [
     key: "qty",
     type: "number",
     header: "Qty",
-    width: 80,
+    width: 90,
     align: "right",
     sortable: true,
     footer: "count",
@@ -99,7 +125,7 @@ const columns: ColDef<Order>[] = [
     key: "price",
     type: "number",
     header: "Price (₫)",
-    width: 120,
+    width: 130,
     align: "right",
     sortable: true,
     footer: "sum",
@@ -110,10 +136,10 @@ const columns: ColDef<Order>[] = [
     key: "orderedAt",
     type: "date",
     header: "Ordered",
-    width: 130,
+    width: 150,
     sortable: true,
   },
-  { key: "active", type: "boolean", header: "Active", width: 80 },
+  { key: "active", type: "boolean", header: "Active", width: 100 },
 ];
 
 const GITHUB = "https://github.com/zzgiabaozzbui/edit-table-pro";
@@ -152,21 +178,55 @@ const SHORTCUTS = [
   ["Shift+Arrow", "Extend selection"],
 ];
 
+const THEMES: Record<string, TableTheme | undefined> = {
+  Light: undefined,
+  Dark: DARK_THEME,
+  Green: GREEN_THEME,
+  Purple: PURPLE_THEME,
+  Orange: ORANGE_THEME,
+};
+
 function Demo() {
   const ref = useRef<EditableTableRef<Order>>(null);
-  const [dark, setDark] = useState(false);
+  const [themeName, setThemeName] = useState("Light");
   const [copied, setCopied] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [lastAction, setLastAction] = useState("Ready.");
+  const [hiddenKeys, setHiddenKeys] = useState<string[]>([]);
+  const [colsOpen, setColsOpen] = useState(false);
+  const colsRef = useRef<HTMLSpanElement>(null);
   const guideOnly =
     new URLSearchParams(window.location.search).get("view") === "guide";
-  const theme: TableTheme | undefined = dark ? DARK_THEME : undefined;
+  const theme = THEMES[themeName];
 
   useEffect(() => {
-    document.documentElement.dataset.theme = dark ? "dark" : "light";
-  }, [dark]);
+    document.documentElement.dataset.theme =
+      themeName === "Dark" ? "dark" : "light";
+  }, [themeName]);
 
-  const btn = (label: string, fn: () => void): React.ReactNode => (
+  useEffect(() => {
+    if (!colsOpen) return;
+    const close = (e: MouseEvent | KeyboardEvent) => {
+      if (
+        e instanceof KeyboardEvent
+          ? e.key === "Escape"
+          : !colsRef.current?.contains(e.target as Node)
+      )
+        setColsOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [colsOpen]);
+
+  const btn = (
+    label: string,
+    fn: () => void,
+    ico?: React.ReactNode,
+  ): React.ReactNode => (
     <button
       key={label}
       type="button"
@@ -179,6 +239,7 @@ function Demo() {
         }
       }}
     >
+      {ico}
       {label}
     </button>
   );
@@ -204,13 +265,6 @@ function Demo() {
             <a href="?view=guide">Guide</a>
             <a href={GITHUB}>GitHub</a>
             <a href="https://www.npmjs.com/package/edit-table-pro">npm</a>
-            <button
-              type="button"
-              className="btn"
-              onClick={() => setDark((d) => !d)}
-            >
-              {dark ? "☀ Light" : "🌙 Dark"}
-            </button>
           </nav>
         </div>
       </header>
@@ -261,28 +315,87 @@ function Demo() {
             <section className="section" id="demo">
               <h2>Live demo</h2>
               <p className="hint">
-                Header ⋮ menu: sort / hide / pin · Drag column edges to resize ·
-                Drag rows by ⠿ · Fill handle drag (↓↑←→) · Ctrl+D fill down
+                Column menu: sort / hide / pin · Drag column edges to resize ·
+                Drag rows by the drag handle · Fill handle drag (↓↑←→) · Ctrl+D
+                fill down
               </p>
               <div className="card demo-card">
                 <div className="toolbar">
-                  {btn("＋ Add row", () =>
-                    setLastAction("Row added at the bottom"),
+                  {btn(
+                    "Add row",
+                    () => setLastAction("Row added at the bottom"),
+                    ICON_PLUS,
                   )}
-                  {btn(`🗑 Delete selected (${selected.length})`, () => {
-                    if (!selected.length) return;
-                    ref.current?.removeRows(selected);
-                    setSelected([]);
-                    setLastAction("Rows removed (Ctrl+Z to undo)");
-                  })}
-                  {btn("⬇ Export CSV", () => {
-                    exportCsv("orders", columns, []);
-                    setLastAction("CSV exported");
-                  })}
+                  {btn(
+                    `Delete selected (${selected.length})`,
+                    () => {
+                      if (!selected.length) return;
+                      ref.current?.removeRows(selected);
+                      setSelected([]);
+                      setLastAction("Rows removed (Ctrl+Z to undo)");
+                    },
+                    ICON_TRASH,
+                  )}
+                  {btn(
+                    "Export CSV",
+                    () => {
+                      exportCsv("orders", columns, []);
+                      setLastAction("CSV exported");
+                    },
+                    ICON_DOWNLOAD,
+                  )}
                   {btn("Skeleton 2s", () => {
                     setLastAction("Loading skeleton…");
                     setTimeout(() => setLastAction("Loaded."), 2000);
                   })}
+                  <span className="col-pop" ref={colsRef}>
+                    <button
+                      type="button"
+                      className="btn"
+                      aria-haspopup="true"
+                      aria-expanded={colsOpen}
+                      onClick={() => setColsOpen((o) => !o)}
+                    >
+                      {ICON_COLUMNS}
+                      Columns
+                    </button>
+                    {colsOpen && (
+                      <div className="col-pop-menu">
+                        {columns.map((c) => (
+                          <label key={c.key}>
+                            <input
+                              type="checkbox"
+                              checked={!hiddenKeys.includes(c.key)}
+                              disabled={
+                                !hiddenKeys.includes(c.key) &&
+                                hiddenKeys.length === columns.length - 1
+                              }
+                              onChange={(e) =>
+                                setHiddenKeys(
+                                  e.target.checked
+                                    ? hiddenKeys.filter((k) => k !== c.key)
+                                    : [...hiddenKeys, c.key],
+                                )
+                              }
+                            />
+                            {c.header ?? c.key}
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </span>
+                  <select
+                    className="btn"
+                    aria-label="Theme"
+                    value={themeName}
+                    onChange={(e) => setThemeName(e.target.value)}
+                  >
+                    {Object.keys(THEMES).map((n) => (
+                      <option key={n} value={n}>
+                        Theme: {n}
+                      </option>
+                    ))}
+                  </select>
                   <output className="status">{lastAction}</output>
                 </div>
                 <div className="table-wrap">
@@ -298,6 +411,8 @@ function Demo() {
                     sticky
                     bordered
                     theme={theme}
+                    hiddenColumnKeys={hiddenKeys}
+                    onHiddenColumnKeysChange={setHiddenKeys}
                     createRow={() => ({
                       id: `ORD-${Math.floor(Math.random() * 900 + 100)}`,
                       customer: "",
@@ -323,6 +438,7 @@ function Demo() {
                       pinLeft: "Pin left",
                       pinRight: "Pin right",
                       unpin: "Unpin",
+                      showColumn: "Show",
                     }}
                   />
                 </div>

@@ -3,6 +3,8 @@ import { useTableContext } from "../context/TableContext";
 
 export function HeaderMenu({ colKey }: { colKey: string }) {
   const {
+    columns,
+    hiddenColumns,
     sortState,
     sortColumn,
     setColumnVisibility,
@@ -43,7 +45,17 @@ export function HeaderMenu({ colKey }: { colKey: string }) {
         className="et-col-menu-btn"
         onClick={() => setOpen((o) => !o)}
       >
-        ⋮
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          stroke="currentColor"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          aria-hidden="true"
+        >
+          <path d="M7 2.5h0M7 7h0M7 11.5h0" />
+        </svg>
       </button>
       {open && (
         <>
@@ -87,10 +99,18 @@ export function HeaderMenu({ colKey }: { colKey: string }) {
                 margin: "4px 0",
               }}
             />
-            {item(
-              L?.hideColumn ?? "Hide column",
-              () => setColumnVisibility(colKey, false),
-              "hc",
+            {columns.length > 1 &&
+              item(
+                L?.hideColumn ?? "Hide column",
+                () => setColumnVisibility(colKey, false),
+                "hc",
+              )}
+            {hiddenColumns.map((c) =>
+              item(
+                `${L?.showColumn ?? "Show"} ${c.header ?? c.key}`,
+                () => setColumnVisibility(c.key, true),
+                `sc-${c.key}`,
+              ),
             )}
           </div>
         </>

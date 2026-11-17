@@ -100,7 +100,7 @@ export default function App() {
 | `loading` | `boolean` | `undefined` | Hiện overlay loading |
 | `showHeader` | `boolean` | `true` | Hiện hàng header cột |
 | `autoFocus` | `boolean` | `false` | Focus ô editable đầu tiên khi mount |
-| `theme` | `TableTheme` | `{}` | Ghi đè CSS token |
+| `theme` | `TableTheme` | `{}` | Ghi đè CSS token; preset `DARK_THEME`, `GREEN_THEME`, `PURPLE_THEME`, `ORANGE_THEME` |
 | `rowClassName` | `(row: T, index: number) => string` | `undefined` | CSS class động cho dòng |
 | `createRow` | `() => T` | `undefined` | Bật nút "+ Thêm dòng" |
 | `onSelectionChange` | `(ids: RowId[]) => void` | `undefined` | Bật chọn dòng bằng checkbox |

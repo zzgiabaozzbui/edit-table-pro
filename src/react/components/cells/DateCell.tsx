@@ -69,7 +69,8 @@ export function DateCell({
         disabled={disabled}
         onChange={(e) => commitCell(cell, e.target.value)}
         onFocus={() => setActiveCell(cell)}
-        style={{ width: "100%", textAlign: align ?? "left" }}
+        className="et-input"
+        style={{ width: "100%", height: "100%", textAlign: align ?? "left" }}
       />
       {(isActiveCell ||
         (cellSelection?.rowId === cell.rowId &&

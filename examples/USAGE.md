@@ -60,7 +60,7 @@ commit khi hợp lệ. `format` chuẩn hoá trước khi ghi (ví dụ trim, th
 
 ### Header menu — Sort · Hide · Pin
 
-Mỗi header có nút ⋮: sort tăng/giảm/xoá, ẩn cột, pin trái/phải (ghi đè
+Mỗi header có nút menu cột (ba chấm dọc): sort tăng/giảm/xoá, ẩn cột, pin trái/phải (ghi đè
 `col.fixed`). Sort cũng bật bằng `sortable: true`; pin tĩnh bằng
 `fixed: 'left' | 'right'`.
 
@@ -108,7 +108,7 @@ trên xuống.
 ### Thêm / xoá / sắp xếp hàng
 
 `createRow` bật nút Add row (tự cuộn tới dòng mới). Xoá qua ref
-`removeRows(ids)` — **undo được** nhờ history cấu trúc. Kéo ⠿ đầu hàng để
+`removeRows(ids)` — **undo được** nhờ history cấu trúc. Kéo handle đầu hàng để
 reorder (`rowDraggable` + `onRowReorder`).
 
 ```tsx

@@ -72,7 +72,8 @@ export function DropdownCell({
         disabled={disabled}
         onChange={(e) => commitCell(cell, e.target.value)}
         onFocus={() => setActiveCell(cell)}
-        style={{ width: "100%", textAlign: align ?? "left" }}
+        className="et-input"
+        style={{ width: "100%", height: "100%", textAlign: align ?? "left" }}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -80,6 +81,16 @@ export function DropdownCell({
           </option>
         ))}
       </select>
+      <svg
+        className="et-select-chevron"
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M2 4h8L6 8z" />
+      </svg>
       {(isActiveCell ||
         (cellSelection?.rowId === cell.rowId &&
           cellSelection?.colKeyEnd === cell.colKey)) && (

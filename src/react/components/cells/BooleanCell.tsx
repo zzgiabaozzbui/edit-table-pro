@@ -60,12 +60,16 @@ export function BooleanCell({
         width,
         minWidth: width,
         height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         ...pinnedStyle,
       }}
     >
       <input
         ref={inputRef}
         type="checkbox"
+        className="et-checkbox"
         aria-label={cell.colKey}
         checked={TRUTHY_VALUES.has(value.trim().toLowerCase())}
         disabled={disabled}

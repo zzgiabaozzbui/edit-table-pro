@@ -145,10 +145,41 @@ export function useEditableTable<T extends Record<string, string>>(
     [hiddenKeysControlled, options.onHiddenColumnKeysChange],
   );
 
-  const effectiveColumns = useMemo(
-    () => columns.filter((c) => !hiddenKeys.has(c.key)),
+  // Runtime pin override (#52): wins over static col.fixed
+  const [pins, setPins] = useState<Record<string, PinSide>>({});
+  const effectiveFixed = useCallback(
+    (colKey: string): PinSide =>
+      pins[colKey] ?? columns.find((c) => c.key === colKey)?.fixed,
+    [pins, columns],
+  );
+  const setPin = useCallback((colKey: ColKey, side: PinSide) => {
+    setPins((prev) => {
+      const next = { ...prev };
+      if (side) next[colKey] = side;
+      else delete next[colKey];
+      return next;
+    });
+  }, []);
+
+  // Original order minus hidden; a column shown via hiddenKeys must not keep a static `hidden`
+  const visibleColumns = useMemo(
+    () =>
+      columns
+        .filter((c) => !hiddenKeys.has(c.key))
+        .map((c) => (c.hidden ? { ...c, hidden: false } : c)),
     [columns, hiddenKeys],
   );
+  const hiddenColumns = useMemo(
+    () => columns.filter((c) => hiddenKeys.has(c.key)),
+    [columns, hiddenKeys],
+  );
+  // Display order: left-pinned, unpinned, right-pinned (stable within a group)
+  const effectiveColumns = useMemo(() => {
+    const group = (side: PinSide) =>
+      visibleColumns.filter((c) => (pins[c.key] ?? c.fixed) === side);
+    const unpinned = visibleColumns.filter((c) => !(pins[c.key] ?? c.fixed));
+    return [...group("left"), ...unpinned, ...group("right")];
+  }, [visibleColumns, pins]);
 
   // Shared state
   // Controlled: state holds `value` itself (no extra render); the sync effect gives rowsDataRef its
@@ -267,7 +298,7 @@ export function useEditableTable<T extends Record<string, string>>(
   });
 
   // Feature 5: Row Selection
-  const { selectedRowIds, toggleRow, toggleAll } = useRowSelection({
+  const { selectedRowIds, toggleRow, toggleAll, deselect } = useRowSelection({
     rowsDataRef,
     getRowId,
     onSelectionChange,
@@ -321,9 +352,9 @@ export function useEditableTable<T extends Record<string, string>>(
   // Feature 2: Export CSV
   const exportCsv = useCallback(
     (filename: string) => {
-      exportCsvCore(filename, effectiveColumns, displayRows);
+      exportCsvCore(filename, visibleColumns, displayRows);
     },
-    [effectiveColumns, displayRows],
+    [visibleColumns, displayRows],
   );
 
   const focusCell = useCallback((cell: CellPos) => {
@@ -419,8 +450,20 @@ export function useEditableTable<T extends Record<string, string>>(
           editSessionStore.delete(makeCellKey(rowId, c.key));
       }
       updateRows([...rowsDataRef.current]);
+      deselect(ids);
     },
-    [getRowId, updateRows, columns, editSessionStore],
+    [getRowId, updateRows, columns, editSessionStore, deselect],
+  );
+
+  const scrollToRow = useCallback(
+    (rowId: RowId) => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      const idx = getRowIndex(displayRowsRef.current, rowId);
+      if (idx < 0) return;
+      container.scrollTop = getRowOffset(idx, rowHeight);
+    },
+    [rowHeight, getRowIndex],
   );
 
   const addRow = useCallback(() => {
@@ -428,17 +471,17 @@ export function useEditableTable<T extends Record<string, string>>(
     const newRow = createRow();
     appendRows([newRow]);
     const firstCol = columns.find((c) => !c.hidden && c.editable !== false);
-    // Scroll the new (virtualized) row into view, then focus once mounted
+    // Scroll to the new row's display index (sort may move it; the browser
+    // clamps the last row's offset to max scroll), then focus once mounted
     requestAnimationFrame(() => {
-      const sc = scrollContainerRef.current;
-      if (sc) sc.scrollTop = sc.scrollHeight;
+      scrollToRow(getRowId(newRow));
       if (firstCol) {
         setTimeout(() => {
           focusCell({ rowId: getRowId(newRow), colKey: firstCol.key });
         }, 50);
       }
     });
-  }, [createRow, columns, getRowId, focusCell, appendRows]);
+  }, [createRow, columns, getRowId, focusCell, appendRows, scrollToRow]);
 
   const toggleSort = useCallback((colKey: ColKey) => {
     setSortState((prev) => {
@@ -449,21 +492,6 @@ export function useEditableTable<T extends Record<string, string>>(
     });
   }, []);
 
-  // Runtime pin override (#52): wins over static col.fixed
-  const [pins, setPins] = useState<Record<string, PinSide>>({});
-  const effectiveFixed = useCallback(
-    (colKey: string): PinSide =>
-      pins[colKey] ?? columns.find((c) => c.key === colKey)?.fixed,
-    [pins, columns],
-  );
-  const setPin = useCallback((colKey: ColKey, side: PinSide) => {
-    setPins((prev) => {
-      const next = { ...prev };
-      if (side) next[colKey] = side;
-      else delete next[colKey];
-      return next;
-    });
-  }, []);
   const sortColumn = useCallback(
     (colKey: ColKey, dir: "asc" | "desc" | null) => {
       setSortState(dir ? { colKey, dir } : null);
@@ -554,17 +582,6 @@ export function useEditableTable<T extends Record<string, string>>(
       updateRows(next);
     },
     [updateRows],
-  );
-
-  const scrollToRow = useCallback(
-    (rowId: RowId) => {
-      const container = scrollContainerRef.current;
-      if (!container) return;
-      const idx = getRowIndex(displayRowsRef.current, rowId);
-      if (idx < 0) return;
-      container.scrollTop = getRowOffset(idx, rowHeight);
-    },
-    [rowHeight, getRowIndex],
   );
 
   const validate = useCallback(
@@ -680,5 +697,6 @@ export function useEditableTable<T extends Record<string, string>>(
     // Feature 10b: Column visibility (#24)
     setColumnVisibility,
     toggleColumn,
+    hiddenColumns,
   };
 }

@@ -68,4 +68,35 @@ describe("frozen columns (#15)", () => {
     expect(cell.style.position).toBe("sticky");
     expect(cell.style.left).toBe(header.style.left);
   });
+  describe("pinned cell background (round 3)", () => {
+    const cols: ColDef<Row>[] = [
+      { key: "a", type: "text", fixed: "left" },
+      { key: "b", type: "text" },
+    ];
+    const setup = () =>
+      render(
+        <EditableTable<Row>
+          columns={cols}
+          getRowId={(r) => r.id}
+          initialData={[{ id: "1", a: "", b: "" }]}
+        />,
+      ).container;
+
+    it("body pinned cell has an opaque background color", () => {
+      const cell = setup().querySelector(
+        '[data-rowid="1"][data-colkey="a"]',
+      ) as HTMLElement;
+      const style = cell.getAttribute("style") ?? "";
+      expect(style).toContain("background-color: var(--et-color-bg)");
+    });
+
+    it("pinned header cell keeps the header background", () => {
+      const header = setup().querySelector(
+        '[role="columnheader"]',
+      ) as HTMLElement;
+      const style = header.getAttribute("style") ?? "";
+      expect(style).toContain("background-color: var(--et-color-bg-header)");
+      expect(style).toContain("background-image: none");
+    });
+  });
 });

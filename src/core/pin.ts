@@ -1,6 +1,15 @@
 import type { CSSProperties } from "react";
 import type { PinSide } from "./types";
 
+// Opaque so scrolled content never shows through, yet row / cell state tints
+// (set by table.css as --et-row-tint / --et-cell-tint) are layered on top.
+const tint = (v: string) =>
+  `linear-gradient(var(${v}, transparent), var(${v}, transparent))`;
+const PIN_BG: CSSProperties = {
+  backgroundColor: "var(--et-color-bg)",
+  backgroundImage: `${tint("--et-cell-tint")}, ${tint("--et-row-tint")}`,
+};
+
 /**
  * Sticky positioning for frozen columns (#15). `side` is the RESOLVED pin
  * for this column (runtime override ?? static col.fixed); `getSide` resolves
@@ -24,7 +33,7 @@ export function computePinStyle(
       position: "sticky",
       left: `${offset}px`,
       zIndex: 1,
-      background: "var(--et-color-bg)",
+      ...PIN_BG,
     };
   }
   for (let i = idx + 1; i < keys.length; i++) {
@@ -34,6 +43,6 @@ export function computePinStyle(
     position: "sticky",
     right: `${offset}px`,
     zIndex: 1,
-    background: "var(--et-color-bg)",
+    ...PIN_BG,
   };
 }

@@ -9,5 +9,7 @@ export default defineConfig({
   base: "./", // served from /edit-table-pro/, relative paths keep it working at any sub-path
   plugins: [react()],
   build: { outDir: "../dist/demo", emptyOutDir: true },
-  resolve: { alias: { "@": fileURLToPath(new URL("../src", import.meta.url)) } },
+  resolve: {
+    alias: { "@": fileURLToPath(new URL("../src", import.meta.url)) },
+  },
 });

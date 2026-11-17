@@ -100,8 +100,8 @@ describe("onCellCommit callback (#36)", () => {
       onCellCommit,
     } as Partial<Parameters<typeof useEditableTable<Row>>[0]>);
     await commit(result, "1", "name", "");
-    await commit(result, "1", "name", "a");
-    await commit(result, "1", "name", "a");
+    await commit(result, "1", "name", "x");
+    await commit(result, "1", "name", "x");
     expect(onCellCommit).toHaveBeenCalledTimes(1);
   });
 });
@@ -137,6 +137,30 @@ describe("undo/redo keep the dirty tracker in sync", () => {
     });
     expect(result.current.getDirtyRows().length).toBe(2);
     act(() => result.current.undo());
+    expect(result.current.getDirtyRows()).toEqual([]);
+  });
+
+  it("undo of removeRows restores dirty", async () => {
+    const { result } = setup({
+      initialData: initialData.map((r) => ({ ...r })),
+    });
+    await commit(result, "1", "name", "y");
+    act(() => result.current.removeRows(["1"]));
+    expect(result.current.getDirtyRows()).toEqual([]);
+    act(() => result.current.undo());
+    expect(result.current.getDirtyRows()).toEqual([
+      { rowId: "1", changes: { name: "y" } },
+    ]);
+  });
+
+  it("redo remove drops dirty again", async () => {
+    const { result } = setup({
+      initialData: initialData.map((r) => ({ ...r })),
+    });
+    await commit(result, "1", "name", "y");
+    act(() => result.current.removeRows(["1"]));
+    act(() => result.current.undo());
+    act(() => result.current.redo());
     expect(result.current.getDirtyRows()).toEqual([]);
   });
 

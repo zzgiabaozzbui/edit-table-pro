@@ -107,13 +107,22 @@ export function Cell({
   }, [cellKey, cellRefs]);
 
   // ── Cleanup on unmount ───────────────────────────────────────────────
+  // Latest values for the unmount-only cleanup below.
+  const latestRef = useRef({ cell, commitCell });
+  latestRef.current = { cell, commitCell };
+
   useEffect(() => {
     return () => {
       hideTooltip();
-      // Keep both 'editing' and 'error' sessions alive across virtual scroll
-      // remounts so the user's in-progress value and error state are restored.
+      // An 'editing' session is committed on unmount (virtual scroll, removed
+      // row) since blur never fires; an 'error' session is kept so the error
+      // state is restored on remount.
+      const s = editSessionStore.get(cellKey);
+      if (s?.status === "editing") {
+        void latestRef.current.commitCell(latestRef.current.cell, s.value);
+      }
     };
-  }, [hideTooltip]);
+  }, [hideTooltip, editSessionStore, cellKey]);
 
   // ── Handlers ─────────────────────────────────────────────────────────
   const handleChange = useCallback(

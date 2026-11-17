@@ -65,17 +65,19 @@ export function useKeyboardNav<T extends Record<string, string>>({
           lastPointerInsideRef.current));
     if (!inScope) return;
 
+    const mod = e.ctrlKey || e.metaKey;
+    const key = e.key?.toLowerCase() ?? "";
     const active = activeCellRef.current;
     const navigableCols = columns.filter(
       (c) => !c.hidden && c.editable !== false && !c.render,
     );
 
-    if (e.ctrlKey && e.key === "z" && !e.shiftKey) {
+    if (mod && key === "z" && !e.shiftKey) {
       e.preventDefault();
       undo();
       return;
     }
-    if (e.ctrlKey && (e.key === "y" || (e.shiftKey && e.key === "z"))) {
+    if (mod && (key === "y" || (e.shiftKey && key === "z"))) {
       e.preventDefault();
       redo();
       return;
@@ -89,7 +91,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       ae.type !== "checkbox" &&
       ae.type !== "radio";
 
-    if (e.ctrlKey && e.key === "a") {
+    if (mod && key === "a") {
       if (isTypingTarget) return;
       e.preventDefault();
       const rows = displayRowsRef.current;
@@ -106,7 +108,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    if (e.ctrlKey && e.key === "c" && !isTypingTarget && cellSelection) {
+    if (mod && key === "c" && !isTypingTarget && cellSelection) {
       e.preventDefault();
       const tsv = buildSelectionTsv(
         displayRowsRef.current,
@@ -118,7 +120,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    if (e.ctrlKey && e.key === "x" && !isTypingTarget && cellSelection) {
+    if (mod && key === "x" && !isTypingTarget && cellSelection) {
       e.preventDefault();
       const tsv = buildSelectionTsv(
         displayRowsRef.current,
@@ -181,7 +183,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    if (e.ctrlKey && e.key === "d") {
+    if (mod && key === "d") {
       e.preventDefault();
       const allRows = displayRowsRef.current;
       const rowIdx = getRowIndex(allRows, active.rowId);
@@ -198,7 +200,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    if (e.ctrlKey && e.key === "r") {
+    if (mod && key === "r") {
       e.preventDefault();
       const allRows = displayRowsRef.current;
       const rowIdx = getRowIndex(allRows, active.rowId);
@@ -210,8 +212,13 @@ export function useKeyboardNav<T extends Record<string, string>>({
         const prevValue = allRows[rowIdx][nextColKey] ?? "";
         if (sourceValue !== prevValue) {
           applyFill(
-            { rowIndexStart: rowIdx, rowIndexEnd: rowIdx, colKey: nextColKey },
-            { rowId: getRowId(sourceRow), colKey: active.colKey },
+            {
+              rowIndexStart: rowIdx,
+              rowIndexEnd: rowIdx,
+              colKey: active.colKey,
+              targetColKey: nextColKey,
+            },
+            active,
           );
         }
       }

@@ -107,6 +107,8 @@ export type HistoryStructuralEntry<
     row: T;
     /** For op="move": the index the row came from */
     prevIndex?: number;
+    /** For op="remove": the row's dirty snapshot, restored on undo */
+    dirty?: DirtyRow;
   }>;
   timestamp: number;
 };

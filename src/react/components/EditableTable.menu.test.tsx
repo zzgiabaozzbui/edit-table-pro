@@ -62,24 +62,86 @@ describe("column header menu (#52)", () => {
     expect(header[0].style.right).toBe("0px");
   });
 
-  it("sorts descending directly from the menu", async () => {
-    const { container } = render(
+  const sortData = [
+    { id: "1", a: "b", b: "" },
+    { id: "2", a: "c", b: "" },
+    { id: "3", a: "a", b: "" },
+  ];
+  const renderSorted = () =>
+    render(
       <EditableTable<Row>
-        columns={columns}
+        columns={[...columns, { key: "c", type: "text" }]}
         getRowId={getRowId}
-        initialData={[
-          { id: "1", a: "b", b: "" },
-          { id: "2", a: "a", b: "" },
-        ]}
+        initialData={sortData}
       />,
-    );
-    await openMenu(container, "a");
-    await act(async () => {
-      fireEvent.click(menuItem(container, "Sort descending") as HTMLElement);
-    });
-    const vals = [...container.querySelectorAll('[data-colkey="a"] input')].map(
+    ).container;
+  const colA = (container: HTMLElement) =>
+    [...container.querySelectorAll('[data-colkey="a"] input')].map(
       (e) => (e as HTMLInputElement).value,
     );
-    expect(vals).toEqual(["b", "a"]);
+  const click = (el: HTMLElement) =>
+    act(async () => {
+      fireEvent.click(el);
+    });
+
+  it("sorts ascending directly from the menu", async () => {
+    const container = renderSorted();
+    await openMenu(container, "a");
+    await click(menuItem(container, "Sort ascending") as HTMLElement);
+    expect(colA(container)).toEqual(["a", "b", "c"]);
+  });
+
+  it("sorts descending directly from the menu", async () => {
+    const container = renderSorted();
+    await openMenu(container, "a");
+    await click(menuItem(container, "Sort descending") as HTMLElement);
+    expect(colA(container)).toEqual(["c", "b", "a"]);
+  });
+
+  it("hiding a column on another column keeps sort", async () => {
+    const container = renderSorted();
+    await openMenu(container, "a");
+    await click(menuItem(container, "Sort ascending") as HTMLElement);
+    await openMenu(container, "b");
+    await click(menuItem(container, "Hide column") as HTMLElement);
+    expect(colA(container)).toEqual(["a", "b", "c"]);
+  });
+
+  it("backdrop click closes the menu without changing sort", async () => {
+    const container = renderSorted();
+    await openMenu(container, "a");
+    await click(menuItem(container, "Sort ascending") as HTMLElement);
+    await openMenu(container, "a");
+    await click(
+      container.querySelector('[role="presentation"]') as HTMLElement,
+    );
+    expect(colA(container)).toEqual(["a", "b", "c"]);
+  });
+
+  it("Enter on the column menu button does not sort", async () => {
+    const container = renderSorted();
+    const btn = container.querySelector(
+      '[aria-label="Column menu a"]',
+    ) as HTMLElement;
+    let notPrevented = false;
+    await act(async () => {
+      notPrevented = fireEvent.keyDown(btn, { key: "Enter" });
+    });
+    expect(colA(container)).toEqual(["b", "c", "a"]);
+    expect(notPrevented).toBe(true);
+  });
+
+  it("Enter on a menu item does not toggle the header sort", async () => {
+    const container = renderSorted();
+    await openMenu(container, "a");
+    let notPrevented = false;
+    await act(async () => {
+      notPrevented = fireEvent.keyDown(
+        menuItem(container, "Hide column") as HTMLElement,
+        { key: "Enter" },
+      );
+    });
+    expect(colA(container)).toEqual(["b", "c", "a"]);
+    expect(notPrevented).toBe(true);
   });
 });

@@ -85,3 +85,61 @@ describe("useEditableTable controlled mode (#21)", () => {
     expect(onChange).toHaveBeenCalledWith([{ id: "1", name: "z" }]);
   });
 });
+
+describe("useEditableTable input array immutability (H6)", () => {
+  const makeData = (): Row[] => [
+    { id: "1", name: "a" },
+    { id: "2", name: "b" },
+    { id: "3", name: "c" },
+  ];
+
+  const mutateAll = async (api: {
+    commitCell: (
+      c: { rowId: string; colKey: string },
+      v: string,
+    ) => Promise<void>;
+    applyFill: (
+      r: { rowIndexStart: number; rowIndexEnd: number; colKey: string },
+      s: { rowId: string; colKey: string },
+    ) => void;
+    removeRows: (ids: string[]) => void;
+  }) => {
+    await act(async () => {
+      await api.commitCell({ rowId: "1", colKey: "name" }, "z");
+    });
+    act(() => {
+      api.applyFill(
+        { rowIndexStart: 1, rowIndexEnd: 1, colKey: "name" },
+        { rowId: "1", colKey: "name" },
+      );
+    });
+    act(() => api.removeRows(["3"]));
+  };
+
+  it("initialData array is not mutated", async () => {
+    const data = makeData();
+    const snapshot = [...data];
+    const { result } = renderHook(() =>
+      useEditableTable<Row>({ ...base, initialData: data }),
+    );
+    await mutateAll(result.current);
+    expect(data).toHaveLength(snapshot.length);
+    snapshot.forEach((row, i) => expect(data[i]).toBe(row));
+  });
+
+  it("controlled value not mutated", async () => {
+    const data = makeData();
+    const snapshot = [...data];
+    const { result } = renderHook(() =>
+      useEditableTable<Row>({
+        ...base,
+        initialData: [],
+        value: data,
+        onChange: vi.fn(),
+      }),
+    );
+    await mutateAll(result.current);
+    expect(data).toHaveLength(snapshot.length);
+    snapshot.forEach((row, i) => expect(data[i]).toBe(row));
+  });
+});

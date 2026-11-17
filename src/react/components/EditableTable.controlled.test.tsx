@@ -1,5 +1,5 @@
 import type { ColDef } from "@/core/types";
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { EditableTable } from "./EditableTable";
@@ -108,5 +108,31 @@ describe("controlled props (#38)", () => {
     fireEvent.pointerMove(sep, { pointerId: 1, clientX: 50 });
     fireEvent.pointerUp(sep, { pointerId: 1 });
     expect(onWidths).toHaveBeenCalled();
+  });
+
+  it("controlled mount renders the body as often as uncontrolled", () => {
+    const rows = [
+      { id: "1", a: "x", b: "" },
+      { id: "2", a: "y", b: "" },
+      { id: "3", a: "z", b: "" },
+    ];
+    const count = (props: object) => {
+      const rowClassName = vi.fn(() => "");
+      act(() => {
+        render(
+          <EditableTable<Row>
+            columns={columns}
+            getRowId={getRowId}
+            initialData={rows}
+            rowClassName={rowClassName}
+            {...props}
+          />,
+        );
+      });
+      return rowClassName.mock.calls.length;
+    };
+    const uncontrolled = count({});
+    const controlled = count({ value: rows, onChange: vi.fn() });
+    expect(controlled).toBe(uncontrolled);
   });
 });

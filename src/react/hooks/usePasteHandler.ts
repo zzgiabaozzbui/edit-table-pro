@@ -9,6 +9,7 @@ import type {
   ColDef,
   DirtyRow,
   HistoryState,
+  PasteSkippedCell,
   RowId,
 } from "@/core/types";
 import { makeCellKey } from "@/core/types";
@@ -38,6 +39,7 @@ type UsePasteHandlerOptions<T> = {
   appendRows: (newRows: T[]) => void;
   createRow?: () => T;
   getRowId: (row: T) => string;
+  onPasteSkipped?: (cells: PasteSkippedCell[]) => void;
 };
 
 export function usePasteHandler<T extends Record<string, string>>({
@@ -53,6 +55,7 @@ export function usePasteHandler<T extends Record<string, string>>({
   appendRows,
   createRow,
   getRowId,
+  onPasteSkipped,
 }: UsePasteHandlerOptions<T>) {
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const handlePaste = useCallback(
@@ -93,20 +96,46 @@ export function usePasteHandler<T extends Record<string, string>>({
           nextValue: string;
         }> = [];
         const sideEffectCells: Array<{ cell: CellPos; value: string }> = [];
+        const skipped: PasteSkippedCell[] = [];
+        const skipFrom = (
+          reason: PasteSkippedCell["reason"],
+          line: number,
+          values: string[],
+          from = 0,
+        ) =>
+          values.forEach((value, col) => {
+            if (col >= from) skipped.push({ reason, line, col, value });
+          });
         for (let li = 0; li < lines.length; li++) {
           const displayIndex = activeRowIndex + li;
           const displayRow = displayRowsRef.current[displayIndex];
           const rowIndex = displayRow
             ? getRowIndex(rowsDataRef.current, getRowId(displayRow))
             : allRows.length + displayIndex - visibleCount;
-          if (rowIndex < 0 || rowIndex >= rowsDataRef.current.length) break;
+          if (rowIndex < 0 || rowIndex >= rowsDataRef.current.length) {
+            for (let l = li; l < lines.length; l++)
+              skipFrom("no-row", l, lines[l].split("\t"));
+            break;
+          }
           const rowId = getRowId(rowsDataRef.current[rowIndex]);
           const values = lines[li].split("\t");
           for (let ci = 0; ci < values.length; ci++) {
             const col = editableCols[activeColIndex + ci];
-            if (!col) break;
-            if (!resolveEditable(col.editable, rowsDataRef.current[rowIndex]))
+            if (!col) {
+              skipFrom("no-column", li, values, ci);
+              break;
+            }
+            if (!resolveEditable(col.editable, rowsDataRef.current[rowIndex])) {
+              skipped.push({
+                reason: "row-not-editable",
+                line: li,
+                col: ci,
+                value: values[ci],
+                rowId,
+                colKey: col.key,
+              });
               continue;
+            }
             const trimmed = values[ci].trim();
             const validation = validateCell(
               col,
@@ -149,6 +178,7 @@ export function usePasteHandler<T extends Record<string, string>>({
             });
           }
         }
+        if (skipped.length > 0) onPasteSkipped?.(skipped);
         if (batchEntries.length > 0) {
           pushBatchHistory(historyRef.current, batchEntries);
           setRows([...rowsDataRef.current]);
@@ -188,6 +218,7 @@ export function usePasteHandler<T extends Record<string, string>>({
       createRow,
       getRowId,
       getRowIndex,
+      onPasteSkipped,
     ],
   );
 

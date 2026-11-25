@@ -23,6 +23,7 @@ import type {
   ColKey,
   DirtyRow,
   HistoryState,
+  PasteSkippedCell,
   RowId,
   SubmitRow,
   ValidationResult,
@@ -60,6 +61,8 @@ export type UseEditableTableOptions<T> = {
   onCellClick?: CellClickHandler;
   onCellCommit?: (info: CellCommitInfo) => void;
   onRowSave?: (row: T) => void | Promise<void>;
+  /** Called once per paste with the cells that could not be written. */
+  onPasteSkipped?: (cells: PasteSkippedCell[]) => void;
   /** Controlled search query (#38) */
   searchValue?: string;
   onSearchChange?: (query: string) => void;
@@ -89,6 +92,7 @@ export function useEditableTable<T extends Record<string, string>>(
     initialData,
     getRowId,
     createRow,
+    onPasteSkipped,
     rowHeight: rowHeightProp,
     size = "medium",
     theme = {},
@@ -577,6 +581,7 @@ export function useEditableTable<T extends Record<string, string>>(
     appendRows,
     createRow,
     getRowId,
+    onPasteSkipped,
   });
 
   // Feature 10: Imperative ref API (#20)

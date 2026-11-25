@@ -79,6 +79,13 @@ Bảng đọc văn bản clipboard phân cách bằng tab và ánh xạ giá tr�
 - Nếu dữ liệu dán có nhiều dòng hơn bảng và `createRow` được cung cấp, dòng mới sẽ được append tự động
 - Mỗi cell được dán qua validate trước khi commit — giá trị không hợp lệ bị bỏ qua (cell giữ nguyên giá trị trước)
 - Dán là một bước undo duy nhất
+- Cell có xuống dòng, tab hoặc dấu nháy được đọc đúng như Excel ghi (nháy kép bao quanh cell, `""` cho một dấu nháy), nên cell nhiều dòng dán vào đúng một cell
+- Cell rỗng ở đầu hoặc cuối dòng dán cũng được dán: chúng xoá các cell tương ứng
+- Copy (`Ctrl+C`, `Ctrl+X`) cũng bọc nháy các cell như vậy, nên dán lại vào Excel hoặc vào bảng vẫn nguyên vẹn
+
+### Cell nhiều dòng
+
+Giá trị cell có thể chứa xuống dòng (`\n`). Ô nhập hiển thị chúng thành một khoảng trắng và dữ liệu vẫn giữ xuống dòng. Focus rồi rời cell không đổi giá trị; gõ vào cell sẽ thay giá trị bằng văn bản một dòng bạn vừa gõ.
 
 ### Ví dụ
 

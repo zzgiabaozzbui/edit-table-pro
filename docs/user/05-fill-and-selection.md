@@ -79,6 +79,13 @@ The table reads the tab-separated clipboard text and maps values to the correct 
 - If the pasted data has more rows than the table and `createRow` is provided, new rows are appended automatically
 - Each pasted cell is validated before commit — invalid values are skipped (the cell retains its previous value)
 - The paste is a single undo step
+- Cells with line breaks, tabs or quotes are read the way Excel writes them (double quotes around the cell, `""` for a quote), so a multi-line cell pastes into one cell
+- Empty cells at the start or end of a pasted row are pasted too: they clear the matching cells
+- Copying (`Ctrl+C`, `Ctrl+X`) quotes such cells the same way, so they paste back into Excel and into the table unchanged
+
+### Multi-line cells
+
+A cell value can contain line breaks (`\n`). The text input shows them as a single space and the data keeps the line break. Focusing and leaving a cell does not change it; typing in it replaces the value with the single-line text you typed.
 
 ### Example
 

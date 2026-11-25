@@ -56,7 +56,7 @@ function MyCustomCell() {
 ```ts
 exportCsv('data.csv', columns, rowsDataRef.current)
 // Tạo file download với BOM cho Excel UTF-8
-// Filter hidden columns và render columns tự động
+// Filter hidden columns và cột chỉ có `render` (cột có `renderEditor` vẫn được export) tự động
 ```
 
 ### `DARK_THEME`
@@ -108,7 +108,25 @@ ColDef<T> = {
     debounceMs?: number
     handler: (value: string, ctx: SideEffectContext<T>) => Promise<void>
   }
-  render?: (value: string, row: T, index: number) => ReactNode
+  render?: (value: string, row: T, index: number) => ReactNode      // chỉ hiển thị
+  renderEditor?: (value: string, ctx: RenderEditorContext<T>) => ReactNode  // ô sửa do app vẽ; thắng `render`
+}
+
+RenderEditorContext<T> = {
+  row: T
+  rowIndex: number
+  disabled: boolean                   // editable(row) === false → commit bị bỏ qua
+  error?: string                      // lỗi validate/dán đang giữ trong phiên sửa
+  commit: (value: string) => void     // = commitCell: validate, format, dirty, 1 bước undo, sideEffect, onCellCommit
+  cancel: () => void                  // xoá phiên sửa, value quay về giá trị đã lưu
+  ref: (el: HTMLElement | null) => void  // đăng ký phần tử focus được (input, button, [tabindex]) để Tab/Enter/mũi tên focus vào
+}
+
+PasteSkippedCell = {
+  reason: 'no-column' | 'no-row' | 'row-not-editable'
+  line: number; col: number           // vị trí 0-based trong văn bản đã dán
+  value: string
+  rowId?: RowId; colKey?: string      // chỉ có khi reason = 'row-not-editable'
 }
 
 SideEffectContext<T> = {
@@ -117,6 +135,13 @@ SideEffectContext<T> = {
   patchRow: (patch: Partial<T>) => void  // update các cột khác
 }
 ```
+
+### `onPasteSkipped`
+
+`onPasteSkipped?: (cells: PasteSkippedCell[]) => void` — gọi đúng một lần mỗi lần dán vào ô đang chọn nếu có ô không
+ghi được (hết cột, hết hàng khi không có `createRow`, hàng `editable` false). Không gọi khi dán trọn vẹn. Không báo lỗi
+`validate` (đã hiện qua `ctx.error`), không báo khi dán lúc chưa chọn ô, và không báo việc dồn giá trị quanh cột chỉ có
+`render` (dán bỏ qua cột đó và dồn sang cột kế).
 
 ### Menu cột (`labels`)
 

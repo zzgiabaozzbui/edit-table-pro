@@ -74,6 +74,34 @@ export type ColDef<T = Record<string, string>> = {
   };
   // biome-ignore lint/suspicious/noExplicitAny: return type is ReactNode in the React layer
   render?: (value: string, row: T, index: number) => any;
+  // biome-ignore lint/suspicious/noExplicitAny: return type is ReactNode in the React layer
+  renderEditor?: (value: string, ctx: RenderEditorContext<T>) => any;
+};
+
+export type RenderEditorContext<T> = {
+  row: T;
+  rowIndex: number;
+  /** Cell is not editable on this row (editable(row) === false). */
+  disabled: boolean;
+  /** Validate/paste error held in the edit session. */
+  error?: string;
+  /** Calls commitCell; no-op when disabled. */
+  commit: (value: string) => void;
+  /** Clears the edit session; value returns to the saved one. */
+  cancel: () => void;
+  /** Registers the focus element into cellRefs (input, button or [tabindex]). */
+  ref: (el: HTMLElement | null) => void;
+};
+
+export type PasteSkippedCell = {
+  reason: "no-column" | "no-row" | "row-not-editable";
+  /** 0-based position in the pasted text. */
+  line: number;
+  col: number;
+  value: string;
+  /** Only set when reason = "row-not-editable". */
+  rowId?: RowId;
+  colKey?: string;
 };
 
 export type HistoryEntry = {

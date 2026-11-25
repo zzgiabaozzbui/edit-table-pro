@@ -32,6 +32,8 @@ export type {
   FillState,
   SideEffectContext,
   SideEffectFn,
+  RenderEditorContext,
+  PasteSkippedCell,
 } from "./core/types";
 
 export type { FillSeriesType } from "./core/fill";

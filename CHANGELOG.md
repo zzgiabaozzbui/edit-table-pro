@@ -5,6 +5,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+- **Pasting an Excel cell with a line break split it into several cells** — pasted text is now read as
+  Excel writes it (double quotes around a cell that holds line breaks, tabs or quotes, `""` for a quote),
+  `\r\n` and `\n` both split rows, and one trailing line break adds no row. A multi-line cell pastes into one
+  cell and keeps its line break. Plain single-value paste into a focused input is still left to the browser.
+- **Empty cells at the edge of a pasted row were dropped** — pasting `a<tab>` now clears the next cell too.
+- **Multi-line values were rewritten on blur** — browsers strip line breaks from `<input>`, so focusing and
+  leaving a cell used to turn `a\nb` into `ab` and mark it dirty. An untouched cell now commits its stored
+  value (validation still runs), and the input shows a line break as a single space.
+
+### Changed
+- **Copy quotes cells that hold a tab, line break or double quote** — the clipboard text is valid Excel TSV, so
+  such cells paste back into Excel and into the table unchanged.
+- **Bundle-size budget** — `index.js` raised 94.0 → 98.5 kB and `index.cjs` 59.0 → 61.0 kB for the quote-aware
+  paste/copy parser on top of `renderEditor` (measured 97.9 / 60.7 kB; the earlier budget of this release
+  was 97.5 / 60.5 kB).
+
 ## [0.6.0] — 2026-11-25
 
 ### Added

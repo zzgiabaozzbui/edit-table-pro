@@ -17,7 +17,7 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 | T8 | `onPasteSkipped` | T3, T5 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `useEditableTable.ts`, `EditableTable.paste-skipped.test.tsx` | DONE — `60f675d` · R0 · F0 |
 | T9 | Docs nội bộ | T7, T8 | main | `docs/03-public-api.md`, `docs/05-gotchas.md` | DONE — `5bb8cae` · R0 · F0 |
 | T10 | Docs người dùng (en + vi) | T7, T8 | main | `docs/user/08-custom-render.md`, `docs/user/vi/08-custom-render.md` | DONE — `078fb21` · R0 · F0 |
-| T11 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 | main | `CHANGELOG.md`, `scripts/post-build.mjs` (chỉ khi build vượt ngân sách) | DOING — base 078fb21 |
+| T11 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 | main | `CHANGELOG.md`, `scripts/post-build.mjs` (chỉ khi build vượt ngân sách) | DONE — `f7685c3` · R1 · F0 |
 
 ## Kiểm trước khi chạy
 - T3, T8 chung `usePasteHandler.ts` · T3 đổi bộ lọc cột và xoá phiên lỗi, T8 thêm thu thập ô bị bỏ · tuần tự T3 → T8.
@@ -45,6 +45,9 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 - 2026-11-25 · T7: sửa fixture `renderEditor: () => null` thành `<input ref={ctx.ref} />` trong `EditableTable.render-editor-nav.test.tsx` và `EditableTable.delete-selection.test.tsx` (ngoài `File đụng` của T7, trong Scope của intent) · hai test T4/T5 cần ô có phần tử focus được khi `EditorCell` đã vẽ thật · giá nếu sai: khôi phục hai dòng fixture · main (chế độ 3)
 
 - 2026-11-25 · T9: `docs/05-gotchas.md` bị `.gitignore` (`docs/*.md`, file không được git theo dõi) nên bản sửa chỉ nằm trên đĩa, không vào commit; không `git add -f` · USER chưa nói thêm · giá nếu sai: USER bảo thì `git add -f` hoặc bỏ ignore ở commit riêng (R-172) · main (chế độ 3)
+
+- 2026-11-25 · Review cuối: 5 mục "Đã gạt ra" của reviewer (`no-row` không phát sinh khi có `createRow`; nhánh không ô active và dồn cột quanh cột `render`-only không báo — đã nằm ở intent › Không làm; `EditorCell` không gọi `onCellClick` như `RenderCell`; `editSessionStore.delete` khi dán áp mọi cột, không hồi quy; unmount `EditorCell` khi cuộn ảo không mất dữ liệu) giữ nguyên, không đổi code · reviewer đã dò, khớp quyết định đã chốt · giá nếu sai: thêm task sau · main (chế độ 3)
+- 2026-11-25 · Review cuối: ghi 3 MEDIUM RC1–RC3 vào `review.md` ở trạng thái `hoãn`, chờ USER quyết sửa hay giữ; 2 LOW (`value` thô chứa `\r` khi dán từ Excel Windows, `commit`/`cancel` không `useCallback`) không ghi theo quy ước · main
 
 ## Đã thử, không được
 

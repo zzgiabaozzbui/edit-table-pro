@@ -1,3 +1,7 @@
+---
+plan_duyet: 79b8d03e62986465a718b6250acea3de129999a7
+---
+
 # Progress — `renderEditor` + `onPasteSkipped`
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |

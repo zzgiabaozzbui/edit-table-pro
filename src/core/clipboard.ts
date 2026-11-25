@@ -52,3 +52,39 @@ export function buildSelectionTsv<T extends Record<string, string>>(
   }
   return lines.join("\n");
 }
+
+/** Parse clipboard TSV; a field starting with `"` may hold tabs/newlines, `""` is a literal quote. */
+export function parseTsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let fieldStart = true; // no char of the current field consumed yet
+  let fresh = true; // no char of the current record consumed yet
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    fresh = false;
+    if (c === '"' && fieldStart) {
+      for (i++; i < text.length; i++) {
+        if (text[i] !== '"') field += text[i];
+        else if (text[i + 1] === '"') field += text[++i];
+        else break;
+      }
+    } else if (c === "\t") {
+      row.push(field);
+      field = "";
+      fieldStart = true;
+      continue;
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+      fieldStart = fresh = true;
+      continue;
+    } else field += c;
+    fieldStart = false;
+  }
+  if (!fresh) rows.push([...row, field]);
+  return rows;
+}

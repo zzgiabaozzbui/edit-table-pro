@@ -7,7 +7,7 @@ plan_duyet: 4311585227899fdd5d8139d820a3481c84fd80b2
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
-| T1 | `parseTsv` hiểu nháy kép | — | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | TODO |
+| T1 | `parseTsv` hiểu nháy kép | — | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DOING — base 1719517 |
 | T2 | Copy bọc nháy khi ô có `\n`, `\t`, `"` | T1 | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | TODO |
 | T3 | Dán dùng `parseTsv`, giữ ô rỗng đầu/cuối | T1 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.paste-excel.test.tsx` | TODO |
 | T4 | `Cell` hiển thị `\n` như khoảng trắng, blur không ghi đè | — | edit-table-pro-lib-dev | `cells/Cell.tsx`, `EditableTable.multiline.test.tsx` | TODO |

@@ -1,4 +1,8 @@
-import { buildSelectionTsv, isRowInSelection } from "@/core/clipboard";
+import {
+  buildSelectionTsv,
+  isRowInSelection,
+  parseTsv,
+} from "@/core/clipboard";
 import type { CellSelectionRange, ColDef } from "@/core/types";
 import { describe, expect, it } from "vitest";
 
@@ -73,5 +77,55 @@ describe("isRowInSelection", () => {
     };
     expect(isRowInSelection(4, sel)).toBe(true);
     expect(isRowInSelection(2, sel)).toBe(false);
+  });
+});
+
+describe("parseTsv", () => {
+  it("plain grid", () => {
+    expect(parseTsv("a\tb\nc\td")).toEqual([
+      ["a", "b"],
+      ["c", "d"],
+    ]);
+  });
+
+  it("quoted newline stays in one cell", () => {
+    expect(parseTsv('"a\nb"\tc')).toEqual([["a\nb", "c"]]);
+  });
+
+  it("quoted tab stays in one cell", () => {
+    expect(parseTsv('"a\tb"\tc')).toEqual([["a\tb", "c"]]);
+  });
+
+  it("doubled quote", () => {
+    expect(parseTsv('"say ""hi"""')).toEqual([['say "hi"']]);
+  });
+
+  it("crlf rows", () => {
+    expect(parseTsv("a\tb\r\nc\td")).toEqual([
+      ["a", "b"],
+      ["c", "d"],
+    ]);
+  });
+
+  it("one trailing terminator is dropped", () => {
+    expect(parseTsv("a\tb\r\n")).toEqual([["a", "b"]]);
+    expect(parseTsv("a\n\n")).toEqual([["a"], [""]]);
+  });
+
+  it("empty edge cells kept", () => {
+    expect(parseTsv("a\t")).toEqual([["a", ""]]);
+    expect(parseTsv("\ta")).toEqual([["", "a"]]);
+  });
+
+  it("stray quote in unquoted field kept", () => {
+    expect(parseTsv('5" pipe\tx')).toEqual([['5" pipe', "x"]]);
+  });
+
+  it("unterminated quote runs to end", () => {
+    expect(parseTsv('"abc\tdef')).toEqual([["abc\tdef"]]);
+  });
+
+  it("empty text", () => {
+    expect(parseTsv("")).toEqual([]);
   });
 });

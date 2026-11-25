@@ -1,3 +1,4 @@
+import { parseTsv } from "@/core/clipboard";
 import { isRenderOnly } from "@/core/col-kind";
 import { markDirty } from "@/core/dirty";
 import { formatCell, validateCell } from "@/core/engine/pipeline";
@@ -60,13 +61,19 @@ export function usePasteHandler<T extends Record<string, string>>({
   const getRowIndex = useMemo(() => createRowIndexGetter(getRowId), [getRowId]);
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
-      const text = e.clipboardData.getData("text/plain").trim();
-      if (!text) return;
+      const raw = e.clipboardData.getData("text/plain");
+      if (!raw.trim()) return;
 
-      const lines = text.split("\n");
-      const isMultiCell = lines.length > 1 || lines[0].includes("\t");
+      const rows = parseTsv(raw);
+      const isMultiCell = rows.length > 1 || rows[0].length > 1;
 
-      if (!isMultiCell && e.target instanceof HTMLInputElement) return;
+      // Plain text goes to the browser; quotes or newlines are handled here.
+      if (
+        !isMultiCell &&
+        e.target instanceof HTMLInputElement &&
+        rows[0][0] === raw
+      )
+        return;
 
       e.preventDefault();
       const visibleCols = columns.filter((c) => !c.hidden);
@@ -83,7 +90,7 @@ export function usePasteHandler<T extends Record<string, string>>({
 
       if (activeRowIndex !== -1 && activeColIndex !== -1) {
         const allRows = rowsDataRef.current;
-        const needed = activeRowIndex + lines.length;
+        const needed = activeRowIndex + rows.length;
         const visibleCount = displayRowsRef.current.length;
         if (needed > visibleCount && createRow) {
           const extra = needed - visibleCount;
@@ -106,19 +113,19 @@ export function usePasteHandler<T extends Record<string, string>>({
           values.forEach((value, col) => {
             if (col >= from) skipped.push({ reason, line, col, value });
           });
-        for (let li = 0; li < lines.length; li++) {
+        for (let li = 0; li < rows.length; li++) {
           const displayIndex = activeRowIndex + li;
           const displayRow = displayRowsRef.current[displayIndex];
           const rowIndex = displayRow
             ? getRowIndex(rowsDataRef.current, getRowId(displayRow))
             : allRows.length + displayIndex - visibleCount;
           if (rowIndex < 0 || rowIndex >= rowsDataRef.current.length) {
-            for (let l = li; l < lines.length; l++)
-              skipFrom("no-row", l, lines[l].split("\t"));
+            for (let l = li; l < rows.length; l++)
+              skipFrom("no-row", l, rows[l]);
             break;
           }
           const rowId = getRowId(rowsDataRef.current[rowIndex]);
-          const values = lines[li].split("\t");
+          const values = rows[li];
           for (let ci = 0; ci < values.length; ci++) {
             const col = editableCols[activeColIndex + ci];
             if (!col) {
@@ -194,8 +201,7 @@ export function usePasteHandler<T extends Record<string, string>>({
           }
         }
       } else if (createRow) {
-        const newRows = lines.map((line) => {
-          const values = line.split("\t");
+        const newRows = rows.map((values) => {
           const row = createRow();
           editableCols.forEach((col, i) => {
             if (values[i] === undefined || !resolveEditable(col.editable, row))

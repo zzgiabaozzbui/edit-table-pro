@@ -8,8 +8,8 @@ plan_duyet: 4311585227899fdd5d8139d820a3481c84fd80b2
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
 | T1 | `parseTsv` hiểu nháy kép | — | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DONE — `ff7fbe7` · R0 · F0 |
-| T2 | Copy bọc nháy khi ô có `\n`, `\t`, `"` | T1 | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DOING — base ff7fbe7 |
-| T3 | Dán dùng `parseTsv`, giữ ô rỗng đầu/cuối | T1 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.paste-excel.test.tsx` | TODO |
+| T2 | Copy bọc nháy khi ô có `\n`, `\t`, `"` | T1 | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DONE — `f82d687` · R0 · F0 |
+| T3 | Dán dùng `parseTsv`, giữ ô rỗng đầu/cuối | T1 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.paste-excel.test.tsx` | DOING — base f82d687 |
 | T4 | `Cell` hiển thị `\n` như khoảng trắng, blur không ghi đè | — | edit-table-pro-lib-dev | `cells/Cell.tsx`, `EditableTable.multiline.test.tsx` | TODO |
 | T5 | Docs người dùng (en + vi) | T2, T3, T4 | main | `docs/user/05-fill-and-selection.md`, `docs/user/vi/05-fill-va-chon-vung.md` | TODO |
 | T6 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5 | main | `CHANGELOG.md`, `scripts/post-build.mjs` (chỉ khi build vượt ngân sách) | TODO |
@@ -26,5 +26,8 @@ plan_duyet: 4311585227899fdd5d8139d820a3481c84fd80b2
 - 2026-11-25 · Nhánh: làm trên nhánh hiện tại `main` (commit vào nhánh chính) · USER
 - 2026-11-25 · Không đổi `<input>` thành `<textarea>` ở task này (làm theo plan) · USER
 - 2026-11-25 · Bundle: nếu `build` vượt ngân sách, cho main nâng `BUDGET["index.js"]` / `["index.cjs"]` ở `scripts/post-build.mjs` vừa đủ cộng đệm nhỏ, ghi lý do và số cũ / mới vào CHANGELOG · USER
+
+- 2026-11-25 · T3: build vượt (`index.js` 97.786 B, `index.cjs` 60.707 B); main nâng sớm `BUDGET` ở `scripts/post-build.mjs` ngay trong commit T3 (plan nói T6, nâng sớm để các task sau còn verify được `build`): `index.js` 97.500 → 98.500, `index.cjs` 60.500 → 61.000 theo quyền USER; lý do ghi CHANGELOG ở T6 · main (chế độ 3, trong quyền USER)
+- 2026-11-25 · T3: jsdom cũng bỏ `\n` khỏi `input.value`, nên test đọc giá trị nhiều dòng qua `getDirtyRows()` · xác nhận giả định về `<input>` ở mức jsdom (chưa kiểm trình duyệt thật) · main
 
 ## Đã thử, không được

@@ -13,7 +13,10 @@ const columns: ColDef<Row>[] = [
     key: "b",
     type: "text",
     render: (v: string) => <span>{v}</span>,
-    renderEditor: () => null,
+    renderEditor: (
+      _v: string,
+      ctx: { ref: (el: HTMLElement | null) => void },
+    ) => <input ref={ctx.ref} />,
     validate: (v: string) =>
       v === "bad" ? { ok: false, error: "no" } : { ok: true },
   } as ColDef<Row>,

@@ -9,6 +9,7 @@ import { BooleanCell } from "./cells/BooleanCell";
 import { Cell } from "./cells/Cell";
 import { DateCell } from "./cells/DateCell";
 import { DropdownCell } from "./cells/DropdownCell";
+import { EditorCell } from "./cells/EditorCell";
 import { ReadonlyCell } from "./cells/ReadonlyCell";
 import { RenderCell } from "./cells/RenderCell";
 import { SelectCell } from "./cells/SelectCell";
@@ -234,6 +235,24 @@ export function VirtualBody<T extends Record<string, string>>({
                     .filter(Boolean)
                     .join(" ") || undefined;
 
+                if (col.renderEditor) {
+                  return (
+                    <EditorCell
+                      key={col.key}
+                      cell={{ rowId, colKey: col.key }}
+                      value={liveRow[col.key] ?? ""}
+                      renderEditor={col.renderEditor}
+                      row={liveRow}
+                      rowIndex={rowIndex}
+                      width={colWidth}
+                      pinnedStyle={pinStyles[col.key]}
+                      disabled={!isEditable}
+                      className={cellClass}
+                      data-colkey={col.key}
+                      data-rowid={rowId}
+                    />
+                  );
+                }
                 if (col.render) {
                   return (
                     <RenderCell

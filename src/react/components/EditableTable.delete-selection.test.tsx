@@ -93,7 +93,10 @@ describe("Delete and autoFocus with renderEditor column", () => {
       key: "b",
       type: "text",
       render: (v: string) => <span>{v}</span>,
-      renderEditor: () => null,
+      renderEditor: (
+        _v: string,
+        ctx: { ref: (el: HTMLElement | null) => void },
+      ) => <input ref={ctx.ref} />,
     } as ColDef<Row>,
     { key: "c", type: "text", render: (v: string) => <span>{v}</span> },
     { key: "d", type: "text" },

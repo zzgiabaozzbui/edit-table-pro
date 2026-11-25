@@ -5,6 +5,24 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- **`renderEditor` column option** — a column can draw its own editor (date picker, combobox…) and still take
+  part in the table's editing: paste, fill (drag, Ctrl+D, Ctrl+R), Tab/Enter/arrow keys, Delete, undo/redo
+  and CSV export. `ctx.commit(value)` goes through `commitCell`, so `validate`, `format`, dirty tracking,
+  one undo step, `sideEffect` and `onCellCommit` apply; `ctx.error` exposes a rejected value, `ctx.ref`
+  registers the element to focus. A column with only `render` stays display-only. New exports:
+  `RenderEditorContext`.
+- **`onPasteSkipped` option** — called once per paste into the active cell with the cells that could not be
+  written (`no-column`, `no-row`, `row-not-editable`), so an app can tell the user. New export:
+  `PasteSkippedCell`.
+
+### Changed
+- **CSV export includes `renderEditor` columns** — they hold a raw string value; columns with only `render`
+  are still left out.
+- **Paste clears a stale error** — a successful paste into a cell drops its earlier validation error session.
+- **Bundle-size budget** — `index.js` raised 94.0 → 97.0 kB and `index.cjs` 59.0 → 60.5 kB for
+  `EditorCell`, `renderEditor` handling and `onPasteSkipped` (measured 96.9 / 60.2 kB).
+
 ## [0.5.0] — 2026-11-25
 
 ### Added

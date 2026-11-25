@@ -16,8 +16,8 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 | T7 | `EditorCell` và nối vào `VirtualBody` | T1, T3, T4 | edit-table-pro-lib-dev | `cells/EditorCell.tsx`, `VirtualBody.tsx`, `EditableTable.render-editor.test.tsx` | DONE — `cf72373` · R0 · F0 |
 | T8 | `onPasteSkipped` | T3, T5 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `useEditableTable.ts`, `EditableTable.paste-skipped.test.tsx` | DONE — `60f675d` · R0 · F0 |
 | T9 | Docs nội bộ | T7, T8 | main | `docs/03-public-api.md`, `docs/05-gotchas.md` | DONE — `5bb8cae` · R0 · F0 |
-| T10 | Docs người dùng (en + vi) | T7, T8 | main | `docs/user/08-custom-render.md`, `docs/user/vi/08-custom-render.md` | DOING — base 5bb8cae |
-| T11 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 | main | `CHANGELOG.md`, `scripts/post-build.mjs` (chỉ khi build vượt ngân sách) | TODO |
+| T10 | Docs người dùng (en + vi) | T7, T8 | main | `docs/user/08-custom-render.md`, `docs/user/vi/08-custom-render.md` | DONE — `078fb21` · R0 · F0 |
+| T11 | CHANGELOG + verify toàn bộ | T1, T2, T3, T4, T5, T6, T7, T8, T9, T10 | main | `CHANGELOG.md`, `scripts/post-build.mjs` (chỉ khi build vượt ngân sách) | DOING — base 078fb21 |
 
 ## Kiểm trước khi chạy
 - T3, T8 chung `usePasteHandler.ts` · T3 đổi bộ lọc cột và xoá phiên lỗi, T8 thêm thu thập ô bị bỏ · tuần tự T3 → T8.

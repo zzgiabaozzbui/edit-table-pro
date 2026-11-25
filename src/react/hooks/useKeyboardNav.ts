@@ -1,4 +1,5 @@
 import { buildSelectionTsv, writeClipboardText } from "@/core/clipboard";
+import { isRenderOnly } from "@/core/col-kind";
 import { createRowIndexGetter } from "@/core/row-index";
 import type { EditSessionStore } from "@/core/session";
 import type {
@@ -69,7 +70,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
     const key = e.key?.toLowerCase() ?? "";
     const active = activeCellRef.current;
     const navigableCols = columns.filter(
-      (c) => !c.hidden && c.editable !== false && !c.render,
+      (c) => !c.hidden && c.editable !== false && !isRenderOnly(c),
     );
 
     if (mod && key === "z" && !e.shiftKey) {

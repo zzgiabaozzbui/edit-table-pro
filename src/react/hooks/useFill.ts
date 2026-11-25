@@ -1,3 +1,4 @@
+import { isRenderOnly } from "@/core/col-kind";
 import { markDirty } from "@/core/dirty";
 import { detectSeriesType, generateFillValues } from "@/core/fill";
 import { pushBatchHistory } from "@/core/history";
@@ -62,7 +63,7 @@ export function useFill<T extends Record<string, string>>({
       // ── Horizontal fill: same row(s), column span from source col ──
       if (range.targetColKey && range.targetColKey !== range.colKey) {
         const visibleKeys = columns
-          .filter((c) => !c.hidden && !c.render)
+          .filter((c) => !c.hidden && !isRenderOnly(c))
           .map((c) => c.key);
         const si = visibleKeys.indexOf(range.colKey);
         const ti = visibleKeys.indexOf(range.targetColKey);

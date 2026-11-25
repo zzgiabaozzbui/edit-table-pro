@@ -20,8 +20,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - **CSV export includes `renderEditor` columns** — they hold a raw string value; columns with only `render`
   are still left out.
 - **Paste clears a stale error** — a successful paste into a cell drops its earlier validation error session.
-- **Bundle-size budget** — `index.js` raised 94.0 → 97.0 kB and `index.cjs` 59.0 → 60.5 kB for
-  `EditorCell`, `renderEditor` handling and `onPasteSkipped` (measured 96.9 / 60.2 kB).
+- **Bundle-size budget** — `index.js` raised 94.0 → 97.5 kB and `index.cjs` 59.0 → 60.5 kB for
+  `EditorCell`, `renderEditor` handling and `onPasteSkipped` (measured 97.1 / 60.3 kB).
+- **Fill, Delete and paste clear a stale cell error** — writing a value into a cell by fill, Delete or paste
+  (including a value equal to the saved one for paste) drops that cell's earlier validation error session.
+- **`onPasteSkipped` runs last** — after data, history and re-render are done; an error thrown by the
+  callback is logged with `console.error` and does not break the paste.
 
 ## [0.5.0] — 2026-11-25
 

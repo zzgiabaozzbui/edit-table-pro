@@ -151,6 +151,7 @@ export function usePasteHandler<T extends Record<string, string>>({
               });
               continue;
             }
+            editSessionStore.delete(cellKey);
             const formatted = formatCell(col, trimmed);
             const prevValue = rowsDataRef.current[rowIndex][col.key] ?? "";
             if (formatted === prevValue) continue;
@@ -165,7 +166,6 @@ export function usePasteHandler<T extends Record<string, string>>({
               prevValue,
               formatted,
             );
-            editSessionStore.delete(cellKey);
             batchEntries.push({
               rowId,
               colKey: col.key,
@@ -178,12 +178,19 @@ export function usePasteHandler<T extends Record<string, string>>({
             });
           }
         }
-        if (skipped.length > 0) onPasteSkipped?.(skipped);
         if (batchEntries.length > 0) {
           pushBatchHistory(historyRef.current, batchEntries);
           setRows([...rowsDataRef.current]);
           for (const { cell, value } of sideEffectCells) {
             runSideEffect(cell, value, "blur");
+          }
+        }
+        // After data, history and re-render are done: a throwing callback must not break the paste.
+        if (skipped.length > 0) {
+          try {
+            onPasteSkipped?.(skipped);
+          } catch (err) {
+            console.error(err);
           }
         }
       } else if (createRow) {

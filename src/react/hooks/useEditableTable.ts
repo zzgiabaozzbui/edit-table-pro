@@ -352,6 +352,7 @@ export function useEditableTable<T extends Record<string, string>>(
     displayRowsRef,
     dirtyRowsRef,
     historyRef,
+    editSessionStore,
     setRows: updateRows,
     setCellSelection,
   });
@@ -540,6 +541,7 @@ export function useEditableTable<T extends Record<string, string>>(
         if (prevValue === "" || !resolveEditable(col.editable, row)) continue;
         mutated = { ...(mutated ?? row), [colKey]: "" };
         markDirty(dirtyRowsRef.current, rowId, colKey, prevValue, "");
+        editSessionStore.delete(makeCellKey(rowId, colKey));
         batchEntries.push({
           rowId,
           colKey,
@@ -564,6 +566,7 @@ export function useEditableTable<T extends Record<string, string>>(
     effectiveColumns,
     getRowId,
     getRowIndex,
+    editSessionStore,
     updateRows,
     runSideEffect,
   ]);

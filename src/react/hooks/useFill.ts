@@ -3,6 +3,7 @@ import { markDirty } from "@/core/dirty";
 import { detectSeriesType, generateFillValues } from "@/core/fill";
 import { pushBatchHistory } from "@/core/history";
 import { createRowIndexGetter } from "@/core/row-index";
+import type { EditSessionStore } from "@/core/session";
 import type {
   CellPos,
   CellRange,
@@ -14,6 +15,7 @@ import type {
   HistoryState,
   RowId,
 } from "@/core/types";
+import { makeCellKey } from "@/core/types";
 import {
   type Dispatch,
   type MutableRefObject,
@@ -38,6 +40,7 @@ type UseFillOptions<T> = {
   displayRowsRef: MutableRefObject<T[]>;
   dirtyRowsRef: MutableRefObject<Map<RowId, DirtyRow>>;
   historyRef: MutableRefObject<HistoryState>;
+  editSessionStore: EditSessionStore;
   setRows: Dispatch<SetStateAction<T[]>>;
   setCellSelection: (sel: CellSelectionRange | null) => void;
 };
@@ -49,6 +52,7 @@ export function useFill<T extends Record<string, string>>({
   displayRowsRef,
   dirtyRowsRef,
   historyRef,
+  editSessionStore,
   setRows,
   setCellSelection,
 }: UseFillOptions<T>) {
@@ -111,6 +115,7 @@ export function useFill<T extends Record<string, string>>({
                 prevValue,
                 nextValue,
               );
+              editSessionStore.delete(makeCellKey(getRowId(row), ck));
               batchEntries.push({
                 rowId: getRowId(row),
                 colKey: ck,
@@ -189,6 +194,7 @@ export function useFill<T extends Record<string, string>>({
             prevValue,
             nextValue,
           );
+          editSessionStore.delete(makeCellKey(getRowId(row), ck));
           batchEntries.push({
             rowId: getRowId(row),
             colKey: ck,
@@ -213,6 +219,7 @@ export function useFill<T extends Record<string, string>>({
       displayRowsRef,
       dirtyRowsRef,
       historyRef,
+      editSessionStore,
       setRows,
       setCellSelection,
       getRowIndex,

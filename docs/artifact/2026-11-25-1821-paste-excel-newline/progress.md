@@ -1,3 +1,8 @@
+---
+chay_tu: 4311585
+plan_duyet: 4311585227899fdd5d8139d820a3481c84fd80b2
+---
+
 # Progress — dán và copy ô Excel có xuống dòng
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |

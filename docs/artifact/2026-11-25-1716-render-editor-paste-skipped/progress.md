@@ -1,6 +1,6 @@
 ---
 chay_tu: c340cc7
-plan_duyet: 79b8d03e62986465a718b6250acea3de129999a7
+plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 ---
 
 # Progress — `renderEditor` + `onPasteSkipped`

@@ -8,8 +8,8 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
 | T1 | Type `RenderEditorContext`, `renderEditor`, `PasteSkippedCell`, `onPasteSkipped` | — | edit-table-pro-lib-dev | `core/types.ts`, `index.ts` | DONE — `cf45a89` · R0 · F0 |
-| T2 | Helper `isRenderOnly` | T1 | edit-table-pro-lib-dev | `core/col-kind.ts`, `core/col-kind.test.ts` | DOING — base cf45a89 |
-| T3 | Dán nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.render-editor-paste.test.tsx` | TODO |
+| T2 | Helper `isRenderOnly` | T1 | edit-table-pro-lib-dev | `core/col-kind.ts`, `core/col-kind.test.ts` | DONE — `9e0471a` · R0 · F0 |
+| T3 | Dán nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.render-editor-paste.test.tsx` | DOING — base 9e0471a |
 | T4 | Fill và phím nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `useFill.ts`, `EditableTable.render-editor-nav.test.tsx` | TODO |
 | T5 | Delete vùng chọn và autoFocus nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete-selection.test.tsx` | TODO |
 | T6 | Export CSV nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `core/export/index.ts`, `core/export/export-render-editor.test.ts` | TODO |

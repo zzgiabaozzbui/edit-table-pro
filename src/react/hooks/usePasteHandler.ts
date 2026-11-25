@@ -1,3 +1,4 @@
+import { isRenderOnly } from "@/core/col-kind";
 import { markDirty } from "@/core/dirty";
 import { formatCell, validateCell } from "@/core/engine/pipeline";
 import { pushBatchHistory } from "@/core/history";
@@ -67,7 +68,7 @@ export function usePasteHandler<T extends Record<string, string>>({
       e.preventDefault();
       const visibleCols = columns.filter((c) => !c.hidden);
       const editableCols = visibleCols.filter(
-        (c) => c.editable !== false && !c.render,
+        (c) => c.editable !== false && !isRenderOnly(c),
       );
       const active = activeCellRef.current;
       const activeRowIndex = active
@@ -135,6 +136,7 @@ export function usePasteHandler<T extends Record<string, string>>({
               prevValue,
               formatted,
             );
+            editSessionStore.delete(cellKey);
             batchEntries.push({
               rowId,
               colKey: col.key,

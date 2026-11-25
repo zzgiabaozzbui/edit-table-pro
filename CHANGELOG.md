@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-11-25
+
 ### Added
 - **`renderEditor` column option** — a column can draw its own editor (date picker, combobox…) and still take
   part in the table's editing: paste, fill (drag, Ctrl+D, Ctrl+R), Tab/Enter/arrow keys, Delete, undo/redo
@@ -237,7 +239,8 @@ Virtual scroll, inline validation, side effects, undo/redo, fill handle,
 multi-cell selection, Excel/Sheets paste, row selection, column resize, CSV
 export, theming.
 
-[Unreleased]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/zzgiabaozzbui/edit-table-pro/compare/v0.3.0...v0.3.1

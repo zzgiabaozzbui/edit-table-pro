@@ -156,6 +156,69 @@ render: (_, row) => (
 
 ---
 
+## Cell tự vẽ ô sửa: `renderEditor`
+
+`render` chỉ để hiển thị. Khi cell phải nằm trong phần sửa của bảng — dán, fill, phím Tab/Enter/mũi tên, Delete,
+undo/redo và xuất CSV — hãy khai `renderEditor` cho cột. Bạn tự vẽ ô sửa (date picker, combobox…); bảng vẫn giữ phiên
+sửa, theo dõi dirty và lịch sử.
+
+```tsx
+{
+  key: 'dueAt',
+  type: 'text',
+  header: 'Hạn',
+  renderEditor: (value, ctx) => (
+    <MyDatePicker
+      inputRef={ctx.ref}
+      value={value}
+      disabled={ctx.disabled}
+      status={ctx.error ? 'error' : undefined}
+      onChange={(next) => ctx.commit(next)}
+    />
+  ),
+}
+```
+
+| Trường `ctx` | Ý nghĩa |
+|--------------|---------|
+| `row`, `rowIndex` | Dòng đầy đủ và chỉ số dòng (bắt đầu từ 0) |
+| `disabled` | `true` khi `editable(row)` là `false`; lúc đó `commit` bị bỏ qua |
+| `error` | Lỗi validate hoặc lỗi dán đang giữ trong phiên sửa (`validate` từ chối giá trị) |
+| `commit(value)` | Cùng đường với gõ vào cell thường: validate, `format`, đánh dấu dirty, một bước undo, `sideEffect`, `onCellCommit` |
+| `cancel()` | Xoá phiên sửa; `value` quay về giá trị đã lưu |
+| `ref` | Gắn vào phần tử cần nhận focus (input, button hoặc phần tử có `[tabindex]`). Tab, Enter và mũi tên sẽ focus vào đó |
+
+Lưu ý:
+
+- Cột có cả `render` và `renderEditor` thì `renderEditor` thắng.
+- `validate` từ chối thì giá trị không vào dữ liệu; hãy hiện `ctx.error` cho người dùng.
+- Bảng xử lý Enter, Tab, Escape và Delete ở cấp `document`. Với picker có popup, gọi `stopPropagation` cho các phím
+  picker cần (handler React chạy trước listener của bảng).
+
+---
+
+## Báo ô dán bị bỏ: `onPasteSkipped`
+
+Dán vào bảng sẽ ghi mọi cell ghi được. `onPasteSkipped` nhận danh sách cell không ghi được, một lần cho mỗi lần dán,
+để bạn báo cho người dùng.
+
+```ts
+<EditableTable
+  onPasteSkipped={(cells) =>
+    notify(`${cells.length} ô đã dán chưa được áp dụng`)
+  }
+/>
+```
+
+Mỗi phần tử có `reason` (`'no-column'`: vượt cột sửa được cuối cùng · `'no-row'`: vượt hàng cuối và không có
+`createRow` · `'row-not-editable'`: `editable(row)` của hàng là `false`), `line` và `col` (vị trí bắt đầu từ 0 trong văn
+bản dán), và `value`. `row-not-editable` còn có `rowId` và `colKey`.
+
+Không gọi khi mọi ô đều được ghi. Không báo lỗi `validate` (dùng `ctx.error`), lần dán khi chưa chọn ô, hay giá trị bị
+dồn qua cột chỉ có `render`: dán bỏ qua cột đó và dồn giá trị sang cột kế.
+
+---
+
 ## Lưu ý về hiệu năng
 
 Hàm render chạy cho mọi dòng hiển thị mỗi lần re-render. Giữ nó đơn giản — tránh tạo object hay array bên trong hàm render nếu có thể. Nếu phần thân hàm phức tạp, memoize component mà nó trả về.

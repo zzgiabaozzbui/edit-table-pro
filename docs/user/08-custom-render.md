@@ -156,6 +156,70 @@ render: (_, row) => (
 
 ---
 
+## Editable custom cell: `renderEditor`
+
+`render` is display-only. When the cell must stay part of the table's editing — paste, fill, Tab/Enter/arrow keys,
+Delete, undo/redo and CSV export — give the column `renderEditor` instead. You draw the editor (a date picker, a
+combobox…); the table keeps the edit session, dirty tracking and history.
+
+```tsx
+{
+  key: 'dueAt',
+  type: 'text',
+  header: 'Due',
+  renderEditor: (value, ctx) => (
+    <MyDatePicker
+      inputRef={ctx.ref}
+      value={value}
+      disabled={ctx.disabled}
+      status={ctx.error ? 'error' : undefined}
+      onChange={(next) => ctx.commit(next)}
+    />
+  ),
+}
+```
+
+| `ctx` field | Meaning |
+|-------------|---------|
+| `row`, `rowIndex` | The full row and its 0-based index |
+| `disabled` | `true` when `editable(row)` is `false`; `commit` is then ignored |
+| `error` | Validation or paste error held in the edit session (`validate` rejected the value) |
+| `commit(value)` | Same path as typing in a normal cell: validate, `format`, dirty mark, one undo step, `sideEffect`, `onCellCommit` |
+| `cancel()` | Clears the edit session; `value` returns to the saved one |
+| `ref` | Pass it to the element that should receive focus (an input, button or `[tabindex]` element). Tab, Enter and arrow keys focus it |
+
+Notes:
+
+- `renderEditor` wins when a column has both `render` and `renderEditor`.
+- A `validate` rejection keeps the value out of the data; show `ctx.error` to the user.
+- The table handles Enter, Tab, Escape and Delete at `document` level. For a picker with a popup, call
+  `stopPropagation` on the keys the picker needs (React handlers run before the table's listener).
+
+---
+
+## Report skipped paste cells: `onPasteSkipped`
+
+Pasting into the table writes every cell it can. `onPasteSkipped` receives the cells it could not write, once per
+paste, so you can tell the user.
+
+```ts
+<EditableTable
+  onPasteSkipped={(cells) =>
+    notify(`${cells.length} pasted cells were not applied`)
+  }
+/>
+```
+
+Each item has `reason` (`'no-column'`: past the last editable column · `'no-row'`: past the last row and no
+`createRow` · `'row-not-editable'`: the row's `editable(row)` is `false`), `line` and `col` (0-based position in the
+pasted text), and `value`. `row-not-editable` also carries `rowId` and `colKey`.
+
+It is not called when everything was written. It does not report `validate` failures (use `ctx.error`), pastes made
+with no active cell, or values shifted past a `render`-only column: paste skips such a column and moves the values to
+the next one.
+
+---
+
 ## Performance note
 
 Render functions run for every visible row on every re-render. Keep them cheap — avoid creating objects or arrays inside the render function if possible. If the function body is complex, memoize the component it returns.

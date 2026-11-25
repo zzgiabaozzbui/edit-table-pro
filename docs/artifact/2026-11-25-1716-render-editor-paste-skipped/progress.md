@@ -7,8 +7,8 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
-| T1 | Type `RenderEditorContext`, `renderEditor`, `PasteSkippedCell`, `onPasteSkipped` | — | edit-table-pro-lib-dev | `core/types.ts`, `index.ts` | DOING — base ab67585 |
-| T2 | Helper `isRenderOnly` | T1 | edit-table-pro-lib-dev | `core/col-kind.ts`, `core/col-kind.test.ts` | TODO |
+| T1 | Type `RenderEditorContext`, `renderEditor`, `PasteSkippedCell`, `onPasteSkipped` | — | edit-table-pro-lib-dev | `core/types.ts`, `index.ts` | DONE — `cf45a89` · R0 · F0 |
+| T2 | Helper `isRenderOnly` | T1 | edit-table-pro-lib-dev | `core/col-kind.ts`, `core/col-kind.test.ts` | DOING — base cf45a89 |
 | T3 | Dán nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.render-editor-paste.test.tsx` | TODO |
 | T4 | Fill và phím nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `useFill.ts`, `EditableTable.render-editor-nav.test.tsx` | TODO |
 | T5 | Delete vùng chọn và autoFocus nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete-selection.test.tsx` | TODO |
@@ -32,6 +32,8 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 - 2026-11-25 · Chế độ hỏi: tự quyết · USER
 - 2026-11-25 · Nhánh: làm trên nhánh hiện tại `main` (commit vào nhánh chính) · USER
 - 2026-11-25 · Bundle: nếu `build` vượt ngân sách, cho nâng `BUDGET["index.cjs"]` ở `scripts/post-build.mjs` và ghi lý do vào CHANGELOG · USER
+
+- 2026-11-25 · T1 đo build: `index.cjs` 58.563 / 59.000 B (còn 437), `index.js` 93.907 / 94.000 B (còn 93 B, plan chỉ nhắc `index.cjs`). Quyền nâng ngân sách của USER mới nêu `index.cjs`; nếu `index.js` vượt thì hỏi USER trước khi sửa `BUDGET["index.js"]` · main
 
 ## Đã thử, không được
 

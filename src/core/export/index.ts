@@ -1,3 +1,4 @@
+import { isRenderOnly } from "../col-kind";
 import type { ColDef } from "../types";
 
 export function exportCsv<T extends Record<string, string>>(
@@ -5,7 +6,7 @@ export function exportCsv<T extends Record<string, string>>(
   columns: ColDef<T>[],
   rows: T[],
 ): void {
-  const cols = columns.filter((c) => !c.hidden && !c.render);
+  const cols = columns.filter((c) => !c.hidden && !isRenderOnly(c));
   const quote = (s: string) => `"${s.replace(/"/g, '""')}"`;
   const header = cols.map((c) => quote(String(c.header ?? c.key))).join(",");
   const body = rows

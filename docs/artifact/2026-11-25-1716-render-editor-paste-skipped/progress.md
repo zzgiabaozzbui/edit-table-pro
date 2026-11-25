@@ -49,6 +49,10 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 - 2026-11-25 · Review cuối: 5 mục "Đã gạt ra" của reviewer (`no-row` không phát sinh khi có `createRow`; nhánh không ô active và dồn cột quanh cột `render`-only không báo — đã nằm ở intent › Không làm; `EditorCell` không gọi `onCellClick` như `RenderCell`; `editSessionStore.delete` khi dán áp mọi cột, không hồi quy; unmount `EditorCell` khi cuộn ảo không mất dữ liệu) giữ nguyên, không đổi code · reviewer đã dò, khớp quyết định đã chốt · giá nếu sai: thêm task sau · main (chế độ 3)
 - 2026-11-25 · Review cuối: ghi 3 MEDIUM RC1–RC3 vào `review.md` ở trạng thái `hoãn`, chờ USER quyết sửa hay giữ; 2 LOW (`value` thô chứa `\r` khi dán từ Excel Windows, `commit`/`cancel` không `useCallback`) không ghi theo quy ước · main
 
+- 2026-11-25 · Sửa RC1–RC3 (USER: "Sửa cả 3"), commit `b3240b0`. `onPasteSkipped` chạy sau cùng và lỗi callback bị bắt, ghi `console.error` · agent chọn, main chấp nhận: lỗi của app không làm hỏng lần dán, test happy-dom không bắt được lỗi nổi lên · giá nếu sai: bỏ try/catch (~40 B) · main (chế độ 3)
+- 2026-11-25 · Bundle: `index.js` vượt 118 B sau RC1–RC3 (97.118 B); main nâng `BUDGET["index.js"]` 97.000 → 97.500 theo quyền USER; `index.cjs` 60.289 / 60.500 B · main
+- 2026-11-25 · Fill / Delete chỉ xoá phiên lỗi của ô thực sự được ghi (giá trị đổi); fill giá trị bằng giá trị đã lưu không xoá phiên lỗi · đúng phạm vi RC3 · main
+
 ## Đã thử, không được
 
 

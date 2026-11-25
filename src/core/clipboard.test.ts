@@ -53,6 +53,33 @@ describe("buildSelectionTsv", () => {
     };
     expect(buildSelectionTsv(rows, cols, getRowId, sel)).toBe("y2");
   });
+
+  const copyOf = (data: Row[], colKeyEnd = "b") =>
+    buildSelectionTsv(data, cols, getRowId, {
+      rowId: "1",
+      rowIndex: 0,
+      rowIdEnd: String(data.length),
+      rowIndexEnd: data.length - 1,
+      colKeyStart: "a",
+      colKeyEnd,
+    });
+
+  it("plain values unchanged", () => {
+    expect(copyOf([{ id: "1", a: "x 1", b: "" }])).toBe("x 1\t");
+  });
+
+  it("value with newline is quoted", () => {
+    expect(copyOf([{ id: "1", a: "a\nb", b: "c" }], "a")).toBe('"a\nb"');
+  });
+
+  it("round trip", () => {
+    const matrix = [
+      ["x\ty", 'say "hi"'],
+      ["a\nb", ""],
+    ];
+    const data = matrix.map(([a, b], i) => ({ id: String(i + 1), a, b }));
+    expect(parseTsv(copyOf(data))).toEqual(matrix);
+  });
 });
 
 describe("isRowInSelection", () => {

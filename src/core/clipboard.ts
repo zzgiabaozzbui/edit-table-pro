@@ -27,6 +27,10 @@ export function isRowInSelection(
   );
 }
 
+/** Quote a value that would break TSV structure (tab, newline, quote); `"` doubles. */
+const tsvField = (v: string): string =>
+  /[\t\r\n"]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+
 export function buildSelectionTsv<T extends Record<string, string>>(
   rows: T[],
   columns: ColDef<T>[],
@@ -48,7 +52,9 @@ export function buildSelectionTsv<T extends Record<string, string>>(
   for (let r = rLo; r <= rHi; r++) {
     const row = rows[r];
     if (!row || getRowId(row) === undefined) continue;
-    lines.push(colSlice.map((c) => String(row[c.key] ?? "")).join("\t"));
+    lines.push(
+      colSlice.map((c) => tsvField(String(row[c.key] ?? ""))).join("\t"),
+    );
   }
   return lines.join("\n");
 }

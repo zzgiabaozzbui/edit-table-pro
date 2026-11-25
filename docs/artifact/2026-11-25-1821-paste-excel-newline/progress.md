@@ -7,8 +7,8 @@ plan_duyet: 4311585227899fdd5d8139d820a3481c84fd80b2
 
 | ID | Task | Phụ thuộc | Ai làm | File đụng | Trạng thái |
 |---|---|---|---|---|---|
-| T1 | `parseTsv` hiểu nháy kép | — | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DOING — base 1719517 |
-| T2 | Copy bọc nháy khi ô có `\n`, `\t`, `"` | T1 | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | TODO |
+| T1 | `parseTsv` hiểu nháy kép | — | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DONE — `ff7fbe7` · R0 · F0 |
+| T2 | Copy bọc nháy khi ô có `\n`, `\t`, `"` | T1 | edit-table-pro-lib-dev | `core/clipboard.ts`, `core/clipboard.test.ts` | DOING — base ff7fbe7 |
 | T3 | Dán dùng `parseTsv`, giữ ô rỗng đầu/cuối | T1 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.paste-excel.test.tsx` | TODO |
 | T4 | `Cell` hiển thị `\n` như khoảng trắng, blur không ghi đè | — | edit-table-pro-lib-dev | `cells/Cell.tsx`, `EditableTable.multiline.test.tsx` | TODO |
 | T5 | Docs người dùng (en + vi) | T2, T3, T4 | main | `docs/user/05-fill-and-selection.md`, `docs/user/vi/05-fill-va-chon-vung.md` | TODO |

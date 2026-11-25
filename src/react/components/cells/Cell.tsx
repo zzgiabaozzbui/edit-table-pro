@@ -166,9 +166,13 @@ export function Cell({
     (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(false);
       hideTooltip();
-      commitCell(cell, e.target.value);
+      // Untouched cell: commit the stored value, since browsers strip "\n" from input.value.
+      commitCell(
+        cell,
+        editSessionStore.get(cellKey) ? e.target.value : initialValue,
+      );
     },
-    [cell, commitCell, hideTooltip],
+    [cell, cellKey, commitCell, editSessionStore, hideTooltip, initialValue],
   );
 
   const handleClick = useCallback(() => {
@@ -194,7 +198,7 @@ export function Cell({
     >
       <input
         ref={inputRef}
-        value={inputValue}
+        value={inputValue.replace(/\r?\n/g, " ")}
         placeholder={placeholder}
         onClick={handleClick}
         onChange={handleChange}

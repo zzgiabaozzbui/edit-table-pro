@@ -10,8 +10,8 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 | T1 | Type `RenderEditorContext`, `renderEditor`, `PasteSkippedCell`, `onPasteSkipped` | — | edit-table-pro-lib-dev | `core/types.ts`, `index.ts` | DONE — `cf45a89` · R0 · F0 |
 | T2 | Helper `isRenderOnly` | T1 | edit-table-pro-lib-dev | `core/col-kind.ts`, `core/col-kind.test.ts` | DONE — `9e0471a` · R0 · F0 |
 | T3 | Dán nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `EditableTable.render-editor-paste.test.tsx` | DONE — `c446b42` · R0 · F0 |
-| T4 | Fill và phím nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `useFill.ts`, `EditableTable.render-editor-nav.test.tsx` | DOING — base c446b42 |
-| T5 | Delete vùng chọn và autoFocus nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete-selection.test.tsx` | TODO |
+| T4 | Fill và phím nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useKeyboardNav.ts`, `useFill.ts`, `EditableTable.render-editor-nav.test.tsx` | DONE — `9b5b88f` · R0 · F0 |
+| T5 | Delete vùng chọn và autoFocus nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `useEditableTable.ts`, `EditableTable.delete-selection.test.tsx` | DOING — base 9b5b88f |
 | T6 | Export CSV nhận cột `renderEditor` | T2 | edit-table-pro-lib-dev | `core/export/index.ts`, `core/export/export-render-editor.test.ts` | TODO |
 | T7 | `EditorCell` và nối vào `VirtualBody` | T1, T3, T4 | edit-table-pro-lib-dev | `cells/EditorCell.tsx`, `VirtualBody.tsx`, `EditableTable.render-editor.test.tsx` | TODO |
 | T8 | `onPasteSkipped` | T3, T5 | edit-table-pro-lib-dev | `usePasteHandler.ts`, `useEditableTable.ts`, `EditableTable.paste-skipped.test.tsx` | TODO |
@@ -38,6 +38,8 @@ plan_duyet: 59ef1e1fe28a7a16e98acb5a402c66fed49d3fe3
 - 2026-11-25 · Bundle: cho nâng cả `BUDGET["index.js"]` và `BUDGET["index.cjs"]` ở `scripts/post-build.mjs` (mở rộng quyền ban đầu chỉ `index.cjs`) · USER; chỉ main nâng (T11 hoặc sớm hơn khi build vượt), ghi lý do và số cũ / mới vào CHANGELOG
 - 2026-11-25 · T3: `isRenderOnly` nhận `{ render?: unknown; renderEditor?: unknown }` thay `Pick<ColDef, ...>` để khỏi cast ở nơi gọi (`ColDef<T>` không gán được cho `ColDef` mặc định) · sửa `core/col-kind.ts` đã DONE ở T2, test T2 không đổi · giá nếu sai: khôi phục một chữ ký · main (chế độ 3)
 - 2026-11-25 · T3: test đọc phiên sửa bằng `vi.spyOn(EditSessionStore.prototype, "update")` vì ref bảng không lộ store · agent chọn, main chấp nhận · giá nếu sai: viết lại 2 test · main (chế độ 3)
+
+- 2026-11-25 · T4: test đặc tính `render-only column skipped by Tab and Ctrl+R` có thể xanh tầm thường vì `RenderCell` không gọi `setActiveCell`; ca Tab bỏ qua cột `render`-only kiểm chắc ở T7 (`tab skips render-only`, từ `EditorCell` thật) · giá nếu sai: thêm một test ở T7 · main (chế độ 3)
 
 ## Đã thử, không được
 

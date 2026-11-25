@@ -1,3 +1,4 @@
+import { isRenderOnly } from "@/core/col-kind";
 import { collectDirtyRows, discardRow, markDirty } from "@/core/dirty";
 import { validateCell } from "@/core/engine/pipeline";
 import { exportCsv as exportCsvCore } from "@/core/export";
@@ -377,7 +378,8 @@ export function useEditableTable<T extends Record<string, string>>(
     const firstRow = rowsDataRef.current[0];
     if (!firstRow) return;
     const firstEditableCol = columns.find((col) => {
-      if (col.hidden || col.render || col.editable === false) return false;
+      if (col.hidden || isRenderOnly(col) || col.editable === false)
+        return false;
       return typeof col.editable === "function" ? col.editable(firstRow) : true;
     });
     if (!firstEditableCol) return;
@@ -506,7 +508,7 @@ export function useEditableTable<T extends Record<string, string>>(
     if (!sel) return false;
     const rows = displayRowsRef.current;
     const visibleCols = effectiveColumns.filter(
-      (c) => !c.hidden && c.editable !== false && !c.render,
+      (c) => !c.hidden && c.editable !== false && !isRenderOnly(c),
     );
     const startIdx = visibleCols.findIndex((c) => c.key === sel.colKeyStart);
     const endIdx = visibleCols.findIndex((c) => c.key === sel.colKeyEnd);

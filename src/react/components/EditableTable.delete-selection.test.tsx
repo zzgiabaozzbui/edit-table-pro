@@ -85,3 +85,64 @@ describe("removeRows prunes row selection", () => {
     expect(onSelectionChange).not.toHaveBeenCalled();
   });
 });
+
+describe("Delete and autoFocus with renderEditor column", () => {
+  const reColumns: ColDef<Row>[] = [
+    { key: "a", type: "text" },
+    {
+      key: "b",
+      type: "text",
+      render: (v: string) => <span>{v}</span>,
+      renderEditor: () => null,
+    } as ColDef<Row>,
+    { key: "c", type: "text", render: (v: string) => <span>{v}</span> },
+    { key: "d", type: "text" },
+  ];
+  const full = { id: "1", a: "x", b: "y", c: "z", d: "w" };
+
+  const deleteTo = (colKey: string) => {
+    const ref = createRef<EditableTableRef<Row>>();
+    const { container } = render(
+      <EditableTable<Row>
+        ref={ref}
+        columns={reColumns}
+        getRowId={getRowId}
+        initialData={[full]}
+      />,
+    );
+    fireEvent.focus(container.querySelector("input") as HTMLInputElement);
+    fireEvent.pointerDown(
+      container.querySelector(
+        `[data-rowid="1"][data-colkey="${colKey}"]`,
+      ) as HTMLElement,
+      { shiftKey: true },
+    );
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Delete" }));
+    });
+    return ref.current?.getDirtyRows()[0]?.changes ?? {};
+  };
+
+  it("Delete clears a renderEditor column in the selection", () => {
+    expect(deleteTo("b")).toMatchObject({ a: "", b: "" });
+  });
+
+  it("Delete leaves a render-only column alone", () => {
+    expect(deleteTo("c")).not.toHaveProperty("c");
+  });
+
+  it("autoFocus targets a leading renderEditor column", async () => {
+    const { container } = render(
+      <EditableTable<Row>
+        autoFocus
+        columns={[reColumns[1], reColumns[0]]}
+        getRowId={getRowId}
+        initialData={[full]}
+      />,
+    );
+    await act(() => new Promise((r) => requestAnimationFrame(() => r(null))));
+    expect(
+      (document.activeElement as HTMLElement).closest("[data-colkey]"),
+    ).toBe(container.querySelector('[data-rowid="1"][data-colkey="b"]'));
+  });
+});

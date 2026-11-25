@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- **Dirty cell highlight** — cells changed but not yet saved are bold and blue (`data-dirty="true"`,
+  color token `--etp-dirty-color`). On by default; `highlightDirty={false}` turns it off. Cleared by
+  `markSaved`, or by editing/undoing back to the original value.
+
 ## [0.4.0] — 2026-11-17
 
 ### Added

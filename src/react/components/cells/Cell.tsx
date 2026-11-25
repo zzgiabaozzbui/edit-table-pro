@@ -1,7 +1,7 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTableContext } from "../../context/TableContext";
+import { useCellDirty, useTableContext } from "../../context/TableContext";
 import { useEditSession } from "../../hooks/useEditSession";
 import { FillHandle } from "../FillHandle";
 
@@ -175,12 +175,15 @@ export function Cell({
     onCellClick?.(cell.rowId, cell.colKey, inputValue);
   }, [cell.colKey, cell.rowId, inputValue, onCellClick]);
 
+  const dirty = useCellDirty(cell.rowId, cell.colKey);
+
   return (
     <div
       role="gridcell"
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}
+      data-dirty={dirty}
       style={{
         position: "relative",
         width,

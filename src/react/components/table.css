@@ -396,3 +396,9 @@ input[type="date"].et-input:hover::-webkit-calendar-picker-indicator {
   --et-cell-tint: color-mix(in srgb, var(--et-color-primary) 8%, transparent);
   background-color: var(--et-cell-tint) !important;
 }
+
+[data-dirty="true"],
+[data-dirty="true"] .et-input {
+  font-weight: 600;
+  color: var(--etp-dirty-color, #2563eb);
+}

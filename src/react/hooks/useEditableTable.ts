@@ -96,6 +96,7 @@ export function useEditableTable<T extends Record<string, string>>(
     showHeader,
     sticky,
     striped,
+    highlightDirty = true,
     rowClassName,
     loadingType,
     skeletonRows,
@@ -120,6 +121,7 @@ export function useEditableTable<T extends Record<string, string>>(
     showHeader,
     sticky,
     striped,
+    highlightDirty,
     rowClassName,
     loadingType,
     skeletonRows,
@@ -600,12 +602,11 @@ export function useEditableTable<T extends Record<string, string>>(
     return collectDirtyRows(dirtyRowsRef.current);
   }, []);
 
+  const [, setDirtyVersion] = useState(0);
   const markSaved = useCallback((rowIds?: RowId[]) => {
-    if (rowIds === undefined) {
-      dirtyRowsRef.current.clear();
-      return;
-    }
-    for (const id of rowIds) discardRow(dirtyRowsRef.current, id);
+    if (rowIds === undefined) dirtyRowsRef.current.clear();
+    else for (const id of rowIds) discardRow(dirtyRowsRef.current, id);
+    setDirtyVersion((v) => v + 1); // refs only: force cells to drop data-dirty
   }, []);
 
   // Feature 10b: Column visibility (#24) — controllable (#38)

@@ -42,6 +42,19 @@ export function collectDirtyRows(dirtyMap: Map<RowId, DirtyRow>): SubmitRow[] {
   return result;
 }
 
+export function isCellDirty(
+  dirtyMap: Map<RowId, DirtyRow>,
+  rowId: RowId,
+  colKey: ColKey,
+): boolean {
+  const row = dirtyMap.get(rowId);
+  return (
+    !!row &&
+    colKey in row.current &&
+    row.current[colKey] !== row.original[colKey]
+  );
+}
+
 export function isDirty(dirtyMap: Map<RowId, DirtyRow>, rowId: RowId): boolean {
   return dirtyMap.has(rowId);
 }

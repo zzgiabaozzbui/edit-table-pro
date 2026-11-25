@@ -1,7 +1,7 @@
 import { makeCellKey } from "@/core/types";
 import type { CellPos } from "@/core/types";
 import { useEffect, useRef } from "react";
-import { useTableContext } from "../../context/TableContext";
+import { useCellDirty, useTableContext } from "../../context/TableContext";
 import { FillHandle } from "../FillHandle";
 
 type Option = { label: string; value: string };
@@ -52,12 +52,15 @@ export function DropdownCell({
     };
   }, [cellKey, cellRefs]);
 
+  const dirty = useCellDirty(cell.rowId, cell.colKey);
+
   return (
     <div
       role="gridcell"
       className={className}
       data-colkey={dataColKey}
       data-rowid={dataRowId}
+      data-dirty={dirty}
       style={{
         position: "relative",
         width,

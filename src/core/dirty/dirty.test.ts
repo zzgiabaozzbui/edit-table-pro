@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { collectDirtyRows, discardRow, isDirty, markDirty } from "./index";
+import {
+  collectDirtyRows,
+  discardRow,
+  isCellDirty,
+  isDirty,
+  markDirty,
+} from "./index";
 
 describe("markDirty", () => {
   it("marks a new dirty cell", () => {
@@ -93,5 +99,17 @@ describe("discardRow", () => {
     const original = discardRow(map, "r1");
     expect(original).toEqual({ name: "Alice" });
     expect(map.has("r1")).toBe(false);
+  });
+});
+
+describe("isCellDirty", () => {
+  it("is true only while current differs from original", () => {
+    const map = new Map();
+    expect(isCellDirty(map, "r1", "name")).toBe(false);
+    markDirty(map, "r1", "name", "Alice", "Bob");
+    expect(isCellDirty(map, "r1", "name")).toBe(true);
+    expect(isCellDirty(map, "r1", "other")).toBe(false);
+    markDirty(map, "r1", "name", "Bob", "Alice");
+    expect(isCellDirty(map, "r1", "name")).toBe(false);
   });
 });

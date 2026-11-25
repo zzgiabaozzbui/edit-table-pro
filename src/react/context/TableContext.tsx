@@ -1,3 +1,4 @@
+import { isCellDirty } from "@/core/dirty";
 import type { EditSessionStore } from "@/core/session";
 import type { TableTheme } from "@/core/theme";
 import type {
@@ -38,6 +39,8 @@ export type TableProps<T> = {
   searchable?: boolean;
   labels?: Partial<import("@/core/labels").TableLabels>;
   rowDraggable?: boolean;
+  /** Bold + blue for cells changed but not yet saved. Default true. */
+  highlightDirty?: boolean;
 };
 
 export type TableContextValue<T = Record<string, string>> = {
@@ -148,4 +151,13 @@ export function useTableContext<
   if (!ctx)
     throw new Error("useTableContext must be used inside <EditableTable>");
   return ctx as TableContextValue<T>;
+}
+
+/** `data-dirty` attribute for a cell root; undefined when clean or `highlightDirty` is off. */
+export function useCellDirty(rowId: RowId, colKey: ColKey): "true" | undefined {
+  const { dirtyRowsRef, tableProps } = useTableContext();
+  return tableProps.highlightDirty !== false &&
+    isCellDirty(dirtyRowsRef.current, rowId, colKey)
+    ? "true"
+    : undefined;
 }

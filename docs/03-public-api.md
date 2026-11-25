@@ -25,6 +25,7 @@ Tất cả export từ `src/index.ts`. Đây là contract với consumers — đ
   loading
   showHeader
   sticky
+  highlightDirty={true}                                 // bold+blue unsaved cells (default true); color: --etp-dirty-color
   rowClassName={(row, i) => i % 2 === 0 ? 'et-row-stripe' : ''}
 />
 ```

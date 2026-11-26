@@ -96,6 +96,35 @@ describe("textarea column", () => {
     expect(ok).toBe(true);
   });
 
+  it("pasting several plain lines into the focused textarea is left to the browser", () => {
+    const { ta } = setup();
+    act(() => ta.focus());
+    const ok = fireEvent.paste(ta, {
+      clipboardData: { getData: () => "a\nb" },
+    });
+    expect(ok).toBe(true);
+  });
+
+  it("pasting a tab grid or a quoted cell into the textarea is still handled by the table", () => {
+    const { ta } = setup();
+    act(() => ta.focus());
+    for (const raw of ["a\tb", '"a\nb"']) {
+      expect(
+        fireEvent.paste(ta, { clipboardData: { getData: () => raw } }),
+      ).toBe(false);
+    }
+  });
+
+  // jsdom has no layout: only the rule is checked, not the painted stacking order.
+  it("raises the cell holding the focused textarea above its pinned inline z-index", async () => {
+    // vitest strips CSS imports and the repo has no @types/node, so read the file through a computed specifier.
+    const { readFileSync } = await import(/* @vite-ignore */ `node:${"fs"}`);
+    const css: string = readFileSync("src/react/components/table.css", "utf8");
+    expect(css).toMatch(
+      /\[role="gridcell"\]:has\(> \.et-textarea:focus\)\s*\{[^}]*z-index:\s*15\s*!important/,
+    );
+  });
+
   it("pointer down inside the focused textarea does not start a cell selection", () => {
     const { container, ta } = setup();
     act(() => ta.focus());

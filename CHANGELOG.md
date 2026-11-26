@@ -13,6 +13,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
   CSV export work as for a text cell.
 
 ### Fixed
+- **Textarea column: multi-line paste and pinned columns** — pasting plain multi-line text into a focused
+  textarea no longer spills into the rows below (tab grids and quoted Excel cells still paste into cells), and a
+  floating textarea in a pinned column is no longer covered by neighbouring cells.
 - **Pasting an Excel cell with a line break split it into several cells** — pasted text is now read as
   Excel writes it (double quotes around a cell that holds line breaks, tabs or quotes, `""` for a quote),
   `\r\n` and `\n` both split rows, and one trailing line break adds no row. A multi-line cell pastes into one

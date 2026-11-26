@@ -67,6 +67,8 @@ export function usePasteHandler<T extends Record<string, string>>({
       const rows = parseTsv(raw);
       const isMultiCell = rows.length > 1 || rows[0].length > 1;
 
+      // A textarea keeps plain multi-line text as typed; tabs (grid) and quotes (Excel cell) stay with the table.
+      if (e.target instanceof HTMLTextAreaElement && !/[\t"]/.test(raw)) return;
       // Plain text goes to the browser; quotes or newlines are handled here.
       if (
         !isMultiCell &&

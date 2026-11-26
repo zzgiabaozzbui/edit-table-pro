@@ -65,6 +65,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
+/* pinned cells are sticky with an inline z-index: lift the whole cell, or the floating textarea stays inside it */
+[role="gridcell"]:has(> .et-textarea:focus) {
+  z-index: 15 !important;
+}
+
 select.et-input {
   appearance: none;
   padding-right: 26px;

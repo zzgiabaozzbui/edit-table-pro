@@ -94,7 +94,7 @@ store.subscribe(listener) // → unsubscribe fn (dùng với useSyncExternalStor
 ```ts
 ColDef<T> = {
   key: keyof T & string
-  type: 'text' | 'number' | 'date' | 'select' | 'boolean'
+  type: 'text' | 'number' | 'date' | 'select' | 'boolean' | 'textarea'
   header?: string
   width?: number
   align?: 'left' | 'center' | 'right'

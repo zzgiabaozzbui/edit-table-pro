@@ -23,6 +23,7 @@ type Order = {
   price: string;
   orderedAt: string;
   active: string;
+  note: string;
 };
 
 const CATEGORIES = ["Electronics", "Apparel", "Home", "Beauty"];
@@ -53,6 +54,7 @@ function sample(n: number): Order[] {
       price: String(((i * 37) % 90) * 10000 + 50000),
       orderedAt: `2026-0${(i % 8) + 1}-1${i % 9}`,
       active: i % 3 === 0 ? "true" : "false",
+      note: i % 4 === 0 ? "Call first\nLeave at door" : "",
     };
   });
 }
@@ -140,6 +142,7 @@ const columns: ColDef<Order>[] = [
     sortable: true,
   },
   { key: "active", type: "boolean", header: "Active", width: 100 },
+  { key: "note", type: "textarea", header: "Note", width: 180 },
 ];
 
 const GITHUB = "https://github.com/zzgiabaozzbui/edit-table-pro";
@@ -422,6 +425,7 @@ function Demo() {
                       price: "0",
                       orderedAt: "2026-01-01",
                       active: "false",
+                      note: "",
                     })}
                     onSelectionChange={setSelected}
                     onCellCommit={(info) =>

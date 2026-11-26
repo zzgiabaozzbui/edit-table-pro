@@ -25,8 +25,10 @@ const BUDGET = {
   // horizontal fill, auto-scroll, footer, skeleton, ARIA grid, labels, dark theme)
   // 94.0 -> 98.5 kB (index.js) and 59.0 -> 61.0 kB (index.cjs) after renderEditor /
   // EditorCell, onPasteSkipped and the quote-aware paste/copy parser - see CHANGELOG [Unreleased].
-  "index.js": 98_500,
-  "index.cjs": 61_000,
+  // 98.5 -> 102.5 kB (index.js) and 61.0 -> 63.5 kB (index.cjs) after the textarea cell
+  // type (TextareaCell + keyboard/paste/selection handling) - see CHANGELOG [Unreleased].
+  "index.js": 102_500,
+  "index.cjs": 63_500,
   "style.css": 7_000,
 };
 

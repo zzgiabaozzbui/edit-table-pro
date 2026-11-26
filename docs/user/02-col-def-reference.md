@@ -27,10 +27,12 @@ Maps to a property on your row type. Must be a string key.
 ### `type`
 
 ```ts
-type: 'text' | 'number' | 'date' | 'select' | 'boolean'
+type: 'text' | 'number' | 'date' | 'select' | 'boolean' | 'textarea'
 ```
 
 Declares the column's value type. This affects how the cell input behaves and how values are validated/formatted by default.
+
+`'textarea'` edits multi-line text. The row keeps its fixed height and shows the value on one line; while editing, a larger text box floats over the cell. Enter commits and moves on, Shift+Enter or Alt+Enter adds a line break. Paste, fill, undo and CSV export treat it like a text cell. `placeholder` and `align` apply; `ellipsis` does not.
 
 > All values are stored as strings regardless of type. `type` is metadata that your `validate` and `format` callbacks can use — it does not coerce the stored string.
 

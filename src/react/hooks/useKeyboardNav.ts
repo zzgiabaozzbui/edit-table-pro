@@ -87,10 +87,12 @@ export function useKeyboardNav<T extends Record<string, string>>({
     if (!active) return;
 
     const ae = document.activeElement;
+    const textEl =
+      ae instanceof HTMLInputElement || ae instanceof HTMLTextAreaElement
+        ? ae
+        : null;
     const isTypingTarget =
-      ae instanceof HTMLInputElement &&
-      ae.type !== "checkbox" &&
-      ae.type !== "radio";
+      textEl !== null && textEl.type !== "checkbox" && textEl.type !== "radio";
 
     if (mod && key === "a") {
       if (isTypingTarget) return;
@@ -254,7 +256,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
       (document.activeElement instanceof HTMLInputElement &&
         document.activeElement.type === "date");
     const caretAtBoundary = (at: "start" | "end") => {
-      const el = ae instanceof HTMLInputElement ? ae : null;
+      const el = textEl;
       if (!el || el.type === "date" || el.type === "checkbox") return true;
       if (el.selectionStart === null || el.selectionEnd === null) return true;
       return at === "start"
@@ -262,6 +264,15 @@ export function useKeyboardNav<T extends Record<string, string>>({
         : el.selectionStart === el.value.length &&
             el.selectionEnd === el.value.length;
     };
+
+    // A textarea moves the caret between lines; only its first/last line hands ArrowUp/Down to the table.
+    const caretOnEdgeLine = (at: "first" | "last") =>
+      !(ae instanceof HTMLTextAreaElement) ||
+      !(
+        at === "first"
+          ? ae.value.slice(0, ae.selectionStart)
+          : ae.value.slice(ae.selectionEnd)
+      ).includes("\n");
 
     const navigate = (
       from: CellPos,
@@ -342,7 +353,7 @@ export function useKeyboardNav<T extends Record<string, string>>({
         rowIndex !== -1 ? (snapRows[rowIndex][active.colKey] ?? "") : "";
       editSessionStore.delete(key);
       const el = cellRefs.current?.get(key);
-      if (el instanceof HTMLInputElement) {
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
         el.value = originalValue;
         el.blur();
       }
@@ -355,12 +366,12 @@ export function useKeyboardNav<T extends Record<string, string>>({
       return;
     }
 
-    if (!nativeControl && e.key === "ArrowUp") {
+    if (!nativeControl && e.key === "ArrowUp" && caretOnEdgeLine("first")) {
       e.preventDefault();
       navigate(active, "up");
       return;
     }
-    if (!nativeControl && e.key === "ArrowDown") {
+    if (!nativeControl && e.key === "ArrowDown" && caretOnEdgeLine("last")) {
       e.preventDefault();
       navigate(active, "down");
       return;

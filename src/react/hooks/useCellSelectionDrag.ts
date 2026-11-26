@@ -50,7 +50,10 @@ export function useCellSelectionDrag<T>({
     (e: React.PointerEvent<HTMLDivElement>) => {
       const target = e.target as HTMLElement;
       if (target.tagName === "BUTTON") return;
-      if (target.tagName === "INPUT" && document.activeElement === target)
+      if (
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA") &&
+        document.activeElement === target
+      )
         return;
 
       const cellEl = target.closest<HTMLElement>("[data-colkey][data-rowid]");

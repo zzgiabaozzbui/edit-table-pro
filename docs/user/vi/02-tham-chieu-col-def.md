@@ -27,10 +27,12 @@ key: keyof T & string
 ### `type`
 
 ```ts
-type: 'text' | 'number' | 'date' | 'select' | 'boolean'
+type: 'text' | 'number' | 'date' | 'select' | 'boolean' | 'textarea'
 ```
 
 Khai báo kiểu giá trị của cột. Ảnh hưởng đến cách input cell hoạt động và cách giá trị được validate/format mặc định.
+
+`'textarea'` sửa văn bản nhiều dòng. Hàng giữ chiều cao cố định và hiện giá trị trên một dòng; khi sửa, một ô nhập lớn hơn nổi lên trên ô. Enter commit và sang ô kế, Shift+Enter hoặc Alt+Enter xuống dòng. Dán, fill, undo và export CSV xử lý như ô text. `placeholder` và `align` có tác dụng; `ellipsis` không.
 
 > Mọi giá trị đều lưu dạng string bất kể type. `type` là metadata để callback `validate` và `format` của bạn sử dụng — không ép kiểu chuỗi lưu trữ.
 

@@ -43,6 +43,28 @@
     color-mix(in srgb, var(--et-color-primary) 10%, transparent);
 }
 
+.et-textarea {
+  display: block;
+  resize: none;
+  overflow: hidden;
+  white-space: pre;
+  line-height: 1.4;
+}
+
+/* editing: float over the neighbouring cells/rows, taller than the fixed-height cell */
+.et-textarea:focus {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 15;
+  width: max(100%, 240px);
+  height: 7.5em;
+  overflow: auto;
+  white-space: pre-wrap;
+  background: var(--et-color-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
 select.et-input {
   appearance: none;
   padding-right: 26px;

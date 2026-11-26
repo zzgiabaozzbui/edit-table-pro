@@ -49,7 +49,7 @@ export type SideEffectFn<T = Record<string, string>> = (
 
 export type ColDef<T = Record<string, string>> = {
   key: keyof T & string;
-  type: "text" | "number" | "date" | "select" | "boolean";
+  type: "text" | "number" | "date" | "select" | "boolean" | "textarea";
   header?: string;
   headerTooltip?: string;
   /** Sticky footer summary for this column: auto-computed or custom renderer */

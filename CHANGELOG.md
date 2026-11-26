@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- **`type: "textarea"` column** — edits multi-line text. The row keeps its fixed height and shows the value on
+  one line; while editing, a larger `<textarea>` floats over the cell. Enter commits and moves on, Shift+Enter or
+  Alt+Enter adds a line break, Escape restores the value. Inside a `<textarea>`, Ctrl+A/C/X, Backspace and plain
+  paste stay with the text box, and ArrowUp/Down leave the cell only from the first/last line. Paste, fill, undo and
+  CSV export work as for a text cell.
+
 ### Fixed
 - **Pasting an Excel cell with a line break split it into several cells** — pasted text is now read as
   Excel writes it (double quotes around a cell that holds line breaks, tabs or quotes, `""` for a quote),
@@ -21,6 +28,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 - **Bundle-size budget** — `index.js` raised 94.0 → 98.5 kB and `index.cjs` 59.0 → 61.0 kB for the quote-aware
   paste/copy parser on top of `renderEditor` (measured 97.9 / 60.7 kB; the earlier budget of this release
   was 97.5 / 60.5 kB).
+- **Bundle-size budget** — `index.js` raised 98.5 → 102.5 kB and `index.cjs` 61.0 → 63.5 kB for the `textarea`
+  cell type (measured 102.0 / 63.4 kB).
 
 ## [0.6.0] — 2026-11-25
 

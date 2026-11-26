@@ -159,7 +159,7 @@ import { DARK_THEME } from "edit-table-pro";
 | Thuộc tính | Kiểu | Mô tả |
 | --- | --- | --- |
 | key | `keyof T & string` | Trường dữ liệu |
-| type | `"text" \| "number" \| "date" \| "select" \| "boolean"` | Editor |
+| type | `"text" \| "number" \| "date" \| "select" \| "boolean" \| "textarea"` | Editor |
 | header, headerTooltip | `string` | Nhãn & tooltip header |
 | width, align | `number`, `"left" \| "center" \| "right"` | Kích thước/căn |
 | editable | `boolean \| ((row) => boolean)` | Cho phép sửa |

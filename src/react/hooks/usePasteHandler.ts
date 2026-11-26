@@ -70,7 +70,8 @@ export function usePasteHandler<T extends Record<string, string>>({
       // Plain text goes to the browser; quotes or newlines are handled here.
       if (
         !isMultiCell &&
-        e.target instanceof HTMLInputElement &&
+        (e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement) &&
         rows[0][0] === raw
       )
         return;

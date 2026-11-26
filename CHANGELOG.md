@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-11-26
+
 ### Added
 - **`type: "textarea"` column** — edits multi-line text. The row keeps its fixed height and shows the value on
   one line; while editing, a larger `<textarea>` floats over the cell. Enter commits and moves on, Shift+Enter or
